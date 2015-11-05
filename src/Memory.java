@@ -12,8 +12,6 @@
  * integer array approach has been taken since it's simpler to implement and doesn't requried the data to be masked and shifted for the 
  * different bits to be put into the correct byte element. The class also contains a memory dump method that dumps/outputs the current 
  * state of memory which can be useful for debugging purposes.
- * 
- * // TODO - Check if all Integer objects need to be changed to primitive type int. If yes, change call to the toString() method used below.
  */
 
 // Import packages
@@ -28,10 +26,10 @@ import java.lang.*;
 public class Memory
 {
   // Class/Instance fields
-  protected Integer[] memoryArray;                        /** Memory array that emulates physical memory */
-  protected final Integer defaultMemorySize = 1024;       /** Default memory array size */
-  protected Integer memoryArraySize;                      /** Store the custom-defined memory size for future reference in this class */
-  private final Integer memoryInitializationValue = 0;    /** Initialization value for all the location in memory */
+  protected int[] memoryArray;                        /** Memory array that emulates physical memory */
+  protected final int defaultMemorySize = 1024;       /** Default memory array size */
+  protected int memoryArraySize;                      /** Store the custom-defined memory size for future reference in this class */
+  private final int memoryInitializationValue = 0;    /** Initialization value for all the location in memory */
 
   // Class constructors
   /**
@@ -40,7 +38,7 @@ public class Memory
    */
   public Memory()
   {
-    memoryArray = new Integer[defaultMemorySize];
+    memoryArray = new int[defaultMemorySize];
     Arrays.fill(memoryArray, memoryInitializationValue);     // Fill the array with 0's    
   }
 
@@ -49,13 +47,13 @@ public class Memory
    * @param Size of the memory array
    * @return No return value since this is a constructor
    */
-  public Memory(Integer memorySize)
+  public Memory(int memorySize)
   {
     if (memorySize < defaultMemorySize)
     {
       memorySize = defaultMemorySize;       // Prevent the array size from being less that the default array size
     }
-    memoryArray = new Integer[memorySize];
+    memoryArray = new int[memorySize];
     memoryArraySize = memorySize;
     Arrays.fill(memoryArray, memoryInitializationValue);     // Fill the array with 0's
   }
@@ -65,7 +63,7 @@ public class Memory
    * Method to return the size of the memory 
    * @return Size of memory
    */
-  public Integer memorySize()
+  public int memorySize()
   {
     return memoryArraySize;       // Return the size of the memory
     // return memoryArray.length;    // Return the size of the memory
@@ -76,11 +74,11 @@ public class Memory
    * @param memoryLocation Memory location at which the value needs to be read
    * @return Value at the specefied memory location
    */
-  public Integer readValue(Integer memoryLocation)
+  public int readValue(int memoryLocation)
   {
     if (memoryLocation < 0 || memoryLocation >= memoryArray.length)
     {
-      throw new MemIndexOutOfBoundsException("Illegal memory access (" + memoryLocation.toString() + 
+      throw new MemIndexOutOfBoundsException("Illegal memory access (" + memoryLocation + 
                                              ")! Program attempting to read a value from an address/location in memory that does not exist.");
     }
     else
@@ -94,11 +92,11 @@ public class Memory
    * @param memoryLocation Memory location at which the value needs to be writted to
    * @param newValue       Value that needs to be written at the speceifed memory location
    */
-  public void writeValue(Integer memoryLocation, Integer newValue)
+  public void writeValue(int memoryLocation, int newValue)
   {
     if (memoryLocation < 0 || memoryLocation >= memoryArray.length)
     {
-      throw new MemIndexOutOfBoundsException("Illegal memory access (" + memoryLocation.toString() + 
+      throw new MemIndexOutOfBoundsException("Illegal memory access (" + memoryLocation + 
                                              ")! Program attempting to write a value to an address/location in memory that does not exist.");
     }
     else
@@ -114,17 +112,17 @@ public class Memory
    */
   public void initialize(ArrayList <Integer> programList)
   {
-    Integer listIterator;
-    for(Integer memoryLocation = 0; memoryLocation < programList.size(); memoryLocation++)
+    int listIterator;
+    for(int memoryLocation = 0; memoryLocation < programList.size(); memoryLocation++)
     {
       if (memoryLocation < memoryArray.length)
       {
         listIterator = memoryLocation;
-        memoryArray[memoryLocation] = programList.get(listIterator);
+        memoryArray[memoryLocation] = programList.get(listIterator).intValue();
       }
       else
       {
-        throw new MemIndexOutOfBoundsException("Illegal memory access during initialization (" + memoryLocation.toString() + 
+        throw new MemIndexOutOfBoundsException("Illegal memory access during initialization (" + memoryLocation + 
                                                ")! Simulator initializer attempting to write a value to an address/location in memory that does not exist.");
       }
     }
@@ -143,19 +141,19 @@ public class Memory
    */
   public void dumpContents()
   {
-    System.out.println("+---------------------------------------------+");
-    System.out.println("| Dumping current state of memory             |");
-    System.out.println("+---------------------------------------------+");
+    System.out.println("+----------------------------------------------------------------------------------+");
+    System.out.println("| Dumping current state of memory                                                  |");
+    System.out.println("+----------------------------------------------------------------------------------+");
     System.out.println(" >>> Memory dump started <<< ");
-    System.out.println("+---------------------------------------------+");
-    System.out.println("| Location   \t \t   Data (Content)     |");
-    System.out.println("+---------------------------------------------+");
+    System.out.println("+----------------------------------------------------------------------------------+");
+    System.out.println("| Location                               Data (Content)                            |");
+    System.out.println("+----------------------------------------------------------------------------------+");
     for(int memoryLocation = 0; memoryLocation < memoryArray.length; memoryLocation++)
     {
       //System.out.println("| 0x" + Integer.toHexString(memoryLocation) + "\t \t \t" + memoryArray[memoryLocation] + " |");
-      System.out.format("| 0x%08x         \t        0x%08x (%s)             |%n", memoryLocation, memoryArray[memoryLocation], Utility.convertToHex(memoryArray[memoryLocation],4));
+      System.out.format("| 0x%08x            0x%08x (%s)       |%n", memoryLocation, memoryArray[memoryLocation], Utility.convertToHex(memoryArray[memoryLocation],4));
     }
-    System.out.println("+---------------------------------------------+");
+    System.out.println("+----------------------------------------------------------------------------------+");
     System.out.println(" >>> Memory dump complete <<< \n");
   }
 }
