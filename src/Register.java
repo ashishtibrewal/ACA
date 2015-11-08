@@ -48,7 +48,7 @@ public class Register
     linkRegister = 0;
     accumulator = 0;
     statusRegister = new boolean[statusRegisterLength];
-    for(int i = 0; i < statusRegister.length; i++)
+    for (int i = 0; i < statusRegister.length; i++)
     {
       statusRegister[i] = false;
     }
@@ -69,7 +69,7 @@ public class Register
     linkRegister = 0;
     accumulator = 0;
     statusRegister = new boolean[4];
-    for(int i = 0; i < statusRegister.length; i++)
+    for (int i = 0; i < statusRegister.length; i++)
     {
       statusRegister[i] = false;
     }
@@ -83,7 +83,7 @@ public class Register
     stackPointer = 0;
     linkRegister = 0;
     statusRegister = new boolean[4];
-    for(int i = 0; i < statusRegister.length; i++)
+    for (int i = 0; i < statusRegister.length; i++)
     {
       statusRegister[i] = false;
     }
@@ -120,7 +120,7 @@ public class Register
    */
   public void incrementPC()
   {
-    if((programCounter + 1) < 0 || (programCounter + 1) >= cpuMemoryReference.memoryArray.length)
+    if((programCounter + 1) < 0 || (programCounter + 1) >= cpuMemoryReference.memoryArray.length) // TODO change to check it doesnt enter the data region in memory
     {
       throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toString(programCounter + 1) + " doesn't exist in memory)."); 
     }
@@ -263,22 +263,23 @@ public class Register
    */
   public void dumpContents()
   {
-    System.out.println("+-------------------------------------------------+");
-    System.out.println("| Dumping current state of processor registers    |");
-    System.out.println("+-------------------------------------------------+");
-    System.out.println(" >>> Register dump started <<< ");
-    System.out.println("+------------------------------+");
-    System.out.println("| Resigter \t Data (Content)|");
-    System.out.println("+------------------------------+");
-    for(int registerNumber = 0; registerNumber < generalPurposeRegisters.length; registerNumber++)
+    System.out.println("+---------------------------------------------------------------------------------+");
+    System.out.println("| Dumping current state of processor registers                                    |");
+    System.out.println("+---------------------------------------------------------------------------------+");
+    System.out.println(">>> Register dump started <<< ");
+    System.out.println("+---------------------------------------------------------------------------------+");
+    System.out.println("| Resigter                      Data (Content)                                    |");
+    System.out.println("+---------------------------------------------------------------------------------+");
+    for (int registerNumber = 0; registerNumber < generalPurposeRegisters.length; registerNumber++)
     {
-      System.out.format("| R" + "%02d   \t      %d        |%n", registerNumber, generalPurposeRegisters[registerNumber]);
+      System.out.format("| R%02d   \t      0x%08x (%s)        |%n", registerNumber, generalPurposeRegisters[registerNumber], Utility.convertToHex(generalPurposeRegisters[registerNumber], 4));
     }
-    System.out.format("| PC     \t      %d        |%n", programCounter);
-    System.out.format("| SP     \t      %d        |%n", stackPointer);
-    System.out.format("| LR     \t      %d        |%n", linkRegister);
-    System.out.print("| SR      \t ");
-    for(int statusRegisterIndex = 0; statusRegisterIndex < statusRegister.length; statusRegisterIndex++)
+    System.out.format("| IR     \t      0x%08x (%s)        |%n", instructionRegister, Utility.convertToHex(instructionRegister, 4));
+    System.out.format("| PC     \t      0x%08x (%s)        |%n", programCounter, Utility.convertToHex(programCounter, 4));
+    System.out.format("| SP     \t      0x%08x (%s)        |%n", stackPointer, Utility.convertToHex(stackPointer, 4));
+    System.out.format("| LR     \t      0x%08x (%s)        |%n", linkRegister, Utility.convertToHex(linkRegister, 4));
+    System.out.print("| SR      \t      ");
+    for (int statusRegisterIndex = 0; statusRegisterIndex < statusRegister.length; statusRegisterIndex++)
     {
       int tempStatusRegisterBitValue;
       if (statusRegister[statusRegisterIndex] == true)
@@ -291,8 +292,8 @@ public class Register
       }
       System.out.format("%d  ", tempStatusRegisterBitValue);
     }
-    System.out.println("  |");
-    System.out.println("+------------------------------+");
-    System.out.println(" >>> Register dump complete <<< \n");
+    System.out.println("                                                |");
+    System.out.println("+---------------------------------------------------------------------------------+");
+    System.out.println(">>> Register dump complete <<< \n");
   }
 }

@@ -7,13 +7,20 @@
 
 #!/bin/bash
 
+clear
 echo "Current working directory:"
 pwd
-echo "Moving to source directory"
+echo "Moving to source directory."
 cd src/
-echo "Compiling source files"
+echo "Compiling source files."
 javac -d ../bin/ *.java
-echo "Moving to class/bin directory"
-cd ../bin/
-echo "Starting JVM to run the program (CPU simulator)"
-java ProcessorSimulator input.txt 
+if [ $? -eq 0 ]       # Check if the previous command retured with exit status 0. If true, only then run the simulator.
+then
+  echo "Compilation successful."
+  echo "Moving to class/bin directory."
+  cd ../bin/
+  echo "Starting JVM to run the program (CPU simulator)."
+  java ProcessorSimulator input.txt 
+else
+  echo "Compilation failed."
+fi

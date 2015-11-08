@@ -26,7 +26,11 @@ public class ProcessorSimulator
   private Instruction currentInstruction;
   private final int totalRegisters = 16;
   private final int memorySize = 256;
+  private final int pipelineLength = 5;               /* Processor pipeline length */
 
+  private IPipelineStage[] pipelineStages;            /* Array to store references of/to all pipeline units */
+  private IPipelineStage instructionFetchUnit;        /* Reference to the Instruction Fetch Stage of the pipeline */
+  private IPipelineStage instructionDecodeUnit;       /* Reference to the Instruction Decode Stage of the pipeline */
   // Initialize static variables
   static
   {
@@ -53,11 +57,19 @@ public class ProcessorSimulator
   {
     // Add functionality to read the binary file and load it to the memory (Using a method to initialize the contents of memory in the Memory class).
     // Add functionality to reset all variables/objects/components/units used in the simulator
-    cpuMemory = new Memory(memorySize);
+    //cpuMemory = new Memory(memorySize);
+    cpuMemory = new Memory();
     cpuRegisters = new Register(totalRegisters, cpuMemory);
 
     //cpuMemory.initialize();   // Initialize contents of the main memory with the required instructions and data (Generated as an output from the Assembler)
     cpuMemory.testInitialize(); // Initializing contents of memory with hard-coded test instructions
+
+    pipelineStages = new IPipelineStage[pipelineLength];
+    instructionFetchUnit = new InstructionFetch(cpuRegisters, cpuMemory);
+    instructionDecodeUnit = new InstructionDecode(cpuRegisters, cpuMemory);
+
+    pipelineStages[0] = instructionFetchUnit;     // Store the Instruction Fetch unit's reference in the pipeline array
+    pipelineStages[1] = instructionDecodeUnit;    // Store the Instruction Decode unit's reference in the pipeline array
   } 
 
   /**
@@ -68,8 +80,11 @@ public class ProcessorSimulator
     // cpuRegisters.setPC(1025);      // Fails with an exception because this location doesn't physically exist in memory and the PC can never have it's value set to this
     //cpuRegisters.writePC(1000);
     //cpuRegisters.incrementPC();
-    cpuMemory.dumpContents();
+    //cpuMemory.dumpContents();
     //cpuRegisters.dumpContents();
+    
+    pipelineStages[0].step();
+    //dumpState();
   }
 
   /**
@@ -131,6 +146,10 @@ public class ProcessorSimulator
     catch (Exception ex)
     {
       System.err.println("An exception occurred while running the Assembler. The exception is as follows: " + ex.getMessage());
+      System.err.print("Printing stack trace. Exception occurred at: ");
+      ex.printStackTrace();
+      System.out.println();
+      System.exit(1);               // Exit/Terminate the program/Java runtime with error code 1
     }
 
     // Setup the CPU simulator
@@ -143,13 +162,17 @@ public class ProcessorSimulator
       System.out.println("###            SETTING UP THE CPU SIMULATOR             ###");
       System.out.println("###########################################################");
       System.out.println("Setting up the CPU simulator.");
-      // this.setup();                  // Fails due to the following error: non-static variable this cannot be referenced from a static context
+      // this.setup();                 // Fails due to the following error: non-static variable this cannot be referenced from a static context
       cpu.setup();                     // Setup cpu for simulation (i.e. the simulation environment)
       System.out.println("CPU simulator set up complete.");
     }
     catch (Exception ex)
     {
       System.err.println("An exception occurred while setting up the simulator. The exception is as follows: " + ex.getMessage());
+      System.err.print("Printing stack trace. Exception occurred at: ");
+      ex.printStackTrace();
+      System.out.println();
+      System.exit(1);               // Exit/Terminate the program/Java runtime with error code 1
     }
 
     // Run the CPU simulator
@@ -165,11 +188,18 @@ public class ProcessorSimulator
     }
     catch (Exception ex)
     {
-      System.err.println(" >>>>>>>>>>>> Dumping state of CPU <<<<<<<<<<<< ");
+      System.err.println(">>>>>>>>>>>> Dumping state of CPU <<<<<<<<<<<< ");
       cpu.dumpState();                  // Dump the state of the CPU to the standard output
       System.err.println("Warning: An exception occurred during program execution. The exception is as follows: " + ex.getMessage() +
                          " Check the CPU dump data shown above to locate possible issues/problems. \n");
-      System.err.println(" >>>>>>>>>>>> End of simulation <<<<<<<<<<<< \n");
+      System.err.print("Printing stack trace. Exception occurred at: ");
+      ex.printStackTrace();
+      System.out.println();
+      //System.err.println(">>>>>>>>>>>> End of simulation <<<<<<<<<<<< \n");
+    }
+    finally
+    {
+      System.err.println(">>>>>>>>>>>> End of simulation <<<<<<<<<<<< \n");
     }
   }
 }

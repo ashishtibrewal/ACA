@@ -27,8 +27,10 @@ public class Memory
 {
   // Class/Instance fields
   protected int[] memoryArray;                        /** Memory array that emulates physical memory */
-  protected final int defaultMemorySize = 1024;       /** Default memory array size */
+  protected final int defaultMemorySize = 64;         /** Default memory array size */
+  //protected final int defaultMemorySize = 1024;       /** Default memory array size */
   protected int memoryArraySize;                      /** Store the custom-defined memory size for future reference in this class */
+  protected Stack<Integer> memoryStack;               /** Memory/Program Stack that contains Integer objects*/
   private final int memoryInitializationValue = 0;    /** Initialization value for all the location in memory */
 
   // Class constructors
@@ -39,7 +41,8 @@ public class Memory
   public Memory()
   {
     memoryArray = new int[defaultMemorySize];
-    Arrays.fill(memoryArray, memoryInitializationValue);     // Fill the array with 0's    
+    Arrays.fill(memoryArray, memoryInitializationValue);     // Fill the array with 0's
+    memoryStack = new Stack<Integer>();                      // Instantiate a new Stack object
   }
 
   /**
@@ -55,7 +58,8 @@ public class Memory
     }
     memoryArray = new int[memorySize];
     memoryArraySize = memorySize;
-    Arrays.fill(memoryArray, memoryInitializationValue);     // Fill the array with 0's
+    Arrays.fill(memoryArray, memoryInitializationValue);    // Fill the array with 0's
+    memoryStack = new Stack<Integer>();                     // Instantiate a new Stack object
   }
 
   // Class/Instance methods
@@ -113,7 +117,7 @@ public class Memory
   public void initialize(ArrayList <Integer> programList)
   {
     int listIterator;
-    for(int memoryLocation = 0; memoryLocation < programList.size(); memoryLocation++)
+    for (int memoryLocation = 0; memoryLocation < programList.size(); memoryLocation++)
     {
       if (memoryLocation < memoryArray.length)
       {
@@ -130,9 +134,10 @@ public class Memory
 
   public void testInitialize()
   {
+    Random randomNumberGenerator = new Random();
     for(int memoryLocation = 0; memoryLocation < 10; memoryLocation++)
     {
-      memoryArray[memoryLocation] = memoryLocation;
+      memoryArray[memoryLocation] = randomNumberGenerator.nextInt(100);
     }
   }
 
@@ -144,16 +149,31 @@ public class Memory
     System.out.println("+----------------------------------------------------------------------------------+");
     System.out.println("| Dumping current state of memory                                                  |");
     System.out.println("+----------------------------------------------------------------------------------+");
-    System.out.println(" >>> Memory dump started <<< ");
+    System.out.println(">>> Memory dump started <<< ");
+    System.out.println("> Dumping .text and .data sections < ");
     System.out.println("+----------------------------------------------------------------------------------+");
     System.out.println("| Location                               Data (Content)                            |");
     System.out.println("+----------------------------------------------------------------------------------+");
-    for(int memoryLocation = 0; memoryLocation < memoryArray.length; memoryLocation++)
+    for (int memoryLocation = 0; memoryLocation < memoryArray.length; memoryLocation++)
     {
       //System.out.println("| 0x" + Integer.toHexString(memoryLocation) + "\t \t \t" + memoryArray[memoryLocation] + " |");
       System.out.format("| 0x%08x            0x%08x (%s)       |%n", memoryLocation, memoryArray[memoryLocation], Utility.convertToHex(memoryArray[memoryLocation],4));
     }
     System.out.println("+----------------------------------------------------------------------------------+");
-    System.out.println(" >>> Memory dump complete <<< \n");
+    System.out.println("> Dumping stack < ");
+    if (memoryStack.empty())
+    {
+      System.out.println("Stack is empty.");
+    }
+    else
+    {
+      System.out.println("Contents being printed in the reverse order. Top of stack is printed first (LIFO).");
+      while (!memoryStack.empty())
+      {
+        Integer topOfStackElement = new Integer(memoryStack.pop());
+        System.out.format("0x%08x (%s) \n", topOfStackElement, Utility.convertToHex(topOfStackElement.intValue(), 4));
+      } 
+    } 
+    System.out.println(">>> Memory dump complete <<< \n");
   }
 }

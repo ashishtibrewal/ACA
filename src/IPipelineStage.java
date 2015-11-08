@@ -14,11 +14,11 @@ public interface IPipelineStage
   /**
    * Method that executes a time step for a processor pipeline unit. (i.e Execute and move ahead by one time step).
    */
-  void step();
+  public void step();
 
   /**
    * Method to shift the contents of the processor pipeline forward.
    */
-  void shift();
+  //void shift();
 
 }
