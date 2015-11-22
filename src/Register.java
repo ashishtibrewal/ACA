@@ -28,11 +28,17 @@ public class Register
   private int[] generalPurposeRegisters;              /** Array that holds all the processor register values */
   private int accumulator;                            /** Temporary storage location for operations */
   private int programCounter;                         /** Program counter register: Holds address to the next instruction in memory */
-  private int stackPointer;                           /** Stack pointer registe: Holds address to the top of the stack */
+  private int programCounterIncremented;              /** Program counter incremented register: Holds the temporary incremented program counter value */
+  private int prograCounterBranch;                    /** Program counter branch register: Holds the temporary branch program counter value */
+  private int stackPointer;                           /** Stack pointer register: Holds address to the top of the stack */
+  private int framePointer;                           /** Frame pointer register: Holds address of the start of the current frame in the stack */
   private int linkRegister;                           /** Link register: Holds return address values */
   private boolean[] statusRegister;                   /** Status register: Holds values of architectural status flags */
   private int instructionRegister;                    /** Instruction register: Holds the value of the last decoded instruction */
   private Memory cpuMemoryReference;                  /** Reference to the CPU memory */
+  private int clockCounter;                           /** Variable that holds the number of cycles completed by the simulator */
+  private int memoryAddressRegister;                  /** Memory Address Register: Holds the memory address to which the data contained in the Memory Data Register needs to be stored */
+  private int memoryDataRegister;                     /** Memory Data Register: Holds the data that needs to be stored to memory address contained in the Memory Address Register */
 
   // Class constructors
   /**
@@ -44,9 +50,13 @@ public class Register
     generalPurposeRegisters = new int[totalRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
     programCounter = 0;
+    programCounterIncremented = 0;
+    prograCounterBranch = 0;
     stackPointer = 0;
     linkRegister = 0;
     accumulator = 0;
+    memoryAddressRegister = 0;
+    memoryDataRegister = 0;
     statusRegister = new boolean[statusRegisterLength];
     for (int i = 0; i < statusRegister.length; i++)
     {
@@ -120,13 +130,13 @@ public class Register
    */
   public void incrementPC()
   {
-    if((programCounter + 1) < 0 || (programCounter + 1) >= cpuMemoryReference.memoryArray.length) // TODO change to check it doesnt enter the data region in memory
+    if((programCounterIncremented + 1) < 0 || (programCounterIncremented + 1) >= cpuMemoryReference.memoryArray.length) // TODO change to check it doesnt enter the data region in memory
     {
-      throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toString(programCounter + 1) + " doesn't exist in memory)."); 
+      throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toHexString(programCounterIncremented + 1) + " doesn't exist in memory)."); 
     }
     else
     {
-      programCounter++;
+      programCounterIncremented++;
     }
   }
 
@@ -138,11 +148,27 @@ public class Register
   {
     if (newValue < 0 || newValue >= cpuMemoryReference.memoryArray.length)
     {
-      throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toString(newValue) + " doesn't exist in memory)."); 
+      throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toHexString(newValue) + " doesn't exist in memory)."); 
     }
     else
     {
-      programCounter = newValue;
+      prograCounterBranch = newValue;
+    }
+  }
+
+  /**
+   * Method to update the value stored in the program counter (PC) register. Updated value is chosen based on whether or not a brach is taken. 
+   * @param branchTaken Boolean value representing/stating whether a branch is taken or not
+   */
+  public void updatePC(boolean branchTaken)
+  {
+    if (branchTaken == false)
+    {
+      programCounter = programCounterIncremented;
+    }
+    else
+    {
+      programCounter = prograCounterBranch;
     }
   }
 
@@ -152,9 +178,11 @@ public class Register
    */
   public void writeIR(int newValue)
   {
-    if (newValue < 0 || newValue >= 50)     // Needs to be changed to refer to a value in the globalconstants class that specifies the number of instruction in the ISA
+    int opCode = (newValue >> 27) & 31;     // Extract instruction OpCode
+
+    if(opCode > (GlobalConstants.ISA_TOTAL_INSTRUCTIONS - 1))
     {
-      throw new RegisterAccessException("Illegal IR value (Instruction 0x" + Integer.toString(newValue) + " is not specified in the ISA)."); 
+      throw new RegisterAccessException("Illegal IR value (Instruction 0x" + Integer.toHexString(opCode) + " is not specified in the ISA)."); 
     }
     else
     {
@@ -268,7 +296,7 @@ public class Register
     System.out.println("+---------------------------------------------------------------------------------+");
     System.out.println(">>> Register dump started <<< ");
     System.out.println("+---------------------------------------------------------------------------------+");
-    System.out.println("| Resigter                      Data (Content)                                    |");
+    System.out.println("| Register                      Data (Content in 2's complement)                  |");
     System.out.println("+---------------------------------------------------------------------------------+");
     for (int registerNumber = 0; registerNumber < generalPurposeRegisters.length; registerNumber++)
     {

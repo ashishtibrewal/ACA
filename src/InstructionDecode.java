@@ -30,6 +30,7 @@ public class InstructionDecode implements IPipelineStage
 
   public void step()
   {
-
+    currentInstruction = cpuRegisters.readIR();       // Read the value currently stored in the instruction register (IR)
+    cpuRegisters.updatePC(false);
   }
 }

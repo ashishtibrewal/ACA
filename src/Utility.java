@@ -35,4 +35,25 @@ public class Utility
       result.replace(result.length() - 1, result.length(), "");
       return result.toString();
   } 
+
+  /**
+   * Convert 32-bit 2's complement binary string to an integer 
+   * @param  input 32-bit 2's complement binary string
+   * @return       Converted integer value
+   */
+  public static int convertToInt(String binaryString)
+  {
+    char[] inputArray = new char[binaryString.length()];
+    inputArray = binaryString.toCharArray();
+    int intResult = 0;
+    for (int i = 0; i < 31; i++)
+    {
+      intResult+= (inputArray[(31 - i)] - 48) * Math.pow(2,i);      // Subtracting 48 because inputArray is of char type and it returns an ASCII value
+    }
+    if (inputArray[0] == '1')     // Check if the MSB is 1 (i.e. a negative number in 2's complement)
+    {
+      intResult-= (inputArray[0] - 48) * Math.pow(2,31);            // Subtracting 48 because inputArray is of char type and it returns an ASCII value
+    }
+    return intResult;
+  }
 }

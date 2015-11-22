@@ -65,11 +65,16 @@ public class ProcessorSimulator
     cpuMemory.testInitialize(); // Initializing contents of memory with hard-coded test instructions
 
     pipelineStages = new IPipelineStage[pipelineLength];
+
     instructionFetchUnit = new InstructionFetch(cpuRegisters, cpuMemory);
     instructionDecodeUnit = new InstructionDecode(cpuRegisters, cpuMemory);
+    //instructionIssueUnit = new InstructionIssue(cpuRegisters, cpuMemory);
+    //instructionExecuteBlock = new InstructionExecute(cpuRegisters, cpuMemory);  //TODO Note this object should contain one or more execution units (EUs)
 
     pipelineStages[0] = instructionFetchUnit;     // Store the Instruction Fetch unit's reference in the pipeline array
     pipelineStages[1] = instructionDecodeUnit;    // Store the Instruction Decode unit's reference in the pipeline array
+    //pipelineStages[2] = instructionIssueUnit;     // Store the Instruction Issue unit's reference in the pipeline array
+    //pipelineStages[3] = instructionExecuteBlock;   // Store the Instruction Execute unit's reference in the pipeline array
   } 
 
   /**
@@ -82,9 +87,11 @@ public class ProcessorSimulator
     //cpuRegisters.incrementPC();
     //cpuMemory.dumpContents();
     //cpuRegisters.dumpContents();
-    
-    pipelineStages[0].step();
-    //dumpState();
+    //for (int i = 0; i < pipelineStages.length; i++)
+    for (int i = 0; i < 2; i++)
+    {
+      pipelineStages[i].step();
+    }
   }
 
   /**
@@ -146,7 +153,7 @@ public class ProcessorSimulator
     catch (Exception ex)
     {
       System.err.println("An exception occurred while running the Assembler. The exception is as follows: " + ex.getMessage());
-      System.err.print("Printing stack trace. Exception occurred at: ");
+      System.err.println("\nPrinting stack trace ... \n");
       ex.printStackTrace();
       System.out.println();
       System.exit(1);               // Exit/Terminate the program/Java runtime with error code 1
@@ -169,7 +176,7 @@ public class ProcessorSimulator
     catch (Exception ex)
     {
       System.err.println("An exception occurred while setting up the simulator. The exception is as follows: " + ex.getMessage());
-      System.err.print("Printing stack trace. Exception occurred at: ");
+      System.err.println("\nPrinting stack trace ... \n");
       ex.printStackTrace();
       System.out.println();
       System.exit(1);               // Exit/Terminate the program/Java runtime with error code 1
@@ -183,7 +190,11 @@ public class ProcessorSimulator
       System.out.println("###              RUNNING THE CPU SIMULATOR              ###");
       System.out.println("###########################################################");
       System.out.println("CPU simulator starting program execution.");
-      cpu.run();                        // Run the cpu simulator
+      for(int numCycles = 0; numCycles < 4; numCycles++)
+      {
+        cpu.run();                        // Run the cpu simulator
+        // TODO Add code to print state of every stage for current cycle
+      }
       System.out.println("CPU simulator finished executing the program. \n");
     }
     catch (Exception ex)
@@ -191,8 +202,8 @@ public class ProcessorSimulator
       System.err.println(">>>>>>>>>>>> Dumping state of CPU <<<<<<<<<<<< ");
       cpu.dumpState();                  // Dump the state of the CPU to the standard output
       System.err.println("Warning: An exception occurred during program execution. The exception is as follows: " + ex.getMessage() +
-                         " Check the CPU dump data shown above to locate possible issues/problems. \n");
-      System.err.print("Printing stack trace. Exception occurred at: ");
+                         " Check the CPU dump data shown above to locate possible issues/problems.");
+      System.err.println("\nPrinting stack trace ... \n");
       ex.printStackTrace();
       System.out.println();
       //System.err.println(">>>>>>>>>>>> End of simulation <<<<<<<<<<<< \n");

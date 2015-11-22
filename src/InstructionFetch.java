@@ -31,8 +31,8 @@ public class InstructionFetch implements IPipelineStage
   public void step()
   {
     currentPC = cpuRegisters.readPC();                        // Read value of the PC register
-    currentInstruction = cpuMemory.readValue(currentPC);      // Read value from main memory at the location specified by the PC register.
+    currentInstruction = cpuMemory.readValue(currentPC);      // Read value from main memory at the location specified by the PC register
     cpuRegisters.writeIR(currentInstruction);                 // Write value to the instruction register (IR)
-    cpuRegisters.incrementPC();
+    cpuRegisters.incrementPC();                               // Increment value stored in the (temporary) PC register
   }
 }

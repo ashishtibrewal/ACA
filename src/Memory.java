@@ -82,7 +82,7 @@ public class Memory
   {
     if (memoryLocation < 0 || memoryLocation >= memoryArray.length)
     {
-      throw new MemIndexOutOfBoundsException("Illegal memory access (" + memoryLocation + 
+      throw new MemIndexOutOfBoundsException("Illegal memory access (" + Integer.toHexString(memoryLocation) + 
                                              ")! Program attempting to read a value from an address/location in memory that does not exist.");
     }
     else
@@ -100,7 +100,7 @@ public class Memory
   {
     if (memoryLocation < 0 || memoryLocation >= memoryArray.length)
     {
-      throw new MemIndexOutOfBoundsException("Illegal memory access (" + memoryLocation + 
+      throw new MemIndexOutOfBoundsException("Illegal memory access (" + Integer.toHexString(memoryLocation) + 
                                              ")! Program attempting to write a value to an address/location in memory that does not exist.");
     }
     else
@@ -126,7 +126,7 @@ public class Memory
       }
       else
       {
-        throw new MemIndexOutOfBoundsException("Illegal memory access during initialization (" + memoryLocation + 
+        throw new MemIndexOutOfBoundsException("Illegal memory access during initialization (" + Integer.toHexString(memoryLocation) + 
                                                ")! Simulator initializer attempting to write a value to an address/location in memory that does not exist.");
       }
     }
@@ -134,11 +134,22 @@ public class Memory
 
   public void testInitialize()
   {
-    Random randomNumberGenerator = new Random();
-    for(int memoryLocation = 0; memoryLocation < 10; memoryLocation++)
-    {
-      memoryArray[memoryLocation] = randomNumberGenerator.nextInt(100);
-    }
+    // Random randomNumberGenerator = new Random();
+    // for(int memoryLocation = 0; memoryLocation < 10; memoryLocation++)
+    // {
+    //   memoryArray[memoryLocation] = randomNumberGenerator.nextInt(100);
+    // }
+    /*
+    memoryArray[0] = Integer.parseInt("01000100000000000000000000100001", 2); // MOVI R1, 2 (Move 2 into R1)
+    memoryArray[1] = Integer.parseInt("01000100000000000000000001000010", 2); // MOVI R2, 3 (Move 3 into R2) 
+    memoryArray[2] = Integer.parseInt("00000100000000000000000100100001", 2); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
+    memoryArray[3] = Integer.parseInt("-00000000000000000000000000000001", 2); // Should be -1 in decimal integer
+    memoryArray[4] = 0xffffffff;   // Should be -1 in decimal integer
+    */
+    memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001"); // MOVI R2, 3 (Move 3 into R2)
+    memoryArray[1] = Utility.convertToInt("10001000000000000000000001000010"); // MOVI R2, 3 (Move 3 into R2)
+    memoryArray[2] = Utility.convertToInt("00001000000000000000000100100001"); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
+
   }
 
   /**
@@ -152,7 +163,7 @@ public class Memory
     System.out.println(">>> Memory dump started <<< ");
     System.out.println("> Dumping .text and .data sections < ");
     System.out.println("+----------------------------------------------------------------------------------+");
-    System.out.println("| Location                               Data (Content)                            |");
+    System.out.println("| Location                       Data (Content in 2's complement)                  |");
     System.out.println("+----------------------------------------------------------------------------------+");
     for (int memoryLocation = 0; memoryLocation < memoryArray.length; memoryLocation++)
     {
