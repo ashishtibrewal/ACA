@@ -9,6 +9,10 @@
  */
 
 // Import packages
+// Custom packages
+import pipeline.*;
+
+// Pre-defined Java packages
 import java.io.*;
 import java.util.*;
 import java.lang.*;
@@ -19,18 +23,21 @@ import java.lang.*;
 public class ProcessorSimulator
 {
   // Class/Instance fields 
-  public static final boolean debugMode;              /* Boolean variable that is set to true for debugging purposes */
-  public static final boolean verboseMode;            /* Boolean variable that is set to true for debugging purposes that provides extra information */ 
+  public static final boolean debugMode;                    /** Boolean variable that is set to true for debugging purposes */
+  public static final boolean verboseMode;                  /** Boolean variable that is set to true for debugging purposes that provides extra information */ 
   private Register cpuRegisters;
   private Memory cpuMemory;
   private Instruction currentInstruction;
   private final int totalRegisters = 16;
   private final int memorySize = 256;
-  private final int pipelineLength = 5;               /* Processor pipeline length */
+  private final int pipelineLength = 5;                     /** Processor pipeline length */ // TODO check for the best possible length in the design
 
-  private IPipelineStage[] pipelineStages;            /* Array to store references of/to all pipeline units */
-  private IPipelineStage instructionFetchUnit;        /* Reference to the Instruction Fetch Stage of the pipeline */
-  private IPipelineStage instructionDecodeUnit;       /* Reference to the Instruction Decode Stage of the pipeline */
+  private IPipeline sequentialProcessorPipeline;            /** Reference to the sequential processor pipeline */
+  private IStage instructionFetchStage;                     /** Reference to the Instruction Fetch Stage of the pipeline */
+  private IStage instructionDecodeStage;                    /** Reference to the Instruction Decode Stage of the pipeline */
+  private IStage instructionIssueStage;                     /** Reference to the Instruction Issue Stage of the pipeline */
+  private IStage instructionExecuteStage;                   /** Reference to the Instruction Execute Stage of the pipeline */
+  private ProcessorPipelineContext pipelineContext;         /** Reference to the sequential pipeline context */
   // Initialize static variables
   static
   {
@@ -55,26 +62,28 @@ public class ProcessorSimulator
    */
   private void setup()
   {
-    // Add functionality to read the binary file and load it to the memory (Using a method to initialize the contents of memory in the Memory class).
-    // Add functionality to reset all variables/objects/components/units used in the simulator
+    // TODO Add functionality to read the binary file and load it to the memory (Using a method to initialize the contents of memory in the Memory class).
+    // TODO Add functionality to reset all variables/objects/components/units used in the simulator
     //cpuMemory = new Memory(memorySize);
     cpuMemory = new Memory();
     cpuRegisters = new Register(totalRegisters, cpuMemory);
 
+    sequentialProcessorPipeline = new SequentialPipeline();     // Instantiate the sequential processor pipeline object
+
+    instructionFetchStage = new InstructionFetchStage();        // Instantiate the Instruction Fetch (IF) stage object
+    instructionDecodeStage = new InstructionDecodeStage();      // Instantiate the Instruction Decode (ID) stage object
+    //instructionIssueStage = new InstructionIssueStage();      // TODO The instruction issue class needs to implement register re-naming and re-order buffer, etc.  
+    //instructionExecuteStage = new InstructionExecuteStage();  //TODO Note this object should contain one or more execution units (EUs)
+    
+    sequentialProcessorPipeline.addStage(instructionFetchStage);       // Add the IF stage to the pipeline
+    sequentialProcessorPipeline.addStage(instructionDecodeStage);      // Add the ID stage to the pipeline
+    //sequentialProcessorPipeline.addStage(instructionIssueStage);       // Add the II stage to the pipeline
+    //sequentialProcessorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
+
+    pipelineContext = new ProcessorPipelineContext(cpuRegisters, cpuMemory);   // Instantiate the sequential pipeline context object
+
     //cpuMemory.initialize();   // Initialize contents of the main memory with the required instructions and data (Generated as an output from the Assembler)
     cpuMemory.testInitialize(); // Initializing contents of memory with hard-coded test instructions
-
-    pipelineStages = new IPipelineStage[pipelineLength];
-
-    instructionFetchUnit = new InstructionFetch(cpuRegisters, cpuMemory);
-    instructionDecodeUnit = new InstructionDecode(cpuRegisters, cpuMemory);
-    //instructionIssueUnit = new InstructionIssue(cpuRegisters, cpuMemory);
-    //instructionExecuteBlock = new InstructionExecute(cpuRegisters, cpuMemory);  //TODO Note this object should contain one or more execution units (EUs)
-
-    pipelineStages[0] = instructionFetchUnit;     // Store the Instruction Fetch unit's reference in the pipeline array
-    pipelineStages[1] = instructionDecodeUnit;    // Store the Instruction Decode unit's reference in the pipeline array
-    //pipelineStages[2] = instructionIssueUnit;     // Store the Instruction Issue unit's reference in the pipeline array
-    //pipelineStages[3] = instructionExecuteBlock;   // Store the Instruction Execute unit's reference in the pipeline array
   } 
 
   /**
@@ -88,10 +97,7 @@ public class ProcessorSimulator
     //cpuMemory.dumpContents();
     //cpuRegisters.dumpContents();
     //for (int i = 0; i < pipelineStages.length; i++)
-    for (int i = 0; i < 2; i++)
-    {
-      pipelineStages[i].step();
-    }
+    sequentialProcessorPipeline.execute(pipelineContext);
   }
 
   /**

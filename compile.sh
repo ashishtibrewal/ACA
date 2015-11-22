@@ -13,8 +13,8 @@ pwd
 echo "Moving to source directory."
 cd src/
 echo "Compiling source files."
-javac -d ../bin/ *.java
-if [ $? -eq 0 ]       # Check if the previous command retured with exit status 0. If true, only then run the simulator.
+javac -d ../bin/ *.java   # Could use javac -d ../bin/ ProcessorSimulator.java (Since this is the main entry point to the simulator) 
+if [ $? -eq 0 ]           # Check if the previous command retured with exit status 0. If true, only then run the simulator.
 then
   echo "Compilation successful."
   echo "Moving to class/bin directory."

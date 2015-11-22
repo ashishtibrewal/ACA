@@ -6,6 +6,13 @@
  * the pipeline.
  */
 
+/*
+ ********************************************************************************************
+ *****            THIS CLASS IS REDUNDANT. DO NOT USE THIS CLASS/FILE!!!                *****
+ ********************************************************************************************
+*/
+
+package pipeline;
 /**
  * IPipelineStage Interface declaration. This interface must be implemented by all the classes that form a stage in the processor pipeline.
  */

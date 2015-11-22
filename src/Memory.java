@@ -26,6 +26,7 @@ import java.lang.*;
 public class Memory
 {
   // Class/Instance fields
+  // TODO change all access specifiers to private and see if that works.
   protected int[] memoryArray;                        /** Memory array that emulates physical memory */
   protected final int defaultMemorySize = 64;         /** Default memory array size */
   //protected final int defaultMemorySize = 1024;       /** Default memory array size */

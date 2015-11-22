@@ -36,4 +36,7 @@ public final class GlobalConstants
 
   public static final int ISA_TOTAL_INSTRUCTIONS = 25;
 
+
+  // TODO Insert ALL constants to this class.
+
 }
