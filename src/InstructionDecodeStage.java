@@ -53,162 +53,137 @@ public class InstructionDecodeStage implements IStage
       throw new IllegalInstructionException("Illegal instruction (Instruction with OpCode \"" + Utility.convertToBin(opCode, 0).substring((Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH), Isa.INSTRUCTION_LENGTH) + "\" is not specified in the ISA)."); 
     }
     this.printInstructionMnemonic(opCode);
-    switch (opCode)
+    this.extractInformation(instructionName, instructionType);
+    /*switch (opCode)
     {
       // NOP
       case Isa.NOP:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
       
       // ADD dr, sr1, sr2
       case Isa.ADD:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // SUB dr, sr1, sr2
       case Isa.SUB:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // MULT dr, sr1, sr2
       case Isa.MULT:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // DIV dr, sr1, sr2
       case Isa.DIV:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // ADDI dr, sr1, Ix
       case Isa.ADDI:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // SUBI dr, sr1, Ix
       case Isa.SUBI:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // AND dr, sr1, sr2
       case Isa.AND:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // OR dr, sr1, sr2 
       case Isa.OR:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // XOR dr, sr1, sr2
       case Isa.XOR:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // NOT dr, sr1, sr2
       case Isa.NOT:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // SLL dr, sr1, Ix
       case Isa.SLL:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // SLR dr, sr1, Ix
       case Isa.SLR:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // SLLV dr, s1, sr2
       case Isa.SLLV:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // SRA dr, sr1, Ix
       case Isa.SRA:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // LW dr, sr1, Ix
       case Isa.LW:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // SW sr1, sr2, Ix
       case Isa.SW:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // MOVI dr, Ix
       case Isa.MOVI:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // MOVR dr, sr1
       case Isa.MOVR:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // BU Ix
       case Isa.BU:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // BL Ix
       case Isa.BL:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // BEQ sr1, sr2, Ix
       case Isa.BEQ:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // BNE sr1, sr2, Ix
       case Isa.BNE:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // BLT sr1, sr2, Ix
       case Isa.BLT:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // BGT sr1, sr2, Ix
       case Isa.BGT:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // RET
       case Isa.RET:
         this.extractInformation(instructionName, instructionType);
-        // TODO Need to add instructions to the instruction issue unit's queue
         break;
 
       // Default case. This condition should never be reached (Primarily because an invalid instruction can never be written to the IR).
@@ -216,7 +191,7 @@ public class InstructionDecodeStage implements IStage
         System.out.println("Invalid Instruction! Instruction couldn't be decoded!");
         // TODO Find how to throw a new exception
         break;
-    } 
+    } */
   }
 
 

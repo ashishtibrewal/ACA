@@ -83,7 +83,13 @@ public class ProcessorSimulator
     sequentialProcessorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
     sequentialProcessorPipeline.addStage(printProcessorPipelineStatusStage);  // Add the utility stage to the pipeline
 
-    pipelineContext = new ProcessorPipelineContext(cpuRegisters, cpuMemory);   // Instantiate the sequential pipeline context object
+    pipelineContext = new ProcessorPipelineContext(cpuRegisters,
+                                                  cpuMemory,
+                                                  instructionFetchStage,
+                                                  instructionDecodeStage,
+                                                  instructionIssueStage,
+                                                  instructionExecuteStage,
+                                                  printProcessorPipelineStatusStage);   // Instantiate the sequential pipeline context object
 
     //cpuMemory.initialize();   // Initialize contents of the main memory with the required instructions and data (Generated as an output from the Assembler)
     cpuMemory.testInitialize(); // Initializing contents of memory with hard-coded test instructions
@@ -200,7 +206,7 @@ public class ProcessorSimulator
       System.out.println("###              RUNNING THE CPU SIMULATOR              ###");
       System.out.println("###########################################################");
       System.out.println("CPU simulator starting program execution.");
-      for(int numCycles = 0; numCycles < 4; numCycles++)
+      for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)   // TODO this should be changed to run until the last instruction is reached in the .text section
       {  
         cpu.run();          // Run the cpu simulator
         // TODO Add code to print state of every stage for current cycle

@@ -147,8 +147,8 @@ public class Memory
     memoryArray[4] = 0xffffffff;   // Should be -1 in decimal integer
     */
     memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001", false); // MOVI R2, 3 (Move 3 into R2)
-    memoryArray[1] = Utility.convertToInt("10001000000000000000000001000010", false); // MOVI R2, 3 (Move 3 into R2)
-    memoryArray[2] = Utility.convertToInt("00001000000000000000000100100001", false); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
+    memoryArray[5] = Utility.convertToInt("10001000000000000000000001000010", false); // MOVI R2, 3 (Move 3 into R2)
+    memoryArray[9] = Utility.convertToInt("00001000000000000000000100100001", false); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
 
   }
 

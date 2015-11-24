@@ -132,6 +132,24 @@ public class Instruction
   }
 
   /**
+   * Method to get the value for source register 1
+   * @return Source register 1 value 
+   */
+  public int getSourceReg1Val()
+  {
+    return sourceReg1Val;
+  }
+
+  /**
+   * Method to get the value for source register 2
+   * @return Source register 2 value 
+   */
+  public int getSourceReg2Val()
+  {
+    return sourceReg2Val;
+  }
+
+  /**
    * Method to obtain the value for the instruction's dependency flag
    * @return Instruction dependency flag current value
    */
@@ -147,5 +165,50 @@ public class Instruction
   public void setDependencyFlag(boolean _dependencyFlag)
   {
     dependencyFlag = _dependencyFlag;
+  }
+
+  /**
+   * Method to obtain the type of execution unit (EU) required to execute the instruction
+   * @return Type of execution unit (EU) required to execute the instruction
+   */
+  public ExecutionUnit getExecutionUnit()
+  {
+    return executionUnit;
+  }
+
+  /**
+   * Method to obtain a value for the type of instruction
+   * @return Type of instruction
+   */
+  public String getInstructionType()
+  {
+    return instructionType;
+  }
+
+  /**
+   * Method to obtain the first source register's location from which a value needs to be read by the issue stage to issue the instruction to the execution stage
+   * @return Location of source register 1
+   */
+  public int getSourceReg1Loc()
+  {
+    return sourceReg1Loc;
+  }
+
+  /**
+   * Method to obtain the second source register's location from which a value needs to be read by the issue stage to issue the instruction to the execution stage
+   * @return Location of source register 2
+   */
+  public int getSourceReg2Loc()
+  {
+    return sourceReg2Loc;
+  }
+
+  /**
+   * Method to obtain the destination register's location to which a value needs to be written to by the execute/writeback stage
+   * @return Location of destination register
+   */
+  public int getDestinationRegLoc()
+  {
+    return destinationRegLoc;
   }
 }
