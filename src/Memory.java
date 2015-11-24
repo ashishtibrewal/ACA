@@ -28,7 +28,7 @@ public class Memory
   // Class/Instance fields
   // TODO change all access specifiers to private and see if that works.
   protected int[] memoryArray;                        /** Memory array that emulates physical memory */
-  protected final int defaultMemorySize = 64;         /** Default memory array size */
+  protected final int defaultMemorySize = 32;         /** Default memory array size */
   //protected final int defaultMemorySize = 1024;       /** Default memory array size */
   protected int memoryArraySize;                      /** Store the custom-defined memory size for future reference in this class */
   protected Stack<Integer> memoryStack;               /** Memory/Program Stack that contains Integer objects*/
@@ -147,9 +147,9 @@ public class Memory
     memoryArray[3] = Integer.parseInt("-00000000000000000000000000000001", 2); // Should be -1 in decimal integer
     memoryArray[4] = 0xffffffff;   // Should be -1 in decimal integer
     */
-    memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001"); // MOVI R2, 3 (Move 3 into R2)
-    memoryArray[1] = Utility.convertToInt("10001000000000000000000001000010"); // MOVI R2, 3 (Move 3 into R2)
-    memoryArray[2] = Utility.convertToInt("00001000000000000000000100100001"); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
+    memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001", false); // MOVI R2, 3 (Move 3 into R2)
+    memoryArray[1] = Utility.convertToInt("10001000000000000000000001000010", false); // MOVI R2, 3 (Move 3 into R2)
+    memoryArray[2] = Utility.convertToInt("00001000000000000000000100100001", false); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
 
   }
 
@@ -169,7 +169,7 @@ public class Memory
     for (int memoryLocation = 0; memoryLocation < memoryArray.length; memoryLocation++)
     {
       //System.out.println("| 0x" + Integer.toHexString(memoryLocation) + "\t \t \t" + memoryArray[memoryLocation] + " |");
-      System.out.format("| 0x%08x            0x%08x (%s)       |%n", memoryLocation, memoryArray[memoryLocation], Utility.convertToHex(memoryArray[memoryLocation],4));
+      System.out.format("| 0x%08x            0x%08x (%s)       |%n", memoryLocation, memoryArray[memoryLocation], Utility.convertToBin(memoryArray[memoryLocation], 4));
     }
     System.out.println("+----------------------------------------------------------------------------------+");
     System.out.println("> Dumping stack < ");
@@ -183,7 +183,7 @@ public class Memory
       while (!memoryStack.empty())
       {
         Integer topOfStackElement = new Integer(memoryStack.pop());
-        System.out.format("0x%08x (%s) \n", topOfStackElement, Utility.convertToHex(topOfStackElement.intValue(), 4));
+        System.out.format("0x%08x (%s) \n", topOfStackElement, Utility.convertToBin(topOfStackElement.intValue(), 4));
       } 
     } 
     System.out.println(">>> Memory dump complete <<< \n");

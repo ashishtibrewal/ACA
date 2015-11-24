@@ -37,6 +37,7 @@ public class ProcessorSimulator
   private IStage instructionDecodeStage;                    /** Reference to the Instruction Decode Stage of the pipeline */
   private IStage instructionIssueStage;                     /** Reference to the Instruction Issue Stage of the pipeline */
   private IStage instructionExecuteStage;                   /** Reference to the Instruction Execute Stage of the pipeline */
+  private IStage printProcessorPipelineStatusStage;         /** Reference to the utility/debug stage in the pipleline/simulator */
   private ProcessorPipelineContext pipelineContext;         /** Reference to the sequential pipeline context */
   // Initialize static variables
   static
@@ -72,13 +73,15 @@ public class ProcessorSimulator
 
     instructionFetchStage = new InstructionFetchStage();        // Instantiate the Instruction Fetch (IF) stage object
     instructionDecodeStage = new InstructionDecodeStage();      // Instantiate the Instruction Decode (ID) stage object
-    //instructionIssueStage = new InstructionIssueStage();      // TODO The instruction issue class needs to implement register re-naming and re-order buffer, etc.  
-    //instructionExecuteStage = new InstructionExecuteStage();  //TODO Note this object should contain one or more execution units (EUs)
+    instructionIssueStage = new InstructionIssueStage();        // TODO The instruction issue class needs to implement register re-naming and re-order buffer, etc.  
+    instructionExecuteStage = new InstructionExecuteStage();    //TODO Note this object should contain one or more execution units (EUs)
+    printProcessorPipelineStatusStage = new PrintProcessorPipelineStatusStage();  // Instantiate the PrintProcessorPipelineStatusStage object. This is a utility stage in the pipeline to print the current status of the pipeline.
     
     sequentialProcessorPipeline.addStage(instructionFetchStage);       // Add the IF stage to the pipeline
     sequentialProcessorPipeline.addStage(instructionDecodeStage);      // Add the ID stage to the pipeline
-    //sequentialProcessorPipeline.addStage(instructionIssueStage);       // Add the II stage to the pipeline
-    //sequentialProcessorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
+    sequentialProcessorPipeline.addStage(instructionIssueStage);       // Add the II stage to the pipeline
+    sequentialProcessorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
+    sequentialProcessorPipeline.addStage(printProcessorPipelineStatusStage);  // Add the utility stage to the pipeline
 
     pipelineContext = new ProcessorPipelineContext(cpuRegisters, cpuMemory);   // Instantiate the sequential pipeline context object
 
@@ -97,7 +100,8 @@ public class ProcessorSimulator
     //cpuMemory.dumpContents();
     //cpuRegisters.dumpContents();
     //for (int i = 0; i < pipelineStages.length; i++)
-    sequentialProcessorPipeline.execute(pipelineContext);
+    cpuRegisters.incrementClockCounter();                     // Increment the clock counter on every cycle run
+    sequentialProcessorPipeline.execute(pipelineContext);     // Execute/run the pipeline for the current cycle
   }
 
   /**
@@ -197,14 +201,17 @@ public class ProcessorSimulator
       System.out.println("###########################################################");
       System.out.println("CPU simulator starting program execution.");
       for(int numCycles = 0; numCycles < 4; numCycles++)
-      {
-        cpu.run();                        // Run the cpu simulator
+      {  
+        cpu.run();          // Run the cpu simulator
         // TODO Add code to print state of every stage for current cycle
+        //cpu.dumpState();
       }
+      //cpu.dumpState();      // Print end state after having finished running the simulator
       System.out.println("CPU simulator finished executing the program. \n");
     }
     catch (Exception ex)
     {
+      System.err.println("\nThe simulator encounterd a problem. Refer to details given below ... \n");
       System.err.println(">>>>>>>>>>>> Dumping state of CPU <<<<<<<<<<<< ");
       cpu.dumpState();                  // Dump the state of the CPU to the standard output
       System.err.println("Warning: An exception occurred during program execution. The exception is as follows: " + ex.getMessage() +

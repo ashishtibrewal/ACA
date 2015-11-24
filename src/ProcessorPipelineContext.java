@@ -3,10 +3,22 @@
  */
 import pipeline.*;
 
+import java.util.*;
+
 public class ProcessorPipelineContext implements IPipelineContext
 {
+  // All classs fields/members should be declared public since this makes it easier to access them from outside this class. Note that this class is accessed 
+  // by all pipeline stages to read and update values. Having made it public also removes the hassle of creating a method for each functionality the objects
+  // declared offers.
   public Register cpuRegisters;        /** Reference to architectural registers */
   public Memory cpuMemory;             /** Reference to main memory */
+  public Instruction currentInstruction;  /** Reference to the current instruction */
+  public Queue<Instruction> instructionQueue;
+  // public int opCode;
+  // public int sourceReg1;
+  // public int sourceReg2;
+  // public int destinationReg;
+  // public int signedImmediate;
 
   public ProcessorPipelineContext(Register cpuRegisters, Memory cpuMemory)
   {

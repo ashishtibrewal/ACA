@@ -15,7 +15,7 @@ import java.util.*;
 import java.lang.*;
 
 /**
- * This class implements the Instruction Fetch unit of the processor.
+ * This class implements the Instruction Fetch (IF) stage of the processor.
  */
 public class InstructionFetchStage implements IStage
 {
@@ -34,7 +34,7 @@ public class InstructionFetchStage implements IStage
 
   public void execute(IPipelineContext context)
   {
-    pContext = (ProcessorPipelineContext)context;                      // Explicitly cast context to ProcessorPipelineContext type
+    pContext = (ProcessorPipelineContext) context;                     // Explicitly cast context to ProcessorPipelineContext type
     currentPC = pContext.cpuRegisters.readPC();                        // Read value of the PC register
     currentInstruction = pContext.cpuMemory.readValue(currentPC);      // Read value from main memory at the location specified by the PC register
     pContext.cpuRegisters.writeIR(currentInstruction);                 // Write value to the instruction register (IR)

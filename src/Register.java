@@ -75,9 +75,13 @@ public class Register
     generalPurposeRegisters = new int[numberOfRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
     programCounter = 0;
+    programCounterIncremented = 0;
+    prograCounterBranch = 0;
     stackPointer = 0;
     linkRegister = 0;
     accumulator = 0;
+    memoryAddressRegister = 0;
+    memoryDataRegister = 0;
     statusRegister = new boolean[4];
     for (int i = 0; i < statusRegister.length; i++)
     {
@@ -90,8 +94,13 @@ public class Register
     generalPurposeRegisters = new int[numberOfRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
     programCounter = 0;
+    programCounterIncremented = 0;
+    prograCounterBranch = 0;
     stackPointer = 0;
     linkRegister = 0;
+    accumulator = 0;
+    memoryAddressRegister = 0;
+    memoryDataRegister = 0;
     statusRegister = new boolean[4];
     for (int i = 0; i < statusRegister.length; i++)
     {
@@ -102,11 +111,11 @@ public class Register
 
   // Class/Instance methods
   /**
-   * Method to write a value to register
+   * Method to write a value to a general purpose (GP) register
    * @param registerNumber Register number for which the value needs to be read
    * @param newValue       Value that needs to be written to the specified register
    */
-  public void writeRegisterValue(int registerNumber, int newValue)
+  public void writeGP(int registerNumber, int newValue)
   {
     if (registerNumber < 0 || registerNumber > generalPurposeRegisters.length)
     {
@@ -178,16 +187,18 @@ public class Register
    */
   public void writeIR(int newValue)
   {
-    int opCode = (newValue >> 27) & 31;     // Extract instruction OpCode
+    int opCode = (newValue >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
 
-    if(opCode > (GlobalConstants.ISA_TOTAL_INSTRUCTIONS - 1))
-    {
-      throw new RegisterAccessException("Illegal IR value (Instruction 0x" + Integer.toHexString(opCode) + " is not specified in the ISA)."); 
-    }
-    else
-    {
-      instructionRegister = newValue;
-    }
+    // Note this check for an invalid instruction is made in the Instruction Decode Stage class.
+    // if(opCode > (Isa.ISA_TOTAL_INSTRUCTIONS - 1))
+    // {
+    //   throw new RegisterAccessException("Illegal IR value (Instruction with OpCode \"" + Utility.convertToBin(opCode, 0).substring((Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH), Isa.INSTRUCTION_LENGTH) + "\" is not specified in the ISA)."); 
+    // }
+    // else
+    // {
+    //   instructionRegister = newValue;
+    // }
+    instructionRegister = newValue;
   }
 
   /**
@@ -225,11 +236,11 @@ public class Register
   }
 
   /**
-   * Method to read a value from the register
+   * Method to read a value from a general purpose (GP) register
    * @param registerNumber Register number for which the value needs to be read
    * @return Value at the specefied register
    */
-  public int readRegisterValue(int registerNumber)
+  public int readGP(int registerNumber)
   {
     if (registerNumber < 0 || registerNumber > generalPurposeRegisters.length)
     {
@@ -287,6 +298,23 @@ public class Register
   }
 
   /**
+   * Method to increment the clock counter by one
+   */
+  public void incrementClockCounter()
+  {
+    clockCounter++;       // Increment the clock by one (Should be done for each loop iteration) 
+  }
+
+  /**
+   * Method to read the current clock counter value
+   * @return Current clock counter value
+   */
+  public int readClockCounter()
+  {
+    return clockCounter;       // Increment the clock by one (Should be done for each loop iteration) 
+  }
+
+  /**
    * Method to dump contents of all the architectural registers. 
    */
   public void dumpContents()
@@ -300,12 +328,12 @@ public class Register
     System.out.println("+---------------------------------------------------------------------------------+");
     for (int registerNumber = 0; registerNumber < generalPurposeRegisters.length; registerNumber++)
     {
-      System.out.format("| R%02d   \t      0x%08x (%s)        |%n", registerNumber, generalPurposeRegisters[registerNumber], Utility.convertToHex(generalPurposeRegisters[registerNumber], 4));
+      System.out.format("| R%02d   \t      0x%08x (%s)        |%n", registerNumber, generalPurposeRegisters[registerNumber], Utility.convertToBin(generalPurposeRegisters[registerNumber], 4));
     }
-    System.out.format("| IR     \t      0x%08x (%s)        |%n", instructionRegister, Utility.convertToHex(instructionRegister, 4));
-    System.out.format("| PC     \t      0x%08x (%s)        |%n", programCounter, Utility.convertToHex(programCounter, 4));
-    System.out.format("| SP     \t      0x%08x (%s)        |%n", stackPointer, Utility.convertToHex(stackPointer, 4));
-    System.out.format("| LR     \t      0x%08x (%s)        |%n", linkRegister, Utility.convertToHex(linkRegister, 4));
+    System.out.format("| IR     \t      0x%08x (%s)        |%n", instructionRegister, Utility.convertToBin(instructionRegister, 4));
+    System.out.format("| PC     \t      0x%08x (%s)        |%n", programCounter, Utility.convertToBin(programCounter, 4));
+    System.out.format("| SP     \t      0x%08x (%s)        |%n", stackPointer, Utility.convertToBin(stackPointer, 4));
+    System.out.format("| LR     \t      0x%08x (%s)        |%n", linkRegister, Utility.convertToBin(linkRegister, 4));
     System.out.print("| SR      \t      ");
     for (int statusRegisterIndex = 0; statusRegisterIndex < statusRegister.length; statusRegisterIndex++)
     {
