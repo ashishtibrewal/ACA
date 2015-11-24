@@ -13,24 +13,32 @@ public class Instruction
 {
   private int memoryFetchLocation;
   private String instructionType;
+  private String instructionName;
   private int numberOfCycles;
   private int opCode;
+  private int sourceReg1Loc;
+  private int sourceReg2Loc;
+  private int destinationRegLoc;
   private int sourceReg1Val;
   private int sourceReg2Val;
-  private int destinationRegLoc;
   private int signedImmediateVal;
+  private ExecutionUnit executionUnit;
+
+  // TODO add flag(s) required for dependency checking
 
   // RRR and RRI type instructions
-  public Instruction(String instructionType, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Val, int sourceReg2Val, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RRR")     // RRR type
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
+      this.instructionName = instructionName;
+      this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
       this.numberOfCycles = numberOfCycles;
-      this.sourceReg1Val = sourceReg1Val;
-      this.sourceReg2Val = sourceReg2Val;
+      this.sourceReg1Loc = sourceReg1Loc;
+      this.sourceReg2Loc = sourceReg2Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = 0;      // Overwrite immediate value since this instruction type doesn't use it
     }
@@ -38,25 +46,29 @@ public class Instruction
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
+      this.instructionName = instructionName;
+      this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
       this.numberOfCycles = numberOfCycles;
-      this.sourceReg1Val = sourceReg1Val;
-      this.sourceReg2Val = 0;           // Overwrite source register 2 value since this instruction type doesn't use it
+      this.sourceReg1Loc = sourceReg1Loc;
+      this.sourceReg2Loc = 0;           // Overwrite source register 2 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
     }
   }
 
   // RR and RI type instruction
-  public Instruction(String instructionType, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Val, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RR")      // RR type
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
+      this.instructionName = instructionName;
+      this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
       this.numberOfCycles = numberOfCycles;
-      this.sourceReg1Val = sourceReg1Val;
+      this.sourceReg1Loc = sourceReg1Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = 0;    // Overwrite source register 1 value since this instruction type doesn't use it
     }
@@ -64,22 +76,45 @@ public class Instruction
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
+      this.instructionName = instructionName;
+      this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
       this.numberOfCycles = numberOfCycles;
-      this.sourceReg1Val = 0;       // Overwrite source register 1 value since this instruction type doesn't use it
+      this.sourceReg1Loc = 0;       // Overwrite source register 1 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
     }
   }
 
   // I type instruction
-  public Instruction(String instructionType, int opCode, int memoryFetchLocation, int numberOfCycles, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int destinationRegLoc, int signedImmediateVal)
   {
     this.opCode = opCode;
     this.instructionType = instructionType;
+    this.instructionName = instructionName;
+    this.executionUnit = executionUnit;
     this.memoryFetchLocation = memoryFetchLocation;
     this.numberOfCycles = numberOfCycles;    
     this.destinationRegLoc = destinationRegLoc;
     this.signedImmediateVal = signedImmediateVal;
+  }
+
+  /**
+   * Method to return the OpCode for an instruction
+   * @return Instruction's OpCode
+   */
+  public int getOpCode()
+  {
+    return opCode;
+  }
+
+  public void setSourceReg1Val(int _sourceReg1Val)
+  {
+    sourceReg1Val = _sourceReg1Val;
+  }
+
+  public void setSourceReg2Val(int _sourceReg2Val)
+  {
+    sourceReg2Val = _sourceReg2Val;
   }
 }

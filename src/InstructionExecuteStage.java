@@ -21,10 +21,24 @@ import java.lang.*;
 public class InstructionExecuteStage implements IStage
 {
   private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
+  private Alu ALU;      /** Reference to the ALU */
+  private Lsu LSU;      /** Reference to the LSU */
+  private Bu BU;        /** Reference to the BU */
 
-    public void execute(IPipelineContext context)
-    {
-      pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
-      // TODO Add stage functionality here
-    }
+  public InstructionExecuteStage()
+  {
+    ALU = new Alu();    // Instantiate the ALU object
+    LSU = new Lsu();    // Instantiate the LSU object
+    BU = new Bu();      // Instantiate the BU object
+  }
+
+  public void execute(IPipelineContext context)
+  {
+    pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
+    // TODO Add stage functionality here
+    // TODO Read instructions from the instruction queue and feed in to the current execution unit
+    
+    // The line below needs to be removed and put in the execute or the memory access stage
+    pContext.getCpuRegisters().updatePC(false);                     // Update primary PC register with the incremented shadow PC register value.
+  }
 }

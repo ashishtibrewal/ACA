@@ -8,7 +8,8 @@
  * This stage is supposed to contain the following features:
  * 1. Dependency checking
  * 2. Register renaming
- * 3. Instruction issue to the Execution stage
+ * 3. Reservation station (To hold instructions that can be executed in out of order fashion)
+ * 4. Instruction issue to the Execution stage
  */
 
 // Import packages
@@ -26,14 +27,21 @@ public class InstructionIssueStage implements IStage
 {
   private ProcessorPipelineContext pContext;        /** Reference to the processor pipeline context */
   private ArrayList<Instruction> instructionList;   /** Reference to the processor instruction list */
-  private Queue<Instruction> instructionQueue;      /** Reference to the processor's primary instruction queue */
+
+  public InstructionIssueStage()
+  {
+    instructionList = new ArrayList<Instruction>();   // Instantiate the instruction list object
+  }
 
   public void execute(IPipelineContext context)
   {
-    pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
+    pContext = (ProcessorPipelineContext) context;              // Explicitly cast context to ProcessorPipelineContext type
     // TODO Add stage functionality here
-    instructionList = new ArrayList<Instruction>();
-    instructionList.add(pContext.currentInstruction);
+    instructionList.add(pContext.getCurrentInstruction());           // Add the current instruction to the list
+
+    // TODO Do all the work and (flow) checking on the instruction list and only add the instructions that need to be executed in a specific order to the instruction queue
+
+    pContext.getInstructionQueue().add(pContext.getCurrentInstruction());          // Add the current instruction to the queue
   }
 
 }

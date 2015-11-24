@@ -33,6 +33,7 @@ public class InstructionDecodeStage implements IStage
   private int signedImmediate;
   private String instructionName;
   private String instructionType;
+  private ExecutionUnit executionUnit;
 
   // public InstructionDecode(Register cpuRegisters, Memory cpuMemory)
   // {
@@ -42,8 +43,8 @@ public class InstructionDecodeStage implements IStage
 
   public void execute(IPipelineContext context)
   {
-    pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
-    currentInstruction = pContext.cpuRegisters.readIR();       // Read the value currently stored in the instruction register (IR)
+    pContext = (ProcessorPipelineContext) context;                  // Explicitly cast context to ProcessorPipelineContext type
+    currentInstruction = pContext.getCpuRegisters().readIR();       // Read the value currently stored in the instruction register (IR)
     //currentInstructionBinary = Integer.toBinaryString(currentInstruction);  
     currentInstructionBinary = Utility.convertToBin(currentInstruction, 0);   // Not using the Integer.toBinaryString() method because it truncates leading binary zero characters.
     opCode = (currentInstruction >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
@@ -216,8 +217,6 @@ public class InstructionDecodeStage implements IStage
         // TODO Find how to throw a new exception
         break;
     } 
-    // The line below needs to be removed and put in the execute or the memory access stage
-    pContext.cpuRegisters.updatePC(false);                     // Update primary PC register with the incremented shadow PC register value.
   }
 
 
@@ -234,14 +233,16 @@ public class InstructionDecodeStage implements IStage
         sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.S1_START, Isa.InstructionType.RRR.S1_END), true);
         sourceReg2 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.S2_START, Isa.InstructionType.RRR.S2_END), true);
         destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.D_START, Isa.InstructionType.RRR.D_END), true);
-        pContext.currentInstruction = new Instruction(instructionType,
+        pContext.setCurrentInstruction(new Instruction(instructionType,
+                                                      instructionName,
+                                                      executionUnit,
                                                       opCode, 
-                                                      pContext.cpuRegisters.readPC(),
+                                                      pContext.getCpuRegisters().readPC(),
                                                       Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
-                                                      pContext.cpuRegisters.readGP(sourceReg1),
-                                                      pContext.cpuRegisters.readGP(sourceReg2),
+                                                      sourceReg1,
+                                                      sourceReg2,
                                                       destinationReg,
-                                                      Isa.DEFAULT_IMM_VALUE);
+                                                      Isa.DEFAULT_IMM_VALUE));
         // TODO Check is the NOP instruction needs to be handled in a different manner when creating the Instruction object. Note that the way it's being done above should work for both. 
         if (instructionName == "NOP")   // Check exceptional case for the instruction being NOP.
         {
@@ -258,14 +259,16 @@ public class InstructionDecodeStage implements IStage
         signedImmediate = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
         sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), true);
         destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), true);
-        pContext.currentInstruction = new Instruction(instructionType,
+        pContext.setCurrentInstruction(new Instruction(instructionType,
+                                                      instructionName,
+                                                      executionUnit,
                                                       opCode, 
-                                                      pContext.cpuRegisters.readPC(),
+                                                      pContext.getCpuRegisters().readPC(),
                                                       Isa.InstructionType.RRI.NUMBER_OF_CYCLES,
-                                                      pContext.cpuRegisters.readGP(sourceReg1),
+                                                      sourceReg1,
                                                       Isa.DEFAULT_REG_VALUE,
                                                       destinationReg,
-                                                      signedImmediate);
+                                                      signedImmediate));
         System.out.println("Decoded instruction details: " + instructionName + " R" + destinationReg + ", R" + sourceReg1 + ", I" + signedImmediate);
         break;
 
@@ -273,13 +276,15 @@ public class InstructionDecodeStage implements IStage
       case "RR":
         sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RR.S1_START, Isa.InstructionType.RR.S1_END), true);
         destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RR.D_START, Isa.InstructionType.RR.D_END), true);
-        pContext.currentInstruction = new Instruction(instructionType,
+        pContext.setCurrentInstruction(new Instruction(instructionType,
+                                                      instructionName,
+                                                      executionUnit,
                                                       opCode, 
-                                                      pContext.cpuRegisters.readPC(),
+                                                      pContext.getCpuRegisters().readPC(),
                                                       Isa.InstructionType.RR.NUMBER_OF_CYCLES,
-                                                      pContext.cpuRegisters.readGP(sourceReg1),
+                                                      sourceReg1,
                                                       destinationReg,
-                                                      Isa.DEFAULT_IMM_VALUE);
+                                                      Isa.DEFAULT_IMM_VALUE));
         System.out.println("Decoded instruction details: " + instructionName + " R" + destinationReg + ", R" + sourceReg1);
         break;
 
@@ -287,25 +292,29 @@ public class InstructionDecodeStage implements IStage
       case "RI":
         signedImmediate = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RI.IMM_START, Isa.InstructionType.RI.IMM_END), true);
         destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RI.D_START, Isa.InstructionType.RI.D_END), true);
-        pContext.currentInstruction = new Instruction(instructionType,
+        pContext.setCurrentInstruction(new Instruction(instructionType,
+                                                      instructionName,
+                                                      executionUnit,
                                                       opCode, 
-                                                      pContext.cpuRegisters.readPC(),
+                                                      pContext.getCpuRegisters().readPC(),
                                                       Isa.InstructionType.RI.NUMBER_OF_CYCLES,
                                                       Isa.DEFAULT_REG_VALUE,
                                                       destinationReg,
-                                                      signedImmediate);
+                                                      signedImmediate));
         System.out.println("Decoded instruction details: " + instructionName + " R" + destinationReg + ", I" + signedImmediate);
         break;
 
       // I type
       case "I":
         signedImmediate = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.I.IMM_START, Isa.InstructionType.I.IMM_END), true);
-        pContext.currentInstruction = new Instruction(instructionType,
+        pContext.setCurrentInstruction(new Instruction(instructionType,
+                                                      instructionName,
+                                                      executionUnit,
                                                       opCode, 
-                                                      pContext.cpuRegisters.readPC(),
+                                                      pContext.getCpuRegisters().readPC(),
                                                       Isa.InstructionType.I.NUMBER_OF_CYCLES,
                                                       destinationReg,
-                                                      signedImmediate);
+                                                      signedImmediate));
         System.out.println("Decoded instruction details: " + instructionName + " I" + signedImmediate);
         break;
 
@@ -330,156 +339,182 @@ public class InstructionDecodeStage implements IStage
       case Isa.NOP:
         instructionName = "NOP";
         instructionType = "RRR";    // Note that for simplicity, the NOP operation is classified as a RRR type instruction
+        executionUnit = ExecutionUnit.ALU;
         break;
       
       // ADD dr, sr1, sr2
       case Isa.ADD:
         instructionName = "ADD";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // SUB dr, sr1, sr2
       case Isa.SUB:
         instructionName = "SUB";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // MULT dr, sr1, sr2
       case Isa.MULT:
         instructionName = "MULT";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // DIV dr, sr1, sr2
       case Isa.DIV:
         instructionName = "DIV";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // ADDI dr, sr1, Ix
       case Isa.ADDI:
         instructionName = "ADDI";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // SUBI dr, sr1, Ix
       case Isa.SUBI:
         instructionName = "SUBI";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // AND dr, sr1, sr2
       case Isa.AND:
         instructionName = "AND";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // OR dr, sr1, sr2 
       case Isa.OR:
         instructionName = "OR";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // XOR dr, sr1, sr2
       case Isa.XOR:
         instructionName = "XOR";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // NOT dr, sr1, sr2
       case Isa.NOT:
         instructionName = "NOT";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // SLL dr, sr1, Ix
       case Isa.SLL:
         instructionName = "SLL";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // SLR dr, sr1, Ix
       case Isa.SLR:
         instructionName = "SLR";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // SLLV dr, s1, sr2
       case Isa.SLLV:
         instructionName = "SLLV";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // SRA dr, sr1, Ix
       case Isa.SRA:
         instructionName = "SRA";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.ALU;
         break;
 
       // LW dr, sr1, Ix
       case Isa.LW:
         instructionName = "LW";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.LSU;
         break;
 
       // SW sr1, sr2, Ix
       case Isa.SW:
         instructionName = "SW";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.LSU;
         break;
 
       // MOVI dr, Ix
       case Isa.MOVI:
         instructionName = "MOVI";
         instructionType = "RI";
+        executionUnit = ExecutionUnit.LSU;
         break;
 
       // MOVR dr, sr1
       case Isa.MOVR:
         instructionName = "MOVR";
         instructionType = "RR";
+        executionUnit = ExecutionUnit.LSU;
         break;
 
       // BU Ix
       case Isa.BU:
         instructionName = "BU";
         instructionType = "I";
+        executionUnit = ExecutionUnit.BU;
         break;
 
       // BL Ix
       case Isa.BL:
         instructionName = "BL";
         instructionType = "I";
+        executionUnit = ExecutionUnit.BU;
         break;
 
       // BEQ sr1, sr2, Ix
       case Isa.BEQ:
         instructionName = "BEQ";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.BU;
         break;
 
       // BNE sr1, sr2, Ix
       case Isa.BNE:
         instructionName = "BNE";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.BU;
         break;
 
       // BLT sr1, sr2, Ix
       case Isa.BLT:
         instructionName = "BLT";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.BU;
         break;
 
       // BGT sr1, sr2, Ix
       case Isa.BGT:
         instructionName = "BGT";
         instructionType = "RRI";
+        executionUnit = ExecutionUnit.BU;
         break;
 
       // RET
       case Isa.RET:
         instructionName = "RET";
         instructionType = "RRR";
+        executionUnit = ExecutionUnit.BU;
         break;
 
       // Default case. This condition should never be reached (Primarily because an invalid instruction can never be written to the IR).

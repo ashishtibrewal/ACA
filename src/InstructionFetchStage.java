@@ -34,10 +34,10 @@ public class InstructionFetchStage implements IStage
 
   public void execute(IPipelineContext context)
   {
-    pContext = (ProcessorPipelineContext) context;                     // Explicitly cast context to ProcessorPipelineContext type
-    currentPC = pContext.cpuRegisters.readPC();                        // Read value of the PC register
-    currentInstruction = pContext.cpuMemory.readValue(currentPC);      // Read value from main memory at the location specified by the PC register
-    pContext.cpuRegisters.writeIR(currentInstruction);                 // Write value to the instruction register (IR)
-    pContext.cpuRegisters.incrementPC();                               // Increment value stored in the (temporary) PC register
+    pContext = (ProcessorPipelineContext) context;                          // Explicitly cast context to ProcessorPipelineContext type
+    currentPC = pContext.getCpuRegisters().readPC();                        // Read value of the PC register
+    currentInstruction = pContext.getCpuMemory().readValue(currentPC);      // Read value from main memory at the location specified by the PC register
+    pContext.getCpuRegisters().writeIR(currentInstruction);                 // Write value to the instruction register (IR)
+    pContext.getCpuRegisters().incrementPC();                               // Increment value stored in the (temporary) PC register
   }
 }

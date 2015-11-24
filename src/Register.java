@@ -29,7 +29,7 @@ public class Register
   private int accumulator;                            /** Temporary storage location for operations */
   private int programCounter;                         /** Program counter register: Holds address to the next instruction in memory */
   private int programCounterIncremented;              /** Program counter incremented register: Holds the temporary incremented program counter value */
-  private int prograCounterBranch;                    /** Program counter branch register: Holds the temporary branch program counter value */
+  private int programCounterBranch;                    /** Program counter branch register: Holds the temporary branch program counter value */
   private int stackPointer;                           /** Stack pointer register: Holds address to the top of the stack */
   private int framePointer;                           /** Frame pointer register: Holds address of the start of the current frame in the stack */
   private int linkRegister;                           /** Link register: Holds return address values */
@@ -51,7 +51,7 @@ public class Register
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
     programCounter = registerInitializationValue;
     programCounterIncremented = registerInitializationValue;
-    prograCounterBranch = registerInitializationValue;
+    programCounterBranch = registerInitializationValue;
     stackPointer = registerInitializationValue;
     linkRegister = registerInitializationValue;
     accumulator = registerInitializationValue;
@@ -76,7 +76,7 @@ public class Register
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
     programCounter = registerInitializationValue;
     programCounterIncremented = registerInitializationValue;
-    prograCounterBranch = registerInitializationValue;
+    programCounterBranch = registerInitializationValue;
     stackPointer = registerInitializationValue;
     linkRegister = registerInitializationValue;
     accumulator = registerInitializationValue;
@@ -95,7 +95,7 @@ public class Register
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
     programCounter = registerInitializationValue;
     programCounterIncremented = registerInitializationValue;
-    prograCounterBranch = registerInitializationValue;
+    programCounterBranch = registerInitializationValue;
     stackPointer = registerInitializationValue;
     linkRegister = registerInitializationValue;
     accumulator = registerInitializationValue;
@@ -150,7 +150,7 @@ public class Register
   }
 
   /**
-   * Method to write a new value to the program counter (PC) register. Useful during branch and return instructions
+   * Method to write a new value to the program counter (PC) register. Useful during branch and return instructions.
    * @param newValue Value that needs to be written to the PC register
    */
   public void writePC(int newValue)
@@ -161,7 +161,7 @@ public class Register
     }
     else
     {
-      prograCounterBranch = newValue;
+      programCounterBranch = newValue;
     }
   }
 
@@ -177,7 +177,7 @@ public class Register
     }
     else
     {
-      programCounter = prograCounterBranch;
+      programCounter = programCounterBranch;
     }
   }
 

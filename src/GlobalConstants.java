@@ -18,9 +18,9 @@ public final class GlobalConstants
   public static final int MEMORY_SIZE = 32;
   public static final int MEMORY_INITIALIZATION_VALUE = 0;
 
-
   // Other processor constants
   public static final int PIPELINE_LENGTH = 5;
+  public static final int INSTRUCTION_QUEUE_CAPACITY = 100;
   // TODO Insert ALL constants to this class.
 
 }
