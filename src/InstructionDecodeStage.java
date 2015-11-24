@@ -528,4 +528,10 @@ public class InstructionDecodeStage implements IStage
                           Utility.convertToBin(opCode, 0).substring((Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH), Isa.INSTRUCTION_LENGTH), 
                           instructionName, instructionType);    
   }
+
+  // TODO need to fill function contents accordingly
+  public void flush()
+  {
+
+  }
 }

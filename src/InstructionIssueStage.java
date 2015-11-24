@@ -39,9 +39,17 @@ public class InstructionIssueStage implements IStage
     // TODO Add stage functionality here
     instructionList.add(pContext.getCurrentInstruction());           // Add the current instruction to the list
 
+    // TODO need to obtain source register values for all the instructions and update the instructions dependency flag depending on the dependency checking algorithm
+    // Instrucions can remain in this stage for multiple clock cycles (Mainly due to dependencies)
     // TODO Do all the work and (flow) checking on the instruction list and only add the instructions that need to be executed in a specific order to the instruction queue
 
     pContext.getInstructionQueue().add(pContext.getCurrentInstruction());          // Add the current instruction to the queue
+  }
+
+  // TODO need to fill function contents accordingly
+  public void flush()
+  {
+
   }
 
 }

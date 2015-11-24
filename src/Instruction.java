@@ -23,7 +23,7 @@ public class Instruction
   private int sourceReg2Val;
   private int signedImmediateVal;
   private ExecutionUnit executionUnit;
-
+  private boolean dependencyFlag;         // Set to false by default. TODO This needs to be updated by the Instruction Issue stage after having checked for dependencies
   // TODO add flag(s) required for dependency checking
 
   // RRR and RRI type instructions
@@ -41,6 +41,7 @@ public class Instruction
       this.sourceReg2Loc = sourceReg2Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = 0;      // Overwrite immediate value since this instruction type doesn't use it
+      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RRI type
     {
@@ -54,6 +55,7 @@ public class Instruction
       this.sourceReg2Loc = 0;           // Overwrite source register 2 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
+      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
   }
 
@@ -71,6 +73,7 @@ public class Instruction
       this.sourceReg1Loc = sourceReg1Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = 0;    // Overwrite source register 1 value since this instruction type doesn't use it
+      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RI type
     {
@@ -83,6 +86,7 @@ public class Instruction
       this.sourceReg1Loc = 0;       // Overwrite source register 1 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
+      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
   }
 
@@ -97,10 +101,11 @@ public class Instruction
     this.numberOfCycles = numberOfCycles;    
     this.destinationRegLoc = destinationRegLoc;
     this.signedImmediateVal = signedImmediateVal;
+    this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
   }
 
   /**
-   * Method to return the OpCode for an instruction
+   * Method to obtain the OpCode for an instruction
    * @return Instruction's OpCode
    */
   public int getOpCode()
@@ -108,13 +113,39 @@ public class Instruction
     return opCode;
   }
 
+  /**
+   * Method to set the value for source register 1
+   * @param _sourceReg1Val Source register 1 value 
+   */
   public void setSourceReg1Val(int _sourceReg1Val)
   {
     sourceReg1Val = _sourceReg1Val;
   }
 
+  /**
+   * Method to set the value for source register 2
+   * @param _sourceReg1Val Source register 2 value 
+   */
   public void setSourceReg2Val(int _sourceReg2Val)
   {
     sourceReg2Val = _sourceReg2Val;
+  }
+
+  /**
+   * Method to obtain the value for the instruction's dependency flag
+   * @return Instruction dependency flag current value
+   */
+  public boolean getDependencyFlag()
+  {
+    return dependencyFlag;
+  }
+
+  /**
+   * Method to set the value for the instruction's dependency flag
+   * @param _dependencyFlag Instruction dependency flag new value
+   */
+  public void setDependencyFlag(boolean _dependencyFlag)
+  {
+    dependencyFlag = _dependencyFlag;
   }
 }

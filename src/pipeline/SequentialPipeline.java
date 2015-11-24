@@ -65,4 +65,16 @@ public class SequentialPipeline implements IPipeline
 		// 	finalStage.execute(context);
 		// }
 	}
+
+	public void flush()
+	{
+		for (IStage stage:p_stages)		//i.e. for every stage in the pipeline
+		{	
+			stage.flush();	
+			// if (context.getErrors()!= null && !context.getErrors().isEmpty())
+			// {
+			// 	break;
+			// }
+		}
+	}
 }

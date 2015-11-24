@@ -24,6 +24,7 @@ public class InstructionExecuteStage implements IStage
   private Alu ALU;      /** Reference to the ALU */
   private Lsu LSU;      /** Reference to the LSU */
   private Bu BU;        /** Reference to the BU */
+  private Instruction currentInstruction;     /** Reference to the current instruction */   // TODO Should actually be a list of instructions when going superscalar
 
   public InstructionExecuteStage()
   {
@@ -37,8 +38,17 @@ public class InstructionExecuteStage implements IStage
     pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
     // TODO Add stage functionality here
     // TODO Read instructions from the instruction queue and feed in to the current execution unit
+    currentInstruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).getFirst();
+    //currentInstruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).remove();
+    
     
     // The line below needs to be removed and put in the execute or the memory access stage
     pContext.getCpuRegisters().updatePC(false);                     // Update primary PC register with the incremented shadow PC register value.
+  }
+
+  // TODO need to fill function contents accordingly
+  public void flush()
+  {
+
   }
 }

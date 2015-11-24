@@ -38,6 +38,12 @@ public class InstructionFetchStage implements IStage
     currentPC = pContext.getCpuRegisters().readPC();                        // Read value of the PC register
     currentInstruction = pContext.getCpuMemory().readValue(currentPC);      // Read value from main memory at the location specified by the PC register
     pContext.getCpuRegisters().writeIR(currentInstruction);                 // Write value to the instruction register (IR)
-    pContext.getCpuRegisters().incrementPC();                               // Increment value stored in the (temporary) PC register
+    pContext.getCpuRegisters().incrementPC();                               // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
+  }
+
+  // TODO need to fill function contents accordingly
+  public void flush()
+  {
+
   }
 }

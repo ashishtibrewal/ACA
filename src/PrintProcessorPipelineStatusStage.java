@@ -30,11 +30,17 @@ public class PrintProcessorPipelineStatusStage implements IStage
     //tempCounter++;
     //System.out.println("....... " + tempCounter + " ..... " +pContext.cpuRegisters.readPC());
     System.out.println("Current state of the process pipeline is shown below:");
-    System.out.print("List of istructions : "); 
+    System.out.print("List of istructions (In reverse order when looking at the pipeline) : "); 
     for (Instruction instruction:pContext.getInstructionQueue())
     {
       System.out.print(instruction.getOpCode() + ", ");
     }
     System.out.println();
+  }
+
+  // TODO need to fill function contents accordingly
+  public void flush()
+  {
+
   }
 }
