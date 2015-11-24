@@ -28,9 +28,9 @@ public class ProcessorSimulator
   private Register cpuRegisters;
   private Memory cpuMemory;
   private Instruction currentInstruction;
-  private final int totalRegisters = 16;
-  private final int memorySize = 256;
-  private final int pipelineLength = 5;                     /** Processor pipeline length */ // TODO check for the best possible length in the design
+  private final int totalRegisters = GlobalConstants.TOTAL_ARCHITECTURAL_REGISTERS;
+  private final int memorySize = GlobalConstants.MEMORY_SIZE;
+  private final int pipelineLength = GlobalConstants.PIPELINE_LENGTH;                     /** Processor pipeline length */ // TODO check for the best possible length in the design
 
   private IPipeline sequentialProcessorPipeline;            /** Reference to the sequential processor pipeline */
   private IStage instructionFetchStage;                     /** Reference to the Instruction Fetch Stage of the pipeline */

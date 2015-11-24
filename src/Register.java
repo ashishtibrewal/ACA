@@ -22,9 +22,9 @@ import java.lang.*;
 public class Register
 {
   // Class/Instance fields
-  private final int totalRegisters = 32;              /** Total number of processor registers */
-  private final int registerInitializationValue = 0;  /** Initialization value for all the processor registers */
-  private final int statusRegisterLength = 4;         /** Number of bits/flags stored in the status register: Z C N O */
+  private final int totalRegisters = GlobalConstants.TOTAL_ARCHITECTURAL_REGISTERS;              /** Total number of processor registers */
+  private final int registerInitializationValue = GlobalConstants.REGISTER_INITIALIZATION_VALUE;  /** Initialization value for all the processor registers */
+  private final int statusRegisterLength = GlobalConstants.STATUS_REGISTER_LENGTH;         /** Number of bits/flags stored in the status register: Z C N O */
   private int[] generalPurposeRegisters;              /** Array that holds all the processor register values */
   private int accumulator;                            /** Temporary storage location for operations */
   private int programCounter;                         /** Program counter register: Holds address to the next instruction in memory */
@@ -49,14 +49,14 @@ public class Register
   {
     generalPurposeRegisters = new int[totalRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
-    programCounter = 0;
-    programCounterIncremented = 0;
-    prograCounterBranch = 0;
-    stackPointer = 0;
-    linkRegister = 0;
-    accumulator = 0;
-    memoryAddressRegister = 0;
-    memoryDataRegister = 0;
+    programCounter = registerInitializationValue;
+    programCounterIncremented = registerInitializationValue;
+    prograCounterBranch = registerInitializationValue;
+    stackPointer = registerInitializationValue;
+    linkRegister = registerInitializationValue;
+    accumulator = registerInitializationValue;
+    memoryAddressRegister = registerInitializationValue;
+    memoryDataRegister = registerInitializationValue;
     statusRegister = new boolean[statusRegisterLength];
     for (int i = 0; i < statusRegister.length; i++)
     {
@@ -74,14 +74,14 @@ public class Register
   {
     generalPurposeRegisters = new int[numberOfRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
-    programCounter = 0;
-    programCounterIncremented = 0;
-    prograCounterBranch = 0;
-    stackPointer = 0;
-    linkRegister = 0;
-    accumulator = 0;
-    memoryAddressRegister = 0;
-    memoryDataRegister = 0;
+    programCounter = registerInitializationValue;
+    programCounterIncremented = registerInitializationValue;
+    prograCounterBranch = registerInitializationValue;
+    stackPointer = registerInitializationValue;
+    linkRegister = registerInitializationValue;
+    accumulator = registerInitializationValue;
+    memoryAddressRegister = registerInitializationValue;
+    memoryDataRegister = registerInitializationValue;
     statusRegister = new boolean[4];
     for (int i = 0; i < statusRegister.length; i++)
     {
@@ -93,14 +93,14 @@ public class Register
   {
     generalPurposeRegisters = new int[numberOfRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
-    programCounter = 0;
-    programCounterIncremented = 0;
-    prograCounterBranch = 0;
-    stackPointer = 0;
-    linkRegister = 0;
-    accumulator = 0;
-    memoryAddressRegister = 0;
-    memoryDataRegister = 0;
+    programCounter = registerInitializationValue;
+    programCounterIncremented = registerInitializationValue;
+    prograCounterBranch = registerInitializationValue;
+    stackPointer = registerInitializationValue;
+    linkRegister = registerInitializationValue;
+    accumulator = registerInitializationValue;
+    memoryAddressRegister = registerInitializationValue;
+    memoryDataRegister = registerInitializationValue;
     statusRegister = new boolean[4];
     for (int i = 0; i < statusRegister.length; i++)
     {

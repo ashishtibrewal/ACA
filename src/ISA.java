@@ -47,6 +47,7 @@ public class Isa
   public static final int OPCODE_LENGTH = 5;          // Same OpCode length in the entire ISA and for all different types of instructions. This makes the implementation a lot simpler.
   public static final int DEFAULT_IMM_VALUE = 0;
   public static final int DEFAULT_REG_VALUE = 0;
+  public static final int TOTAL_PROCESSOR_REGISTERS = 16;     // Total number of processor registers supported. This is the total number of general purpose registers available to the programmer/assembler. Total processor registers are more than or equal to the total number of physical architectural registers supported by the microarchitecture.
 
   public class InstructionType
   {
