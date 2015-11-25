@@ -150,6 +150,15 @@ public class Instruction
   }
 
   /**
+   * Method to get the value for the signed immediate
+   * @return Signed immediate value 
+   */
+  public int getSignedImmediateVal()
+  {
+    return signedImmediateVal;
+  }
+
+  /**
    * Method to obtain the value for the instruction's dependency flag
    * @return Instruction dependency flag current value
    */

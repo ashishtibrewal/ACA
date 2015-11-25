@@ -18,27 +18,27 @@ public class Utility
   public static String convertToBin(int number, int groupSize)
   {
     // Local variables
-    StringBuilder result;
+    StringBuilder binaryString;
 
     // Method functionality
-    result = new StringBuilder();
-    for(int i = 31; i >= 0 ; i--)
+    binaryString = new StringBuilder();
+    for(int i = GlobalConstants.PROCESSOR_WORD_LENGTH - 1; i >= 0 ; i--)
     {
       int mask = 1 << i;
-      result.append((number & mask) != 0 ? "1" : "0");
+      binaryString.append((number & mask) != 0 ? "1" : "0");
       if (groupSize != 0)   // Need to check that the passed groupSize is not zero. If it is zero we avoid adding the spaces.
       {
         if (i % groupSize == 0)   // Note that this modulo calculation throws an Arithmetic Exception if groupSize if zero, hence the above check is used.
         {
-          result.append(" ");
+          binaryString.append(" ");
         }
       }
     }
     if (groupSize != 0)
     {
-      result.replace(result.length() - 1, result.length(), "");   // This removes the last blank character after the binary string. Only required when the group size is not 0.
+      binaryString.replace(binaryString.length() - 1, binaryString.length(), "");   // This removes the last blank character after the binary string. Only required when the group size is not 0.
     }
-    return result.toString();
+    return binaryString.toString();
   } 
 
   /**
@@ -72,5 +72,23 @@ public class Utility
       }
     }
     return intResult;
+  }
+
+  /**
+   * Mehtod to Sign Extend (SE) a binary string to a specified number of bits
+   * @param  binaryString            String containing the binary number that needs to be sign extended
+   * @return                         Sign extended version of the specified binary string
+   */
+  public static String signExtend(String binaryString)
+  {
+    char msb = binaryString.charAt(0);        // Obtain the MSB
+    int extraBitsRequired = GlobalConstants.PROCESSOR_WORD_LENGTH - binaryString.length();
+    StringBuilder signExtendedBinaryString = new StringBuilder(GlobalConstants.PROCESSOR_WORD_LENGTH);
+    for (int i = 0; i < extraBitsRequired; i++)
+    {
+      signExtendedBinaryString.append(msb);                         // Append the MSB
+    }
+    signExtendedBinaryString.append(binaryString);                  // Append the original binary string                          
+    return signExtendedBinaryString.toString();
   }
 }

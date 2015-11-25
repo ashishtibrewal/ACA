@@ -18,6 +18,7 @@ public final class GlobalConstants
   public static final int MEMORY_INITIALIZATION_VALUE = 0;
 
   // Other processor constants
+  public static final int PROCESSOR_WORD_LENGTH = 32;             // Word length the of the processor - the biggest piece of data that can be handled as a unit by the processor - This also specifies the data size that can be stored in the architectural registers, main memory and memory address sizes.
   public static final int PIPELINE_LENGTH = 5;
   public static final int INSTRUCTION_QUEUE_CAPACITY = 100;
   public static final int INSTRUCTION_LIST_START_INDEX = 0;

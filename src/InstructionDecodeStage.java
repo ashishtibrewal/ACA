@@ -26,14 +26,14 @@ public class InstructionDecodeStage implements IStage
   private int currentInstruction;
   private String currentInstructionBinary;
   private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
-  private int opCode;
-  private int sourceReg1;
-  private int sourceReg2;
-  private int destinationReg;
-  private int signedImmediate;
-  private String instructionName;
-  private String instructionType;
-  private ExecutionUnit executionUnit;
+  private int opCode;                           /** Stores decoded OpCode for an instruction */
+  private int sourceReg1;                       /** Source register 1 number - NOT THE VALUE STORED IN THIS REGISTER */            
+  private int sourceReg2;                       /** Source register 2 number - NOT THE VALUE STORED IN THIS REGISTER */            
+  private int destinationReg;                   /** Destination register number - NOT THE VALUE STORED IN THIS REGISTER */            
+  private int signedImmediate;                  /** Stores the signed immediate value encoded/embedded in the instruction */
+  private String instructionName;               /** Stores the instruction mnemonic */
+  private String instructionType;               /** Stores the type of the instruction */
+  private ExecutionUnit executionUnit;          /** Stores which EU should be used to execute the instruction */
 
   // public InstructionDecode(Register cpuRegisters, Memory cpuMemory)
   // {
@@ -106,7 +106,7 @@ public class InstructionDecodeStage implements IStage
         this.extractInformation(instructionName, instructionType);
         break;
 
-      // NOT dr, sr1, sr2
+      // NOT dr, sr1
       case Isa.NOT:
         this.extractInformation(instructionName, instructionType);
         break;
@@ -380,10 +380,10 @@ public class InstructionDecodeStage implements IStage
         executionUnit = ExecutionUnit.ALU;
         break;
 
-      // NOT dr, sr1, sr2
+      // NOT dr, sr1
       case Isa.NOT:
         instructionName = "NOT";
-        instructionType = "RRR";
+        instructionType = "RR";
         executionUnit = ExecutionUnit.ALU;
         break;
 
