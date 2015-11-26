@@ -21,13 +21,13 @@ public class Instruction
   private int destinationRegLoc;
   private int sourceReg1Val;
   private int sourceReg2Val;
-  private int signedImmediateVal;
+  private String signedImmediateVal;
   private ExecutionUnit executionUnit;
   private boolean dependencyFlag;         // Set to false by default. TODO This needs to be updated by the Instruction Issue stage after having checked for dependencies
   // TODO add flag(s) required for dependency checking
 
   // RRR and RRI type instructions
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, String signedImmediateVal)
   {
     if (instructionType == "RRR")     // RRR type
     {
@@ -40,7 +40,7 @@ public class Instruction
       this.sourceReg1Loc = sourceReg1Loc;
       this.sourceReg2Loc = sourceReg2Loc;
       this.destinationRegLoc = destinationRegLoc;
-      this.signedImmediateVal = 0;      // Overwrite immediate value since this instruction type doesn't use it
+      this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;      // Overwrite immediate value since this instruction type doesn't use it
       this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RRI type
@@ -60,7 +60,7 @@ public class Instruction
   }
 
   // RR and RI type instruction
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, String signedImmediateVal)
   {
     if (instructionType == "RR")      // RR type
     {
@@ -72,7 +72,7 @@ public class Instruction
       this.numberOfCycles = numberOfCycles;
       this.sourceReg1Loc = sourceReg1Loc;
       this.destinationRegLoc = destinationRegLoc;
-      this.signedImmediateVal = 0;    // Overwrite source register 1 value since this instruction type doesn't use it
+      this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;    // Overwrite source register 1 value since this instruction type doesn't use it
       this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RI type
@@ -91,7 +91,7 @@ public class Instruction
   }
 
   // I type instruction
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int destinationRegLoc, String signedImmediateVal)
   {
     this.opCode = opCode;
     this.instructionType = instructionType;
@@ -153,7 +153,7 @@ public class Instruction
    * Method to get the value for the signed immediate
    * @return Signed immediate value 
    */
-  public int getSignedImmediateVal()
+  public String getSignedImmediateVal()
   {
     return signedImmediateVal;
   }
