@@ -29,16 +29,22 @@ public class Register
   private int accumulator;                            /** Temporary storage location for operations */
   private int programCounter;                         /** Program counter register: Holds address to the next instruction in memory */
   private int programCounterIncremented;              /** Program counter incremented register: Holds the temporary incremented program counter value */
-  private int programCounterBranch;                    /** Program counter branch register: Holds the temporary branch program counter value */
+  private int programCounterBranch;                   /** Program counter branch register: Holds the temporary branch program counter value */
   private int stackPointer;                           /** Stack pointer register: Holds address to the top of the stack */
   private int framePointer;                           /** Frame pointer register: Holds address of the start of the current frame in the stack */
   private int linkRegister;                           /** Link register: Holds return address values */
   private boolean[] statusRegister;                   /** Status register: Holds values of architectural status flags */
   private int instructionRegister;                    /** Instruction register: Holds the value of the last decoded instruction */
-  private Memory cpuMemoryReference;                  /** Reference to the CPU memory */
-  private int clockCounter;                           /** Variable that holds the number of cycles completed by the simulator */
   private int memoryAddressRegister;                  /** Memory Address Register: Holds the memory address to which the data contained in the Memory Data Register needs to be stored */
   private int memoryDataRegister;                     /** Memory Data Register: Holds the data that needs to be stored to memory address contained in the Memory Address Register */
+  private Memory cpuMemoryReference;                  /** Reference to the CPU memory */
+  private static int clockCounter;                    /** Variable that holds the number of cycles completed by the simulator - Declared as a static varaible since the processor should only contain a single clockCounter register no matter how many Register objects have been instantiated */
+
+  // Initialize static variables
+  static
+  {
+    clockCounter = GlobalConstants.CLOCK_REGISTER_INITIALIZATION_VALUE;
+  }
 
   // Class constructors
   /**
@@ -207,7 +213,7 @@ public class Register
    */
   public void writeSP(int newValue)
   {
-    // Implement functionality to handle values being written for the stack pointer
+    // TODO Implement functionality to handle values being written for the stack pointer
   }
 
   /**
@@ -216,7 +222,7 @@ public class Register
    */
   public void writeLR(int newValue)
   {
-    // Implement functionality to handle values being written for the link register
+    // TODO Implement functionality to handle values being written for the link register
   }
 
   /**
@@ -233,6 +239,31 @@ public class Register
     {
       System.arraycopy(newValue, 0, statusRegister, 0, statusRegisterLength);   // Copy the contents of the new status value that has been passed to the function to the status register (SR)
     }
+  }
+
+  /**
+   * Method to write a new value to the memory address register (MAR)
+   * @param newValue Value that needs to be written to the memory address register
+   */
+  public void writeMAR(int newValue)
+  {
+    if (newValue < 0 || newValue >= cpuMemoryReference.memoryArray.length)
+    {
+      throw new RegisterAccessException("Illegal MAR value (Location 0x" + Integer.toHexString(newValue) + " doesn't exist in memory)."); 
+    }
+    else
+    {
+      memoryAddressRegister = newValue;
+    }
+  }
+
+  /**
+   * Method to write a new value to the memory data register (MDR)
+   * @param newValue Value that needs to be written to the memory data register
+   */
+  public void writeMDR(int newValue)
+  {
+    memoryDataRegister = newValue;
   }
 
   /**
@@ -298,18 +329,36 @@ public class Register
   }
 
   /**
-   * Method to increment the clock counter by one
+   * Method to read the current value stored in the memory address register (MAR)
+   * @return Value stored in the memory address register
    */
-  public void incrementClockCounter()
+  public int readMAR()
   {
-    clockCounter++;       // Increment the clock by one (Should be done for each loop iteration) 
+    return memoryAddressRegister;
   }
 
   /**
-   * Method to read the current clock counter value
+   * Method to read the current value stored in the memory data register (MDR)
+   * @return Value stored in the memory data register
+   */
+  public int readMDR()
+  {
+    return memoryDataRegister;
+  }
+
+  /**
+   * Method to increment the clock counter by one - Declared as static since it modifies a static (class) variable
+   */
+  public static void incrementClockCounter()
+  {
+    clockCounter++;           // Increment the clock by one (Should be done for each loop iteration) 
+  }
+
+  /**
+   * Method to read the current clock counter value - Declared as static since it returns a static (class) variable
    * @return Current clock counter value
    */
-  public int readClockCounter()
+  public static int readClockCounter()
   {
     return clockCounter;       // Increment the clock by one (Should be done for each loop iteration) 
   }

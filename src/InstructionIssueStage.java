@@ -25,10 +25,11 @@ import java.lang.*;
  */
 public class InstructionIssueStage implements IStage
 {
-  private ProcessorPipelineContext pContext;        /** Reference to the processor pipeline context */
   private Instruction currentInstruction;
   private ArrayList<Instruction> instructionList;   /** Reference to the processor instruction list */
-  private Queue<Instruction> instructionQueue;   /** Reference to the current instruction queue */
+  private Queue<Instruction> instructionQueue;      /** Reference to the current instruction queue */
+  private Register cpuRegisters;                    /** Reference to architectural registers */
+  private ProcessorPipelineContext pContext;        /** Reference to the processor pipeline context */
 
   public InstructionIssueStage()
   {
@@ -40,6 +41,7 @@ public class InstructionIssueStage implements IStage
   public void execute(IPipelineContext context)
   {
     pContext = (ProcessorPipelineContext) context;              // Explicitly cast context to ProcessorPipelineContext type
+    cpuRegisters = pContext.getCpuRegisters();                  // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     // TODO Add stage functionality here
     currentInstruction = pContext.getCurrentInstruction();      // Obtain the current instruction from the pipeline context
     instructionList.add(currentInstruction);                    // Add the current instruction to the list
@@ -47,7 +49,7 @@ public class InstructionIssueStage implements IStage
     // TODO need to obtain source register values for all the instructions and update the instructions dependency flag depending on the dependency checking algorithm
     // Instrucions can remain in this stage for multiple clock cycles (Mainly due to dependencies)
     // TODO Do all the work and (flow) checking on the instruction list and only add the instructions that need to be executed in a specific order to the instruction queue
-    // TODO obtain the correct source register value and set it in the instruction object before adding it to the queue. Would need to check for dependencies.
+    // TODO Obtain the correct/updated source register values and set it in the instruction object before adding it to the queue. Would need to check for dependencies. NOTE THIS IS NOT DONE IN THE DECODE STAGE AND NEEDS TO BE DONE HERE !!!
     
     if (currentInstruction.getDependencyFlag() == false)    // Only add the instruction to the instruction queue (and remove from the instruction list) if it doesn't have any dependencies (or if all it's dependencies have finished executing)
     {
@@ -55,18 +57,18 @@ public class InstructionIssueStage implements IStage
       {
         // RRR type
         case "RRR":
-          currentInstruction.setSourceReg1Val(pContext.getCpuRegisters().readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
-          currentInstruction.setSourceReg2Val(pContext.getCpuRegisters().readGP(currentInstruction.getSourceReg2Loc()));      // Read value for source register 2
+          currentInstruction.setSourceReg1Val(cpuRegisters.readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
+          currentInstruction.setSourceReg2Val(cpuRegisters.readGP(currentInstruction.getSourceReg2Loc()));      // Read value for source register 2
           break;
 
         // RRI type
         case "RRI":
-          currentInstruction.setSourceReg1Val(pContext.getCpuRegisters().readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
+          currentInstruction.setSourceReg1Val(cpuRegisters.readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
           break;
 
         // RR type
         case "RR":
-          currentInstruction.setSourceReg1Val(pContext.getCpuRegisters().readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
+          currentInstruction.setSourceReg1Val(cpuRegisters.readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
           break;
 
         // RI type
@@ -85,12 +87,12 @@ public class InstructionIssueStage implements IStage
           break;
       }
       instructionQueue.add(instructionList.get(GlobalConstants.INSTRUCTION_LIST_START_INDEX));    // Add the top instruction to the queue by obtaining it from the instruction list
-      instructionList.remove(GlobalConstants.INSTRUCTION_LIST_START_INDEX);                       // Remove the top instruction from the list after it has been added to the queue
+      instructionList.remove(GlobalConstants.INSTRUCTION_LIST_START_INDEX);                       // Remove the top instruction from the list after it has been added to the executable instruction queue
     }
   }
 
   // TODO need to fill function contents accordingly
-  public void flush()
+  public void flush(IPipelineContext context)
   {
 
   }

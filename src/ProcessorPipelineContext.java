@@ -5,21 +5,20 @@ import pipeline.*;
 
 import java.util.*;
 
+/**
+ * This class is used to store the shared state of the pipeline. This class is accessed by all the pipeline stages to read and update values when required.
+ */
 public class ProcessorPipelineContext implements IPipelineContext
 {
-  // All classs fields/members should be declared public since this makes it easier to access them from outside this class. Note that this class is accessed 
-  // by all pipeline stages to read and update values. Having made it public also removes the hassle of creating a method for each functionality the objects
-  // declared offers.
   private Register cpuRegisters;                 /** Reference to architectural registers */
   private Memory cpuMemory;                      /** Reference to main memory */
   private IStage instructionFetchStage;          /** Reference to the Instruction Fetch Stage of the pipeline. Useful if something is required from this stage by other stages. */
   private IStage instructionDecodeStage;         /** Reference to the Instruction Decode Stage of the pipeline. Useful if something is required from this stage by other stages. */
   private IStage instructionIssueStage;          /** Reference to the Instruction Issue Stage of the pipeline. Useful if something is required from this stage by other stages. */
   private IStage instructionExecuteStage;        /** Reference to the Instruction Execute Stage of the pipeline. Useful if something is required from this stage by other stages. */
-  private IStage printProcessorPipelineStatusStage;         /** Reference to the utility/debug stage in the pipleline/simulator. Useful if something is required from this stage by other stages. */
   private Instruction currentInstruction;        /** Reference to the current instruction */   // TODO this should actually be a list of instructions when going superscalar becase in one cycle the instruction fetch unit would fetch multiple executions 
 
-  public ProcessorPipelineContext(Register cpuRegisters, Memory cpuMemory, IStage instructionFetchStage, IStage instructionDecodeStage, IStage instructionIssueStage, IStage instructionExecuteStage, IStage printProcessorPipelineStatusStage)
+  public ProcessorPipelineContext(Register cpuRegisters, Memory cpuMemory, IStage instructionFetchStage, IStage instructionDecodeStage, IStage instructionIssueStage, IStage instructionExecuteStage)
   {
     this.cpuRegisters = cpuRegisters;
     this.cpuMemory = cpuMemory;
@@ -27,7 +26,6 @@ public class ProcessorPipelineContext implements IPipelineContext
     this.instructionDecodeStage = instructionDecodeStage;
     this.instructionIssueStage = instructionIssueStage;
     this.instructionExecuteStage = instructionExecuteStage;
-    this.printProcessorPipelineStatusStage = printProcessorPipelineStatusStage;
   }
   // TODO Add functions and fields to handle outputs from other stages of the pipeline. (I.e. instruction fetch output, instruction decode output etc)
   // TODO WOULD NEED TO HAVE TWO COPIES OF CERTAIN FIELDS, ONE TO STORE THE VALUES FOR THE CURRENT CYCLE AND THE NEXT TO STORE VALUES FOR THE NEXT CYCLE
@@ -74,6 +72,6 @@ public class ProcessorPipelineContext implements IPipelineContext
    */
   public Queue<Instruction> getInstructionQueue()
   {
-    return ((InstructionIssueStage)instructionIssueStage).getInstructionQueue();
+    return ((InstructionIssueStage) instructionIssueStage).getInstructionQueue();
   }
 }

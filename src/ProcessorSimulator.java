@@ -39,6 +39,7 @@ public class ProcessorSimulator
   private IStage instructionExecuteStage;                   /** Reference to the Instruction Execute Stage of the pipeline */
   private IStage printProcessorPipelineStatusStage;         /** Reference to the utility/debug stage in the pipleline/simulator */
   private ProcessorPipelineContext pipelineContext;         /** Reference to the sequential pipeline context */
+
   // Initialize static variables
   static
   {
@@ -75,21 +76,20 @@ public class ProcessorSimulator
     instructionDecodeStage = new InstructionDecodeStage();      // Instantiate the Instruction Decode (ID) stage object
     instructionIssueStage = new InstructionIssueStage();        // TODO The instruction issue class needs to implement register re-naming and re-order buffer, etc.  
     instructionExecuteStage = new InstructionExecuteStage();    //TODO Note this object should contain one or more execution units (EUs)
-    printProcessorPipelineStatusStage = new PrintProcessorPipelineStatusStage();  // Instantiate the PrintProcessorPipelineStatusStage object. This is a utility stage in the pipeline to print the current status of the pipeline.
+    printProcessorPipelineStatusStage = new PrintProcessorPipelineStatusStage();  // Instantiate the PrintProcessorPipelineStatusStage object. This is a utility stage to print the current status of the pipeline. NOTE THAT THIS STAGE IN NOT EXPLICITLY ADDED TO THE PROCESSOR PIPELINE.
     
     sequentialProcessorPipeline.addStage(instructionFetchStage);       // Add the IF stage to the pipeline
     sequentialProcessorPipeline.addStage(instructionDecodeStage);      // Add the ID stage to the pipeline
     sequentialProcessorPipeline.addStage(instructionIssueStage);       // Add the II stage to the pipeline
     sequentialProcessorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
-    sequentialProcessorPipeline.addStage(printProcessorPipelineStatusStage);  // Add the utility stage to the pipeline
+    //sequentialProcessorPipeline.addStage(printProcessorPipelineStatusStage);  // Add the utility stage to the pipeline - NOT ADDING THIS STAGE TO THE PROCESSOR PIPELINE SINCE IT IS NOT A REAL STAGE REQUIRED BY THE PROCESSOR FOR PROCESSING/EXECUTING INSTRUCTIONS
 
     pipelineContext = new ProcessorPipelineContext(cpuRegisters,
                                                   cpuMemory,
                                                   instructionFetchStage,
                                                   instructionDecodeStage,
                                                   instructionIssueStage,
-                                                  instructionExecuteStage,
-                                                  printProcessorPipelineStatusStage);   // Instantiate the sequential pipeline context object
+                                                  instructionExecuteStage);   // Instantiate the sequential pipeline context object
 
     //cpuMemory.initialize();   // Initialize contents of the main memory with the required instructions and data (Generated as an output from the Assembler)
     cpuMemory.testInitialize(); // Initializing contents of memory with hard-coded test instructions
@@ -98,7 +98,7 @@ public class ProcessorSimulator
   /**
    * Method that controls the flow of the simulation/processor execution
    */
-  private void run()
+  private void step()
   {
     // cpuRegisters.setPC(1025);      // Fails with an exception because this location doesn't physically exist in memory and the PC can never have it's value set to this
     //cpuRegisters.writePC(1000);
@@ -106,8 +106,11 @@ public class ProcessorSimulator
     //cpuMemory.dumpContents();
     //cpuRegisters.dumpContents();
     //for (int i = 0; i < pipelineStages.length; i++)
-    cpuRegisters.incrementClockCounter();                     // Increment the clock counter on every cycle run
-    sequentialProcessorPipeline.execute(pipelineContext);     // Execute/run the pipeline for the current cycle
+    Register.incrementClockCounter();                           // Increment the clock counter on every cycle run
+    sequentialProcessorPipeline.execute(pipelineContext);       // Execute/run the pipeline for the current cycle
+    printProcessorPipelineStatusStage.execute(pipelineContext); // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
+    // TODO Add another stage to copy necessary values between two consecutive pipeline stages
+    //this.dumpState();
   }
 
   /**
@@ -208,7 +211,7 @@ public class ProcessorSimulator
       System.out.println("CPU simulator starting program execution.");
       for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)   // TODO this should be changed to run until the last instruction is reached in the .text section
       {  
-        cpu.run();          // Run the cpu simulator
+        cpu.step();          // Step/Run the cpu simulator by one clock cycle
         // TODO Add code to print state of every stage for current cycle
         //cpu.dumpState();
       }

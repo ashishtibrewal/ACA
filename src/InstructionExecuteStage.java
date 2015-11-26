@@ -20,12 +20,13 @@ import java.lang.*;
  */
 public class InstructionExecuteStage implements IStage
 {
-  private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
   private IExecutionUnit ALU;      /** Reference to the ALU */
   private IExecutionUnit LSU;      /** Reference to the LSU */
   private IExecutionUnit BU;       /** Reference to the BU */
   private Instruction currentInstruction;     /** Reference to the current instruction */   // TODO Should actually be a list of instructions when going superscalar
   private ExecutionUnit requiredExecutionUnit;
+  private Register cpuRegisters;                    /** Reference to architectural registers */
+  private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
 
   public InstructionExecuteStage()
   {
@@ -37,6 +38,7 @@ public class InstructionExecuteStage implements IStage
   public void execute(IPipelineContext context)
   {
     pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
+    cpuRegisters = pContext.getCpuRegisters();                 // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     // TODO Add stage functionality here
     // TODO Read instructions from the instruction queue and feed in to the correct execution unit
     //currentInstruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).getFirst();
@@ -68,11 +70,11 @@ public class InstructionExecuteStage implements IStage
     }
 
     // The line below needs to be removed and put in the execute or the memory access stage
-    pContext.getCpuRegisters().updatePC(false);                     // Update primary PC register with the incremented shadow PC register value.
+    cpuRegisters.updatePC(false);                     // Update primary PC register with the incremented shadow PC register value.
   }
 
   // TODO need to fill function contents accordingly
-  public void flush()
+  public void flush(IPipelineContext context)
   {
 
   }

@@ -24,7 +24,9 @@ public class InstructionFetchStage implements IStage
   // private Memory cpuMemory;
   private int currentPC;
   private int currentInstruction;
-  private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
+  private Register cpuRegisters;                 /** Reference to architectural registers */
+  private Memory cpuMemory;                      /** Reference to main memory */
+  private ProcessorPipelineContext pContext;     /** Reference to the processor pipeline context */
 
   // public InstructionFetch(Register cpuRegisters, Memory cpuMemory)
   // {
@@ -35,14 +37,16 @@ public class InstructionFetchStage implements IStage
   public void execute(IPipelineContext context)
   {
     pContext = (ProcessorPipelineContext) context;                          // Explicitly cast context to ProcessorPipelineContext type
-    currentPC = pContext.getCpuRegisters().readPC();                        // Read value of the PC register
-    currentInstruction = pContext.getCpuMemory().readValue(currentPC);      // Read value from main memory at the location specified by the PC register
-    pContext.getCpuRegisters().writeIR(currentInstruction);                 // Write value to the instruction register (IR)
-    pContext.getCpuRegisters().incrementPC();                               // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
+    cpuRegisters = pContext.getCpuRegisters();                              // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
+    cpuMemory = pContext.getCpuMemory();                                    // Obtain and store the reference to the primary cpu memory object from the pipeline context (Doing this to avoid having to type it over and over again)
+    currentPC = cpuRegisters.readPC();                                      // Read value of the PC register
+    currentInstruction = cpuMemory.readValue(currentPC);                    // Read value from main memory at the location specified by the PC register
+    cpuRegisters.writeIR(currentInstruction);                               // Write value to the instruction register (IR)
+    cpuRegisters.incrementPC();                                             // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
   }
 
   // TODO need to fill function contents accordingly
-  public void flush()
+  public void flush(IPipelineContext context)
   {
 
   }

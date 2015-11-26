@@ -17,11 +17,7 @@ public class Utility
    */
   public static String convertToBin(int number, int groupSize)
   {
-    // Local variables
-    StringBuilder binaryString;
-
-    // Method functionality
-    binaryString = new StringBuilder();
+    StringBuilder binaryString = new StringBuilder();
     for(int i = GlobalConstants.PROCESSOR_WORD_LENGTH - 1; i >= 0 ; i--)
     {
       int mask = 1 << i;

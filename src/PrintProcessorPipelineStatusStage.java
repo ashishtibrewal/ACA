@@ -26,7 +26,7 @@ public class PrintProcessorPipelineStatusStage implements IStage
   public void execute(IPipelineContext context)
   {
     pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
-    // TODO Add stage functionality here to print the current state of the pipeline
+    // TODO Add stage functionality here to print the current state of the pipeline BUT REMOVE THIS STAGE FROM THE ACTUAL PROCESSOR PIPELINE ITSELF
     //tempCounter++;
     //System.out.println("....... " + tempCounter + " ..... " +pContext.cpuRegisters.readPC());
     System.out.println("Current state of the process pipeline is shown below:");
@@ -39,7 +39,7 @@ public class PrintProcessorPipelineStatusStage implements IStage
   }
 
   // TODO need to fill function contents accordingly
-  public void flush()
+  public void flush(IPipelineContext context)
   {
 
   }

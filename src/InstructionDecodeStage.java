@@ -25,7 +25,6 @@ public class InstructionDecodeStage implements IStage
   private int currentPC;
   private int currentInstruction;
   private String currentInstructionBinary;
-  private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
   private int opCode;                           /** Stores decoded OpCode for an instruction */
   private int sourceReg1;                       /** Source register 1 number - NOT THE VALUE STORED IN THIS REGISTER */            
   private int sourceReg2;                       /** Source register 2 number - NOT THE VALUE STORED IN THIS REGISTER */            
@@ -34,6 +33,8 @@ public class InstructionDecodeStage implements IStage
   private String instructionName;               /** Stores the instruction mnemonic */
   private String instructionType;               /** Stores the type of the instruction */
   private ExecutionUnit executionUnit;          /** Stores which EU should be used to execute the instruction */
+  private Register cpuRegisters;                 /** Reference to architectural registers */
+  private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
 
   // public InstructionDecode(Register cpuRegisters, Memory cpuMemory)
   // {
@@ -43,8 +44,9 @@ public class InstructionDecodeStage implements IStage
 
   public void execute(IPipelineContext context)
   {
-    pContext = (ProcessorPipelineContext) context;                  // Explicitly cast context to ProcessorPipelineContext type
-    currentInstruction = pContext.getCpuRegisters().readIR();       // Read the value currently stored in the instruction register (IR)
+    pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
+    cpuRegisters = pContext.getCpuRegisters();                 // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
+    currentInstruction = cpuRegisters.readIR();       // Read the value currently stored in the instruction register (IR)
     //currentInstructionBinary = Integer.toBinaryString(currentInstruction);  
     currentInstructionBinary = Utility.convertToBin(currentInstruction, 0);   // Not using the Integer.toBinaryString() method because it truncates leading binary zero characters.
     opCode = (currentInstruction >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
@@ -136,7 +138,7 @@ public class InstructionDecodeStage implements IStage
         this.extractInformation(instructionName, instructionType);
         break;
 
-      // SW sr1, sr2, Ix
+      // SW sr1, dr, Ix
       case Isa.SW:
         this.extractInformation(instructionName, instructionType);
         break;
@@ -212,7 +214,7 @@ public class InstructionDecodeStage implements IStage
                                                       instructionName,
                                                       executionUnit,
                                                       opCode, 
-                                                      pContext.getCpuRegisters().readPC(),
+                                                      cpuRegisters.readPC(),
                                                       Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
                                                       sourceReg1,
                                                       sourceReg2,
@@ -238,7 +240,7 @@ public class InstructionDecodeStage implements IStage
                                                       instructionName,
                                                       executionUnit,
                                                       opCode, 
-                                                      pContext.getCpuRegisters().readPC(),
+                                                      cpuRegisters.readPC(),
                                                       Isa.InstructionType.RRI.NUMBER_OF_CYCLES,
                                                       sourceReg1,
                                                       Isa.DEFAULT_REG_VALUE,
@@ -255,7 +257,7 @@ public class InstructionDecodeStage implements IStage
                                                       instructionName,
                                                       executionUnit,
                                                       opCode, 
-                                                      pContext.getCpuRegisters().readPC(),
+                                                      cpuRegisters.readPC(),
                                                       Isa.InstructionType.RR.NUMBER_OF_CYCLES,
                                                       sourceReg1,
                                                       destinationReg,
@@ -271,7 +273,7 @@ public class InstructionDecodeStage implements IStage
                                                       instructionName,
                                                       executionUnit,
                                                       opCode, 
-                                                      pContext.getCpuRegisters().readPC(),
+                                                      cpuRegisters.readPC(),
                                                       Isa.InstructionType.RI.NUMBER_OF_CYCLES,
                                                       Isa.DEFAULT_REG_VALUE,
                                                       destinationReg,
@@ -286,7 +288,7 @@ public class InstructionDecodeStage implements IStage
                                                       instructionName,
                                                       executionUnit,
                                                       opCode, 
-                                                      pContext.getCpuRegisters().readPC(),
+                                                      cpuRegisters.readPC(),
                                                       Isa.InstructionType.I.NUMBER_OF_CYCLES,
                                                       destinationReg,
                                                       signedImmediate));
@@ -422,7 +424,7 @@ public class InstructionDecodeStage implements IStage
         executionUnit = ExecutionUnit.LSU;
         break;
 
-      // SW sr1, sr2, Ix
+      // SW sr1, dr, Ix
       case Isa.SW:
         instructionName = "SW";
         instructionType = "RRI";
@@ -505,7 +507,7 @@ public class InstructionDecodeStage implements IStage
   }
 
   // TODO need to fill function contents accordingly
-  public void flush()
+  public void flush(IPipelineContext context)
   {
 
   }
