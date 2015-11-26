@@ -26,7 +26,8 @@ public class Lsu implements IExecutionUnit
       // LW dr, sr1, Ix --- dr = mem[sr1 + Ix]    (Load word from memory, i.e. read from main memory)
       case Isa.LW:
       sourceReg1Val = currentInstruction.getSourceReg1Val();
-      signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(currentInstruction.getSignedImmediateVal())), false);
+      //signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(currentInstruction.getSignedImmediateVal())), false);
+      signedImmediateVal = currentInstruction.getSignedImmediateVal();
       calculationResult = sourceReg1Val + signedImmediateVal;       // Evaluate the memory address
       cpuRegisters.writeMAR(calculationResult);       // Write the calculated memory address to the memory address register (MAR). Not very useful in the current design but can come in really handy when extending the pipeline to 5 stages, one that includes a memory access stage.
       cpuRegisters.writeMDR(cpuMemory.readValue(cpuRegisters.readMAR()));             // Read the value from main memory and write it into the memory data register (MDR) using the memory address register (MAR)
@@ -38,7 +39,8 @@ public class Lsu implements IExecutionUnit
       // SW sr1, dr, Ix --- mem[dr + Ix] = sr1    (Store word to memory, i.e. write to main memory)
       case Isa.SW:
       sourceReg1Val = currentInstruction.getSourceReg1Val();
-      signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(currentInstruction.getSignedImmediateVal())), false);
+      //signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(currentInstruction.getSignedImmediateVal())), false);
+      signedImmediateVal = currentInstruction.getSignedImmediateVal();
       destinationRegLoc = currentInstruction.getDestinationRegLoc();                                // Obtain the location of the destination register from the current instruction object
       calculationResult = cpuRegisters.readGP(destinationRegLoc) + signedImmediateVal;    // Evaluate the memory address      // TODO Check if the destinationRegVal needs to be added to the instruction object. If yes, does it need to be updated in the instruction issue stage ?
       cpuRegisters.writeMAR(calculationResult);       // Write the calculated memory address to the memory address register (MAR). Not very useful in the current design but can come in really handy when extending the pipeline to 5 stages, one that includes a memory access stage.
@@ -49,12 +51,8 @@ public class Lsu implements IExecutionUnit
 
       // MOVI dr, Ix
       case Isa.MOVI:
-      signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(currentInstruction.getSignedImmediateVal())), false);
-      /*
-      System.out.println("1. " + Integer.toBinaryString(currentInstruction.getSignedImmediateVal()));
-      System.out.println("2. " + Utility.signExtend(Integer.toBinaryString(currentInstruction.getSignedImmediateVal())));
-      System.out.println("3. " + signedImmediateVal);
-      */
+      //signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(currentInstruction.getSignedImmediateVal())), false);
+      signedImmediateVal = currentInstruction.getSignedImmediateVal();  
       destinationRegLoc = currentInstruction.getDestinationRegLoc();                                // Obtain the location of the destination register from the current instruction object
       cpuRegisters.writeGP(destinationRegLoc, signedImmediateVal);                                  // Write the sign extended immediate to the destination register
       break;

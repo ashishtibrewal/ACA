@@ -207,9 +207,9 @@ public class InstructionDecodeStage implements IStage
     {
       // RRR type
       case "RRR":
-        sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.S1_START, Isa.InstructionType.RRR.S1_END), true);
-        sourceReg2 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.S2_START, Isa.InstructionType.RRR.S2_END), true);
-        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.D_START, Isa.InstructionType.RRR.D_END), true);
+        sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.S1_START, Isa.InstructionType.RRR.S1_END), false);
+        sourceReg2 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.S2_START, Isa.InstructionType.RRR.S2_END), false);
+        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRR.D_START, Isa.InstructionType.RRR.D_END), false);
         pContext.setCurrentInstruction(new Instruction(instructionType,
                                                       instructionName,
                                                       executionUnit,
@@ -234,8 +234,8 @@ public class InstructionDecodeStage implements IStage
       // RRI type
       case "RRI":
         signedImmediate = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
-        sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), true);
-        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), true);
+        sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
+        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
         pContext.setCurrentInstruction(new Instruction(instructionType,
                                                       instructionName,
                                                       executionUnit,
@@ -251,8 +251,8 @@ public class InstructionDecodeStage implements IStage
 
       // RR type
       case "RR":
-        sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RR.S1_START, Isa.InstructionType.RR.S1_END), true);
-        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RR.D_START, Isa.InstructionType.RR.D_END), true);
+        sourceReg1 = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RR.S1_START, Isa.InstructionType.RR.S1_END), false);
+        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RR.D_START, Isa.InstructionType.RR.D_END), false);
         pContext.setCurrentInstruction(new Instruction(instructionType,
                                                       instructionName,
                                                       executionUnit,
@@ -268,7 +268,7 @@ public class InstructionDecodeStage implements IStage
       // RI type
       case "RI":
         signedImmediate = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RI.IMM_START, Isa.InstructionType.RI.IMM_END), true);
-        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RI.D_START, Isa.InstructionType.RI.D_END), true);
+        destinationReg = Utility.convertToInt(currentInstructionBinary.substring(Isa.InstructionType.RI.D_START, Isa.InstructionType.RI.D_END), false);
         pContext.setCurrentInstruction(new Instruction(instructionType,
                                                       instructionName,
                                                       executionUnit,
