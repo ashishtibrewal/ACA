@@ -110,7 +110,7 @@ public class ProcessorSimulator
     sequentialProcessorPipeline.execute(pipelineContext);       // Execute/run the pipeline for the current cycle
     printProcessorPipelineStatusStage.execute(pipelineContext); // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
     // TODO Add another stage to copy necessary values between two consecutive pipeline stages
-    //this.dumpState();
+    //this.dumpState();                                         // Dump the state of the cpu every cycle
   }
 
   /**
@@ -211,9 +211,9 @@ public class ProcessorSimulator
       System.out.println("CPU simulator starting program execution.");
       for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)   // TODO this should be changed to run until the last instruction is reached in the .text section
       {  
-        cpu.step();          // Step/Run the cpu simulator by one clock cycle
+        cpu.step();           // Step/Run the cpu simulator by one clock cycle
         // TODO Add code to print state of every stage for current cycle
-        //cpu.dumpState();
+        //cpu.dumpState();    // Dump the state of the cpu every cycle
       }
       //cpu.dumpState();      // Print end state after having finished running the simulator
       System.out.println("CPU simulator finished executing the program. \n");

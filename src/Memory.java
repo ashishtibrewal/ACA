@@ -146,10 +146,10 @@ public class Memory
     memoryArray[3] = Integer.parseInt("-00000000000000000000000000000001", 2); // Should be -1 in decimal integer
     memoryArray[4] = 0xffffffff;   // Should be -1 in decimal integer
     */
-    memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001", false); // MOVI R1, 2 (Move 2 into R1)
-    memoryArray[5] = Utility.convertToInt("10001000000000000000000001000010", false); // MOVI R2, 4 (Move 4 into R2)
-    memoryArray[9] = Utility.convertToInt("00001000000000000000000100100001", false); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
-
+    // Have to explicity declare them as signed since they are 32 bit instructions (declared as binary strings) and need to stored in the main memory as a 2's complement 32 bit integer type
+    memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001", true); // MOVI R1, 2 (Move 2 into R1)
+    memoryArray[5] = Utility.convertToInt("10001000000000000000000001000010", true); // MOVI R2, 4 (Move 4 into R2)
+    memoryArray[9] = Utility.convertToInt("00001000000000000000000100100001", true); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
   }
 
   /**

@@ -69,7 +69,7 @@ public class Alu implements IExecutionUnit
       // ADDI dr, sr1, Ix
       case Isa.ADDI:
         sourceReg1Val = currentInstruction.getSourceReg1Val();
-        signedImmediateVal = Utility.convertToInt(Utility.signExtend(currentInstruction.getSignedImmediateVal()), false);
+        signedImmediateVal = currentInstruction.getSignedImmediateVal();
         destinationRegLoc = currentInstruction.getDestinationRegLoc();
         calculationResult = sourceReg1Val + signedImmediateVal;
         cpuRegisters.writeGP(destinationRegLoc, calculationResult);
@@ -78,7 +78,7 @@ public class Alu implements IExecutionUnit
       // SUBI dr, sr1, Ix
       case Isa.SUBI:
         sourceReg1Val = currentInstruction.getSourceReg1Val();
-        signedImmediateVal = Utility.convertToInt(Utility.signExtend(currentInstruction.getSignedImmediateVal()), false);
+        signedImmediateVal = currentInstruction.getSignedImmediateVal();
         destinationRegLoc = currentInstruction.getDestinationRegLoc();
         calculationResult = sourceReg1Val - signedImmediateVal;
         cpuRegisters.writeGP(destinationRegLoc, calculationResult);
@@ -123,7 +123,7 @@ public class Alu implements IExecutionUnit
       // SLL dr, sr1, Ix
       case Isa.SLL:
         sourceReg1Val = currentInstruction.getSourceReg1Val();
-        signedImmediateVal = Utility.convertToInt(Utility.signExtend(currentInstruction.getSignedImmediateVal()), false);
+        signedImmediateVal = currentInstruction.getSignedImmediateVal();
         destinationRegLoc = currentInstruction.getDestinationRegLoc();
         calculationResult = sourceReg1Val << signedImmediateVal;
         cpuRegisters.writeGP(destinationRegLoc, calculationResult);
@@ -132,7 +132,7 @@ public class Alu implements IExecutionUnit
       // SLR dr, sr1, Ix
       case Isa.SLR:
         sourceReg1Val = currentInstruction.getSourceReg1Val();
-        signedImmediateVal = Utility.convertToInt(Utility.signExtend(currentInstruction.getSignedImmediateVal()), false);
+        signedImmediateVal = currentInstruction.getSignedImmediateVal();
         destinationRegLoc = currentInstruction.getDestinationRegLoc();
         calculationResult = sourceReg1Val >>> signedImmediateVal;
         cpuRegisters.writeGP(destinationRegLoc, calculationResult);
@@ -150,7 +150,7 @@ public class Alu implements IExecutionUnit
       // SRA dr, sr1, Ix
       case Isa.SRA:
         sourceReg1Val = currentInstruction.getSourceReg1Val();
-        signedImmediateVal = Utility.convertToInt(Utility.signExtend(currentInstruction.getSignedImmediateVal()), false);
+        signedImmediateVal = currentInstruction.getSignedImmediateVal();
         destinationRegLoc = currentInstruction.getDestinationRegLoc();
         calculationResult = sourceReg1Val >> signedImmediateVal;
         cpuRegisters.writeGP(destinationRegLoc, calculationResult);

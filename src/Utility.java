@@ -38,12 +38,14 @@ public class Utility
   } 
 
   /**
-   * Convert 32-bit 2's complement binary string or a 32-bit unsigned binary string to an integer 
-   * @param  input    32-bit 2's complement binary string or 32-bit unsigned binary string
-   * @param  unsigned Boolean value stating if the binary string being passed is an unsigned number
-   * @return          Converted integer value
+   * Convert a (32-bit or less) 2's complement binary string or a (32-bit or less) unsigned binary string to an integer. 
+   * Note that this method takes care of the sign extension when the binary string being specified is not in 32 bits 
+   * (since it returns Java's primitive/native int type which is internally stored in 32 bits as a 2's complement number)  
+   * @param  input  (32-bit or less) 2's complement binary string or a (32-bit or less) unsigned binary string
+   * @param  signed Boolean value stating if the binary string being passed is a signed number
+   * @return        Converted integer value
    */
-  public static int convertToInt(String binaryString, boolean unsigned)
+  public static int convertToInt(String binaryString, boolean signed)
   {
     int binaryStringLength = binaryString.length();
     char[] inputArray = new char[binaryStringLength];
@@ -53,16 +55,16 @@ public class Utility
     {
       intResult+= (inputArray[((binaryStringLength - 1) - i)] - 48) * Math.pow(2, i);      // Subtracting 48 because inputArray is of char type and it returns an ASCII value
     }
-    if (unsigned == false)       // If the binary string is a 2's complement number
+    if (signed == true)       // If the binary string is a 2's complement number
     {
-      if (inputArray[0] == '1')     // Check if the MSB is 1 (i.e. a negative number in 2's complement)
+      if (inputArray[0] == '1')     // Check if the MSB is 1 (i.e. a negative number in 2's complement) - if 0, do nothing
       {
         intResult-= (inputArray[0] - 48) * Math.pow(2, (binaryStringLength - 1));            // Subtracting 48 because inputArray is of char type and it returns an ASCII value
       }
     }
     else                      // If the binary string is an unsigned number
     {
-      if (inputArray[0] == '1')     // Check if the MSB is 1 (i.e. still a positive number since it's an unsigned binary)
+      if (inputArray[0] == '1')     // Check if the MSB is 1 (i.e. still a positive number since it's an unsigned binary) - if 0, do nothing
       {
         intResult+= (inputArray[0] - 48) * Math.pow(2, (binaryStringLength - 1));            // Subtracting 48 because inputArray is of char type and it returns an ASCII value
       }
