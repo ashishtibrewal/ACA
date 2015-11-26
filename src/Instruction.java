@@ -21,13 +21,13 @@ public class Instruction
   private int destinationRegLoc;
   private int sourceReg1Val;
   private int sourceReg2Val;
-  private String signedImmediateVal;
+  private int signedImmediateVal;
   private ExecutionUnit executionUnit;
   private boolean dependencyFlag;         // Set to false by default. TODO This needs to be updated by the Instruction Issue stage after having checked for dependencies
   // TODO add flag(s) required for dependency checking
 
   // RRR and RRI type instructions
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, String signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RRR")     // RRR type
     {
@@ -60,7 +60,7 @@ public class Instruction
   }
 
   // RR and RI type instruction
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, String signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RR")      // RR type
     {
@@ -91,7 +91,7 @@ public class Instruction
   }
 
   // I type instruction
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int destinationRegLoc, String signedImmediateVal)
+  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int destinationRegLoc, int signedImmediateVal)
   {
     this.opCode = opCode;
     this.instructionType = instructionType;
@@ -153,7 +153,7 @@ public class Instruction
    * Method to get the value for the signed immediate
    * @return Signed immediate value 
    */
-  public String getSignedImmediateVal()
+  public int getSignedImmediateVal()
   {
     return signedImmediateVal;
   }
