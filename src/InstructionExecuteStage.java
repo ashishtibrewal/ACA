@@ -65,7 +65,7 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
 
       // Default case. This condition should never be reached
       default:
-        System.out.println("Fatal error! Unknown/Invalid execution unit (EU) parameter!");
+        System.err.println("Fatal error! Unknown/Invalid execution unit (EU) parameter!");
         break;
     }
 

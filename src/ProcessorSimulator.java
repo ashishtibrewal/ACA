@@ -110,7 +110,7 @@ public class ProcessorSimulator
     processorPipeline.execute(pipelineContext);                 // Execute/run the pipeline for the current cycle
     pipelineStatus.print(pipelineContext);                    // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
     // TODO Add another stage to copy necessary values between two consecutive pipeline stages
-    this.dumpState();                                         // Dump the state of the cpu every cycle
+    //this.dumpState();                                         // Dump the state of the cpu every cycle
   }
 
   /**

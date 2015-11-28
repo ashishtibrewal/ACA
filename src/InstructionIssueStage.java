@@ -83,7 +83,7 @@ public class InstructionIssueStage implements IProcessorPipelineStage
 
         // Shoudn't get here since it's an invalid instruction type
         default:
-          System.out.println("Invalid Instruction Type! Instruction couldn't be issued!");
+          System.err.println("Invalid Instruction Type! Instruction couldn't be issued!");
           break;
       }
       instructionQueue.add(instructionList.get(GlobalConstants.INSTRUCTION_LIST_START_INDEX));    // Add the top instruction to the queue by obtaining it from the instruction list

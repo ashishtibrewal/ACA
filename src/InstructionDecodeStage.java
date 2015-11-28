@@ -297,7 +297,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
 
       // Shoudn't get here since it's an invalid instruction type
       default:
-        System.out.println("Invalid Instruction Type! Instruction information couldn't be extracted!");
+        System.err.println("Invalid Instruction Type! Instruction information couldn't be extracted!");
         // TODO Find how to throw a new exception
         break;
     }
@@ -497,7 +497,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
       // Default case. This condition should never be reached (Primarily because an invalid instruction can never be written to the IR).
       default:
         instructionName = "INVALID";
-        System.out.println("Invalid Instruction! Instruction couldn't be decoded!");
+        System.err.println("Invalid Instruction! Instruction couldn't be decoded!");
         // TODO Find how to throw a new exception
         break;
     }
