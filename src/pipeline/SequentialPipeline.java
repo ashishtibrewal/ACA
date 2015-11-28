@@ -21,9 +21,9 @@ import java.util.List;
 public class SequentialPipeline implements IPipeline
 {
 
-	private List<IStage> p_stages = new ArrayList<IStage> ();
-	// private List<IStage> p_errorStages= new ArrayList<IStage> ();
-	// private List<IStage> p_finalStages= new ArrayList<IStage> ();	
+	protected List<IStage> p_stages = new ArrayList<IStage> ();
+	// protected List<IStage> p_errorStages= new ArrayList<IStage> ();
+	// protected List<IStage> p_finalStages= new ArrayList<IStage> ();	
 	
 	public void addStage(IStage stage)
 	{
@@ -39,13 +39,17 @@ public class SequentialPipeline implements IPipeline
 	// {
 	// 	p_finalStages.add(stage);	
 	// }
-		
+	
+	/**
+	 * Method to execute/run the pipeline.
+	 * @param context Shared object (context object) used throughout all stages in the pipeline
+	 */
 	public void execute(IPipelineContext context)
 	{
 		/* execute the stages */
 		for (IStage stage:p_stages)		//i.e. for every stage in the pipeline
 		{	
-			stage.execute(context);	
+			stage.execute(context);			// Execute each stage in the pipeline	
 			// if (context.getErrors()!= null && !context.getErrors().isEmpty())
 			// {
 			// 	break;
@@ -64,17 +68,5 @@ public class SequentialPipeline implements IPipeline
 		// {
 		// 	finalStage.execute(context);
 		// }
-	}
-
-	public void flush(IPipelineContext context)
-	{
-		for (IStage stage:p_stages)		//i.e. for every stage in the pipeline
-		{	
-			stage.flush(context);	
-			// if (context.getErrors()!= null && !context.getErrors().isEmpty())
-			// {
-			// 	break;
-			// }
-		}
 	}
 }

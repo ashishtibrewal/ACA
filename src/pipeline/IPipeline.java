@@ -5,7 +5,8 @@ package pipeline;
  *
  */
 
-public interface IPipeline extends IStage
+//public interface IPipeline extends IStage
+public interface IPipeline
 {
 	/**
 	 * appends a stage to the pipeline
@@ -24,5 +25,14 @@ public interface IPipeline extends IStage
 	 //  * The final sequence of stages will be executed even if there is any error
 	 //  * @param stage
 	 //  */
-	 // public void addFinalStage (IStage stage);	 
+	 // public void addFinalStage (IStage stage);	
+	 // 
+	
+	/**
+	 * Method to execute the pipeline (i.e. execute the work to be performed in the pipeline)
+	 * The input will be read from the context
+	 * The output will be stored in the context	 
+	 * @param context - context object which keeps shared state 
+	 */
+	public void execute(IPipelineContext context); 
 }

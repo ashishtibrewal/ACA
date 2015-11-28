@@ -17,7 +17,7 @@ import java.lang.*;
 /**
  * This class implements the Instruction Fetch (IF) stage of the processor.
  */
-public class InstructionFetchStage implements IStage
+public class InstructionFetchStage implements IProcessorPipelineStage
 {
   // Class/Instance fields
   // private Register cpuRegisters;

@@ -220,4 +220,13 @@ public class Instruction
   {
     return destinationRegLoc;
   }
+
+  /**
+   * Method to obtain the location in memory from which the instruction was fetched
+   * @return Location in memory from which the instruction was fetched
+   */
+  public int getMemoryFetchLocation()
+  {
+    return memoryFetchLocation;
+  }
 }

@@ -8,7 +8,7 @@
 public final class GlobalConstants
 {
   // Register contants
-  public static final int TOTAL_ARCHITECTURAL_REGISTERS = 16;     // Total number of physical architectural registers available in the microarchitecure. Note that this number only refers to the General Purpose registers.
+  public static final int TOTAL_GP_REGISTERS = 16;     // Total number of physical GP registers available in the microarchitecure.
   public static final int STATUS_REGISTER_LENGTH = 4;
   public static final int REGISTER_INITIALIZATION_VALUE = 0;
   public static final int CLOCK_REGISTER_INITIALIZATION_VALUE = 0;
@@ -17,6 +17,7 @@ public final class GlobalConstants
   // public static final int MEMORY_SIZE = 1024;
   public static final int MEMORY_SIZE = 32;
   public static final int MEMORY_INITIALIZATION_VALUE = 0;
+  //public static final int STACK_SIZE = 1024;                    // Not used since by default the Stack class in Java doesn't support a constructor with a parameter specifying the size
 
   // Other processor constants
   public static final int PROCESSOR_WORD_LENGTH = 32;             // Word length the of the processor - the biggest piece of data that can be handled as a unit by the processor - This also specifies the data size that can be stored in the architectural registers, main memory and memory address sizes.
@@ -24,6 +25,8 @@ public final class GlobalConstants
   public static final int INSTRUCTION_QUEUE_CAPACITY = 100;
   public static final int INSTRUCTION_LIST_START_INDEX = 0;
   public static final int NUM_ITERATIONS = 10;
+  public static final int BL_ITEMS_TO_PUSH = TOTAL_GP_REGISTERS + 1;    // Number of items to push to the stack when a BL, i.e. branch with link instruction, is found. Value = Total number of GP registers + 1, this + 1 is for the link register
+  public static final int RET_ITEMS_TO_POP = TOTAL_GP_REGISTERS + 1;    // Number of items to pop off the stack when a RET, i.e. return instruction, is found. Value = Total number of GP registers + 1, this + 1 is for the link register
   // TODO Insert ALL constants to this class.
   
   // Process execution unit (EU) constants

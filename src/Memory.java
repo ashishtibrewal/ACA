@@ -27,11 +27,12 @@ public class Memory
 {
   // Class/Instance fields
   // TODO change all access specifiers to private and see if that works.
-  protected int[] memoryArray;                        /** Memory array that emulates physical memory */
-  protected final int defaultMemorySize = GlobalConstants.MEMORY_SIZE;         /** Default memory array size */
-  protected int memoryArraySize;                      /** Store the custom-defined memory size for future reference in this class */
-  protected Stack<Integer> memoryStack;               /** Memory/Program Stack that contains Integer objects*/
-  private final int memoryInitializationValue = GlobalConstants.MEMORY_INITIALIZATION_VALUE;    /** Initialization value for all the location in memory */
+  private int[] memoryArray;                        /** Memory array that emulates physical memory */
+  private final int defaultMemorySize = GlobalConstants.MEMORY_SIZE;         /** Default memory array size */
+  private int memorySize;                           /** Store the custom-defined memory size for future reference in this class */
+  private Stack<Integer> memoryStack;               /** Memory/Program Stack that contains Integer objects*/
+  private final int memoryInitializationValue = GlobalConstants.MEMORY_INITIALIZATION_VALUE;    /** Initialization value for all the locations in memory */
+  private Register cpuRegisters;                    /** Reference to the CPU/architectural registers */
 
   // Class constructors
   /**
@@ -41,6 +42,7 @@ public class Memory
   public Memory()
   {
     memoryArray = new int[defaultMemorySize];
+    memorySize = defaultMemorySize;
     Arrays.fill(memoryArray, memoryInitializationValue);     // Fill the array with 0's
     memoryStack = new Stack<Integer>();                      // Instantiate a new Stack object
   }
@@ -54,22 +56,37 @@ public class Memory
   {
     if (memorySize < defaultMemorySize)
     {
-      memorySize = defaultMemorySize;       // Prevent the array size from being less that the default array size
+      this.memorySize = defaultMemorySize;       // Prevent the array size from being less that the default array size
     }
-    memoryArray = new int[memorySize];
-    memoryArraySize = memorySize;
+    else
+    {
+      this.memorySize = memorySize;
+    }
+    memoryArray = new int[this.memorySize];
     Arrays.fill(memoryArray, memoryInitializationValue);    // Fill the array with 0's
     memoryStack = new Stack<Integer>();                     // Instantiate a new Stack object
   }
 
-  // Class/Instance methods
+  // Class/Instance methods 
   /**
-   * Method to return the size of the memory 
-   * @return Size of memory
+   * Method to set the reference stored for the primary cpu registers object. Being done as a separate method and not in the constructor since both Memory and Register
+   * classes require a reference to each others objects, and the Register class contains a constructor that accepts a Memory object as a parameter, hence, ruling out 
+   * this possibilty for the Memory class. An alternative solution would be to pass the Register object to each function in this class that needs to use/modify 
+   * the contents of it, but that simply involves/adds more code and complexity, hence, this approach is being avoided.
+   * @param cpuRegisters Reference to the primary cpu registers object
    */
-  public int memorySize()
+  public void setCpuRegistersReference(Register _cpuRegisters)
   {
-    return memoryArraySize;       // Return the size of the memory
+    cpuRegisters = _cpuRegisters;
+  }
+
+  /**
+   * Method to obtain the size of main memory 
+   * @return Size of main memory
+   */
+  public int getMemorySize()
+  {
+    return memorySize;               // Return the size of the memory
     // return memoryArray.length;    // Return the size of the memory
   }
 
@@ -107,6 +124,27 @@ public class Memory
     {
       memoryArray[memoryLocation] = newValue;     // If the memory address is in range, write the value at this memory location
     }       
+  }
+
+  /**
+   * Method to push current register values onto the stack
+   * @param value Item/value to be pushed onto the stack
+   */
+  public void stackPush(int value)
+  {
+    memoryStack.push(value);                // Push the value onto the stack
+    cpuRegisters.incrementSP();             // Increment the stack pointer by one (This is done implicitly and not as a separate instruction, such as INCSP or using an already existing instruction in the ISA, such as ADDI for simplicity)
+  }
+
+  /**
+   * Method to pop current register values off the stack
+   * @return Item/value popped off the stack (i.e. the top-most item popped off the stack)
+   */
+  public int stackPop()
+  {
+    int poppedValue = memoryStack.pop();    // Pop the value from the stack
+    cpuRegisters.decrementSP();             // Decrement the stack pointer by one (This is done implicitly and not as a separate instruction, such as DECSP or using an already existing instruction in the ISA, such as ADDI for simplicity)
+    return poppedValue;
   }
 
   /**
@@ -148,7 +186,7 @@ public class Memory
     */
     // Have to explicity declare them as signed since they are 32 bit instructions (declared as binary strings) and need to stored in the main memory as a 2's complement 32 bit integer type
     memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001", true); // MOVI R1, 2 (Move 2 into R1)
-    memoryArray[5] = Utility.convertToInt("10001000000000000000000001000010", true); // MOVI R2, 4 (Move 4 into R2)
+    memoryArray[5] = Utility.convertToInt("10001000000011111111111111000010", true); // MOVI R2, -4 (Move -4 into R2)
     memoryArray[9] = Utility.convertToInt("00001000000000000000000100100001", true); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
   }
 

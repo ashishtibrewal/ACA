@@ -28,17 +28,17 @@ public class ProcessorSimulator
   private Register cpuRegisters;
   private Memory cpuMemory;
   private Instruction currentInstruction;
-  private final int totalRegisters = GlobalConstants.TOTAL_ARCHITECTURAL_REGISTERS;
+  private final int totalGeneralPurposeRegisters = GlobalConstants.TOTAL_GP_REGISTERS;
   private final int memorySize = GlobalConstants.MEMORY_SIZE;
   private final int pipelineLength = GlobalConstants.PIPELINE_LENGTH;                     /** Processor pipeline length */ // TODO check for the best possible length in the design
 
-  private IPipeline sequentialProcessorPipeline;            /** Reference to the sequential processor pipeline */
-  private IStage instructionFetchStage;                     /** Reference to the Instruction Fetch Stage of the pipeline */
-  private IStage instructionDecodeStage;                    /** Reference to the Instruction Decode Stage of the pipeline */
-  private IStage instructionIssueStage;                     /** Reference to the Instruction Issue Stage of the pipeline */
-  private IStage instructionExecuteStage;                   /** Reference to the Instruction Execute Stage of the pipeline */
-  private IStage printProcessorPipelineStatusStage;         /** Reference to the utility/debug stage in the pipleline/simulator */
-  private ProcessorPipelineContext pipelineContext;         /** Reference to the sequential pipeline context */
+  private IPipeline processorPipeline;                       /** Reference to the processor pipeline */
+  private IStage instructionFetchStage;                      /** Reference to the Instruction Fetch Stage of the pipeline */
+  private IStage instructionDecodeStage;                     /** Reference to the Instruction Decode Stage of the pipeline */
+  private IStage instructionIssueStage;                      /** Reference to the Instruction Issue Stage of the pipeline */
+  private IStage instructionExecuteStage;                    /** Reference to the Instruction Execute Stage of the pipeline */
+  private IStage printProcessorPipelineStatusStage;          /** Reference to the utility/debug stage in the pipleline/simulator */
+  private IPipelineContext pipelineContext;                           /** Reference to the sequential pipeline context */
 
   // Initialize static variables
   static
@@ -68,9 +68,10 @@ public class ProcessorSimulator
     // TODO Add functionality to reset all variables/objects/components/units used in the simulator
     //cpuMemory = new Memory(memorySize);
     cpuMemory = new Memory();
-    cpuRegisters = new Register(totalRegisters, cpuMemory);
+    cpuRegisters = new Register(totalGeneralPurposeRegisters, cpuMemory);
+    cpuMemory.setCpuRegistersReference(cpuRegisters);           // Set the reference of the cpuRegisters object in an instance field in the cpuMemory object
 
-    sequentialProcessorPipeline = new SequentialPipeline();     // Instantiate the sequential processor pipeline object
+    processorPipeline = new SequentialProcessorPipeline();     // Instantiate the sequential processor pipeline object.
 
     instructionFetchStage = new InstructionFetchStage();        // Instantiate the Instruction Fetch (IF) stage object
     instructionDecodeStage = new InstructionDecodeStage();      // Instantiate the Instruction Decode (ID) stage object
@@ -78,18 +79,18 @@ public class ProcessorSimulator
     instructionExecuteStage = new InstructionExecuteStage();    //TODO Note this object should contain one or more execution units (EUs)
     printProcessorPipelineStatusStage = new PrintProcessorPipelineStatusStage();  // Instantiate the PrintProcessorPipelineStatusStage object. This is a utility stage to print the current status of the pipeline. NOTE THAT THIS STAGE IN NOT EXPLICITLY ADDED TO THE PROCESSOR PIPELINE.
     
-    sequentialProcessorPipeline.addStage(instructionFetchStage);       // Add the IF stage to the pipeline
-    sequentialProcessorPipeline.addStage(instructionDecodeStage);      // Add the ID stage to the pipeline
-    sequentialProcessorPipeline.addStage(instructionIssueStage);       // Add the II stage to the pipeline
-    sequentialProcessorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
-    //sequentialProcessorPipeline.addStage(printProcessorPipelineStatusStage);  // Add the utility stage to the pipeline - NOT ADDING THIS STAGE TO THE PROCESSOR PIPELINE SINCE IT IS NOT A REAL STAGE REQUIRED BY THE PROCESSOR FOR PROCESSING/EXECUTING INSTRUCTIONS
+    processorPipeline.addStage(instructionFetchStage);       // Add the IF stage to the pipeline
+    processorPipeline.addStage(instructionDecodeStage);      // Add the ID stage to the pipeline
+    processorPipeline.addStage(instructionIssueStage);       // Add the II stage to the pipeline
+    processorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
+    //processorPipeline.addStage(printProcessorPipelineStatusStage);  // Add the utility stage to the pipeline - NOT ADDING THIS STAGE TO THE PROCESSOR PIPELINE SINCE IT IS NOT A REAL STAGE REQUIRED BY THE PROCESSOR FOR PROCESSING/EXECUTING INSTRUCTIONS
 
     pipelineContext = new ProcessorPipelineContext(cpuRegisters,
                                                   cpuMemory,
                                                   instructionFetchStage,
                                                   instructionDecodeStage,
                                                   instructionIssueStage,
-                                                  instructionExecuteStage);   // Instantiate the sequential pipeline context object
+                                                  instructionExecuteStage);   // Instantiate the sequential pipeline context object. This is used to store data and share references between all stages in the pipeline. It can be thought of as the control unit (CU) of the cpu since it control all the values that are being updated.
 
     //cpuMemory.initialize();   // Initialize contents of the main memory with the required instructions and data (Generated as an output from the Assembler)
     cpuMemory.testInitialize(); // Initializing contents of memory with hard-coded test instructions
@@ -107,7 +108,7 @@ public class ProcessorSimulator
     //cpuRegisters.dumpContents();
     //for (int i = 0; i < pipelineStages.length; i++)
     Register.incrementClockCounter();                           // Increment the clock counter on every cycle run
-    sequentialProcessorPipeline.execute(pipelineContext);       // Execute/run the pipeline for the current cycle
+    processorPipeline.execute(pipelineContext);                 // Execute/run the pipeline for the current cycle
     printProcessorPipelineStatusStage.execute(pipelineContext); // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
     // TODO Add another stage to copy necessary values between two consecutive pipeline stages
     //this.dumpState();                                         // Dump the state of the cpu every cycle
@@ -209,6 +210,7 @@ public class ProcessorSimulator
       System.out.println("###              RUNNING THE CPU SIMULATOR              ###");
       System.out.println("###########################################################");
       System.out.println("CPU simulator starting program execution.");
+      // TODO This needs to be changed to check if the last instruction has been reached. Could use a special code/pattern in the executable file.
       for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)   // TODO this should be changed to run until the last instruction is reached in the .text section
       {  
         cpu.step();           // Step/Run the cpu simulator by one clock cycle

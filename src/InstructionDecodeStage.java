@@ -17,7 +17,7 @@ import java.lang.*;
 /**
  * This class implements the Instruction Decode (ID) stage of the processor.
  */
-public class InstructionDecodeStage implements IStage
+public class InstructionDecodeStage implements IProcessorPipelineStage
 {
   // Class/Instance fields
   // private Register cpuRegisters;

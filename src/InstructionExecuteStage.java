@@ -18,7 +18,7 @@ import java.lang.*;
 /**
  * This class implements the Instruction Execute (IE) stage of the processor.
  */
-public class InstructionExecuteStage implements IStage
+public class InstructionExecuteStage implements IProcessorPipelineStage
 {
   private IExecutionUnit ALU;      /** Reference to the ALU */
   private IExecutionUnit LSU;      /** Reference to the LSU */
@@ -69,8 +69,8 @@ public class InstructionExecuteStage implements IStage
         break;
     }
 
-    // The line below needs to be removed and put in the execute or the memory access stage
-    cpuRegisters.updatePC(false);                     // Update primary PC register with the incremented shadow PC register value.
+    // THIS IS WHERE THE PC IS UPDATED
+    cpuRegisters.updatePC(pContext.getBranchTaken());   // Update the primary/actual PC register with the correct/required value based on whether a branch was taken or not
   }
 
   // TODO need to fill function contents accordingly

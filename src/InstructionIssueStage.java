@@ -23,7 +23,7 @@ import java.lang.*;
 /**
  * This class implements the Instruction Issue (II) stage of the processor.
  */
-public class InstructionIssueStage implements IStage
+public class InstructionIssueStage implements IProcessorPipelineStage
 {
   private Instruction currentInstruction;
   private ArrayList<Instruction> instructionList;   /** Reference to the processor instruction list */

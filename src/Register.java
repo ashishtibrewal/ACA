@@ -22,7 +22,6 @@ import java.lang.*;
 public class Register
 {
   // Class/Instance fields
-  private final int totalRegisters = GlobalConstants.TOTAL_ARCHITECTURAL_REGISTERS;              /** Total number of processor registers */
   private final int registerInitializationValue = GlobalConstants.REGISTER_INITIALIZATION_VALUE;  /** Initialization value for all the processor registers */
   private final int statusRegisterLength = GlobalConstants.STATUS_REGISTER_LENGTH;         /** Number of bits/flags stored in the status register: Z C N O */
   private int[] generalPurposeRegisters;              /** Array that holds all the processor register values */
@@ -37,7 +36,7 @@ public class Register
   private int instructionRegister;                    /** Instruction register: Holds the value of the last decoded instruction */
   private int memoryAddressRegister;                  /** Memory Address Register: Holds the memory address to which the data contained in the Memory Data Register needs to be stored */
   private int memoryDataRegister;                     /** Memory Data Register: Holds the data that needs to be stored to memory address contained in the Memory Address Register */
-  private Memory cpuMemoryReference;                  /** Reference to the CPU memory */
+  private Memory cpuMemory;                           /** Reference to the CPU memory */
   private static int clockCounter;                    /** Variable that holds the number of cycles completed by the simulator - Declared as a static varaible since the processor should only contain a single clockCounter register no matter how many Register objects have been instantiated */
 
   // Initialize static variables
@@ -53,12 +52,13 @@ public class Register
    */
   public Register()
   {
-    generalPurposeRegisters = new int[totalRegisters];
+    generalPurposeRegisters = new int[GlobalConstants.TOTAL_GP_REGISTERS];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
     programCounter = registerInitializationValue;
     programCounterIncremented = registerInitializationValue;
     programCounterBranch = registerInitializationValue;
     stackPointer = registerInitializationValue;
+    framePointer = stackPointer;
     linkRegister = registerInitializationValue;
     accumulator = registerInitializationValue;
     memoryAddressRegister = registerInitializationValue;
@@ -84,6 +84,7 @@ public class Register
     programCounterIncremented = registerInitializationValue;
     programCounterBranch = registerInitializationValue;
     stackPointer = registerInitializationValue;
+    framePointer = stackPointer;
     linkRegister = registerInitializationValue;
     accumulator = registerInitializationValue;
     memoryAddressRegister = registerInitializationValue;
@@ -95,7 +96,7 @@ public class Register
     }
   }
 
-  public Register(int numberOfRegisters, Memory cpuMemory)
+  public Register(int numberOfRegisters, Memory _cpuMemory)
   {
     generalPurposeRegisters = new int[numberOfRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
@@ -103,6 +104,7 @@ public class Register
     programCounterIncremented = registerInitializationValue;
     programCounterBranch = registerInitializationValue;
     stackPointer = registerInitializationValue;
+    framePointer = stackPointer;
     linkRegister = registerInitializationValue;
     accumulator = registerInitializationValue;
     memoryAddressRegister = registerInitializationValue;
@@ -112,7 +114,7 @@ public class Register
     {
       statusRegister[i] = false;
     }
-    cpuMemoryReference = cpuMemory;   // Store the actual cpu memory's reference for future use
+    cpuMemory = _cpuMemory;   // Store the actual cpu memory's reference for future use
   }
 
   // Class/Instance methods
@@ -145,7 +147,7 @@ public class Register
    */
   public void incrementPC()
   {
-    if((programCounterIncremented + 1) < 0 || (programCounterIncremented + 1) >= cpuMemoryReference.memoryArray.length) // TODO change to check it doesnt enter the data region in memory
+    if((programCounterIncremented + 1) < 0 || (programCounterIncremented + 1) >= cpuMemory.getMemorySize()) // TODO change to check it doesnt enter the data region in memory
     {
       throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toHexString(programCounterIncremented + 1) + " doesn't exist in memory)."); 
     }
@@ -161,7 +163,7 @@ public class Register
    */
   public void writePC(int newValue)
   {
-    if (newValue < 0 || newValue >= cpuMemoryReference.memoryArray.length)
+    if (newValue < 0 || newValue >= cpuMemory.getMemorySize())
     {
       throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toHexString(newValue) + " doesn't exist in memory)."); 
     }
@@ -177,11 +179,11 @@ public class Register
    */
   public void updatePC(boolean branchTaken)
   {
-    if (branchTaken == false)
+    if (branchTaken == false)   // Update the PC to the next instruction address
     {
       programCounter = programCounterIncremented;
     }
-    else
+    else  // Update the PC to the branch target address
     {
       programCounter = programCounterBranch;
     }
@@ -213,7 +215,34 @@ public class Register
    */
   public void writeSP(int newValue)
   {
-    // TODO Implement functionality to handle values being written for the stack pointer
+    stackPointer = newValue;
+  }
+
+  /**
+   * Method to increment the stack pointer (SP)
+   */
+  public void incrementSP()
+  {
+    // TODO Insert check to avoid stack overflow (i.e. value shouln't go higher than the size of the stack - 1)
+    stackPointer++;
+  }
+
+  /**
+   * Method to decrement the stack pointer (SP)
+   */
+  public void decrementSP()
+  {
+    // TODO Insert check to avoid stack overflow (i.e. value shouln't go less than 0)
+    stackPointer--;
+  }
+
+  /**
+   * Method to write a new value to the frame pointer (FP)
+   * @param newValue Value that needs to be written to the FP register
+   */
+  public void writeFP(int newValue)
+  {
+    framePointer = newValue;
   }
 
   /**
@@ -222,7 +251,7 @@ public class Register
    */
   public void writeLR(int newValue)
   {
-    // TODO Implement functionality to handle values being written for the link register
+    linkRegister = newValue;
   }
 
   /**
@@ -247,7 +276,7 @@ public class Register
    */
   public void writeMAR(int newValue)
   {
-    if (newValue < 0 || newValue >= cpuMemoryReference.memoryArray.length)
+    if (newValue < 0 || newValue >= cpuMemory.getMemorySize())
     {
       throw new RegisterAccessException("Illegal MAR value (Location 0x" + Integer.toHexString(newValue) + " doesn't exist in memory)."); 
     }

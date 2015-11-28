@@ -18,7 +18,7 @@ import java.lang.*;
  * This class implements the Instruction Execute (IE) stage of the processor.
  */
 
-public class PrintProcessorPipelineStatusStage implements IStage 
+public class PrintProcessorPipelineStatusStage implements IProcessorPipelineStage 
 {
   private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
   //private static int tempCounter = 0;
