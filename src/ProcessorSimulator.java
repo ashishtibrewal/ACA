@@ -100,17 +100,10 @@ public class ProcessorSimulator
    */
   private void step()
   {
-    // cpuRegisters.setPC(1025);      // Fails with an exception because this location doesn't physically exist in memory and the PC can never have it's value set to this
-    //cpuRegisters.writePC(1000);
-    //cpuRegisters.incrementPC();
-    //cpuMemory.dumpContents();
-    //cpuRegisters.dumpContents();
-    //for (int i = 0; i < pipelineStages.length; i++)
-    Register.incrementClockCounter();                           // Increment the clock counter on every cycle run
-    processorPipeline.execute(pipelineContext);                 // Execute/run the pipeline for the current cycle
-    pipelineStatus.print(pipelineContext);                    // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
-    // TODO Add another stage to copy necessary values between two consecutive pipeline stages
-    //this.dumpState();                                         // Dump the state of the cpu every cycle
+    Register.incrementClockCounter();               // Increment the clock counter on every cycle run
+    processorPipeline.execute(pipelineContext);     // Execute/run the pipeline for the current cycle
+    pipelineStatus.print(pipelineContext);          // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
+    //this.dumpState();                             // Dump the state of the cpu every cycle
   }
 
   /**
@@ -121,7 +114,6 @@ public class ProcessorSimulator
     cpuMemory.dumpContents();         // Dump contents of memory to the standard output
     cpuRegisters.dumpContents();      // Dump contents of processor registers to the standard output
   }
-
 
   /**
    * Method that controls the Assembler and generates the CPU simulator executable binary file

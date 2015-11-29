@@ -39,14 +39,9 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
   {
     pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type
     cpuRegisters = pContext.getCpuRegisters();                 // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
-    // TODO Add stage functionality here
-    // TODO Read instructions from the instruction queue and feed in to the correct execution unit
-    //instruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).getFirst();
-    // TODO Insert a check to see if the Instruction queue is not empty, only if its not empty remove the head (i.e. the first item in the queue)
-    instruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).remove();      //TODO Extract the first instruction from the instruction queue, remove it from the queue and shift all contents forward
-    // TODO NOTE NEED TO CHECK IF THE INSTRUCTION IS A BRANCH INSTRUCTION, IF YES, ONLY RUN THE BU UNIT, IF NOT YOU CAN RUN BOTH THE ALU AND LSU UNITS. NOTE THAT ALL THE THREE UNITS CAN'T BE RUNNING TOGETHER IN THE SAME CYCLE.
+    instruction = pContext.getCurrentInstructionFromInstructionQueue();   // Extract the current instruction from the instruction queue
+    // TODO NOTE NEED TO CHECK IF THE INSTRUCTION IS A BRANCH INSTRUCTION, IF YES, ONLY RUN THE BU UNIT, IF NOT YOU CAN RUN BOTH THE ALU AND LSU UNITS. NOTE THAT ALL THE THREE UNITS CAN'T BE RUNNING TOGETHER IN THE SAME CLOCK CYCLE.
     requiredExecutionUnit = instruction.getExecutionUnit();
-    
     switch(requiredExecutionUnit)
     {
       // ALU instruction

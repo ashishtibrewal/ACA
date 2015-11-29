@@ -4,7 +4,7 @@
  * @date 02.11.2015
  * @details This file contains the InstructionIssueStage class that handles the third stage of the pipeline. It is used to store/queue instructions
  * that have been fetched and decoded from the main memory. This stage queues the instructions until a Execution Unit (EU) in the Instruction Execution 
- * stage becomes free.
+ * stage becomes free. Note that instructions can remain in this stage for multiple clock cycles, mainly due to its dependencies.
  * This stage is supposed to contain the following features:
  * 1. Dependency checking
  * 2. Register renaming
@@ -27,24 +27,20 @@ public class InstructionIssueStage implements IProcessorPipelineStage
 {
   private Instruction instruction;
   private ArrayList<Instruction> instructionList;   /** Reference to the processor instruction list */
-  private Queue<Instruction> instructionQueue;      /** Reference to the current instruction queue */
   private Register cpuRegisters;                    /** Reference to architectural registers */
   private ProcessorPipelineContext pContext;        /** Reference to the processor pipeline context */
 
   public InstructionIssueStage()
   {
     instructionList = new ArrayList<Instruction>();   // Instantiate the instruction list object
-    //instructionQueue = new ArrayBlockingQueue<Instruction>(GlobalConstants.INSTRUCTION_QUEUE_CAPACITY);   // Note this requires the java.util.concurrent.* package to be imported
-    instructionQueue = new LinkedList<Instruction>();
   }
 
   public void execute(IPipelineContext context)
   {
-    pContext = (ProcessorPipelineContext) context;              // Explicitly cast context to ProcessorPipelineContext type
-    cpuRegisters = pContext.getCpuRegisters();                  // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
-    // TODO Add stage functionality here
-    instruction = pContext.getCurrentInstruction();             // Obtain the current instruction from the pipeline context
-    instructionList.add(instruction);                    // Add the current instruction to the list
+    pContext = (ProcessorPipelineContext) context;        // Explicitly cast context to ProcessorPipelineContext type
+    cpuRegisters = pContext.getCpuRegisters();            // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
+    instruction = pContext.getCurrentInstruction();       // Obtain the current instruction from the pipeline context
+    instructionList.add(instruction);                     // Add the current instruction to the list
 
     // TODO need to obtain source register values for all the instructions and update the instructions dependency flag depending on the dependency checking algorithm
     // Instrucions can remain in this stage for multiple clock cycles (Mainly due to dependencies)
@@ -86,8 +82,8 @@ public class InstructionIssueStage implements IProcessorPipelineStage
           System.err.println("Invalid Instruction Type! Instruction couldn't be issued!");
           break;
       }
-      instructionQueue.add(instructionList.get(GlobalConstants.INSTRUCTION_LIST_START_INDEX));    // Add the top instruction to the queue by obtaining it from the instruction list
-      instructionList.remove(GlobalConstants.INSTRUCTION_LIST_START_INDEX);                       // Remove the top instruction from the list after it has been added to the executable instruction queue
+      pContext.setNextInstructionToInstructionQueue(instructionList.get(GlobalConstants.INSTRUCTION_LIST_START_INDEX)); // Add the top instruction to the queue by obtaining it from the instruction list
+      instructionList.remove(GlobalConstants.INSTRUCTION_LIST_START_INDEX);                                             // Remove the top instruction from the list after it has been added to the executable instruction queue
     }
   }
 
@@ -95,15 +91,6 @@ public class InstructionIssueStage implements IProcessorPipelineStage
   public void flush(IPipelineContext context)
   {
 
-  }
-
-  /**
-   * Method to obtain (a reference) to the instruction queue object
-   * @return Reference to the instruction queue object
-   */
-  public Queue<Instruction> getInstructionQueue()
-  {
-    return instructionQueue;
   }
 
   /**
