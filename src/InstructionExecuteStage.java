@@ -23,7 +23,7 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
   private IExecutionUnit ALU;      /** Reference to the ALU */
   private IExecutionUnit LSU;      /** Reference to the LSU */
   private IExecutionUnit BU;       /** Reference to the BU */
-  private Instruction currentInstruction;     /** Reference to the current instruction */   // TODO Should actually be a list of instructions when going superscalar
+  private Instruction instruction;     /** Reference to the current instruction */   // TODO Should actually be a list of instructions when going superscalar
   private ExecutionUnit requiredExecutionUnit;
   private Register cpuRegisters;                    /** Reference to architectural registers */
   private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
@@ -41,26 +41,27 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
     cpuRegisters = pContext.getCpuRegisters();                 // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     // TODO Add stage functionality here
     // TODO Read instructions from the instruction queue and feed in to the correct execution unit
-    //currentInstruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).getFirst();
-    currentInstruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).remove();      //TODO Extract the first instruction from the instruction queue, remove it from the queue and shift all contents forward
+    //instruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).getFirst();
+    // TODO Insert a check to see if the Instruction queue is not empty, only if its not empty remove the head (i.e. the first item in the queue)
+    instruction = ((LinkedList<Instruction>)pContext.getInstructionQueue()).remove();      //TODO Extract the first instruction from the instruction queue, remove it from the queue and shift all contents forward
     // TODO NOTE NEED TO CHECK IF THE INSTRUCTION IS A BRANCH INSTRUCTION, IF YES, ONLY RUN THE BU UNIT, IF NOT YOU CAN RUN BOTH THE ALU AND LSU UNITS. NOTE THAT ALL THE THREE UNITS CAN'T BE RUNNING TOGETHER IN THE SAME CYCLE.
-    requiredExecutionUnit = currentInstruction.getExecutionUnit();
+    requiredExecutionUnit = instruction.getExecutionUnit();
     
     switch(requiredExecutionUnit)
     {
       // ALU instruction
       case ALU:
-        ALU.execute(currentInstruction, context);       // Execute ALU
+        ALU.execute(instruction, context);       // Execute ALU
         break;
       
       // LSU instruction
       case LSU:
-        LSU.execute(currentInstruction, context);       // Execute LSU
+        LSU.execute(instruction, context);       // Execute LSU
         break;
 
       // BU instruction
       case BU:
-        BU.execute(currentInstruction, context);        // Execute BU
+        BU.execute(instruction, context);        // Execute BU
         break;
 
       // Default case. This condition should never be reached
@@ -77,5 +78,15 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
   public void flush(IPipelineContext context)
   {
 
+  }
+
+  /**
+   * Method to obtain the current instruction to be executed by the IE stage in the current (running) cycle.
+   * USED ONLY FOR PRINTING AND DEBUGGING.
+   * @return Current instruction to be executed
+   */
+  public Instruction getCurrentInstruction()
+  {
+    return instruction;
   }
 }

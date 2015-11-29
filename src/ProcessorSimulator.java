@@ -37,7 +37,7 @@ public class ProcessorSimulator
   private IStage instructionDecodeStage;                     /** Reference to the Instruction Decode Stage of the pipeline */
   private IStage instructionIssueStage;                      /** Reference to the Instruction Issue Stage of the pipeline */
   private IStage instructionExecuteStage;                    /** Reference to the Instruction Execute Stage of the pipeline */
-  private ProcessorPipelineStatus pipelineStatus;          /** Reference to the utility/debug stage in the pipleline/simulator */
+  private ProcessorPipelineStatus pipelineStatus;            /** Reference to the utility/debug stage in the pipleline/simulator */
   private IPipelineContext pipelineContext;                           /** Reference to the sequential pipeline context */
 
   // Initialize static variables
@@ -163,10 +163,10 @@ public class ProcessorSimulator
       System.out.println("###########################################################");
       System.out.println("###               RUNNING THE ASSEMBLER                 ###");
       System.out.println("###########################################################");
-      System.out.println("Running the Assembler to generate the executable binary file.");
+      System.out.println("Running the Assembler to generate the executable binary file. \n");
       System.out.println("Input file: " + args[0]);
       cpu.generateBinary(args[0]);      // Call the generateBinary method that controls the Assembler
-      System.out.println("Output executable: " + Assembler.outputFile);
+      System.out.println("Output executable: " + Assembler.outputFile + " \n");
       System.out.println("Assembler completed generating the executable binary file.");
     }
     catch (Exception ex)
@@ -187,7 +187,7 @@ public class ProcessorSimulator
       System.out.println("###########################################################");
       System.out.println("###            SETTING UP THE CPU SIMULATOR             ###");
       System.out.println("###########################################################");
-      System.out.println("Setting up the CPU simulator.");
+      System.out.println("Setting up the CPU simulator. \n");
       // this.setup();                 // Fails due to the following error: non-static variable this cannot be referenced from a static context
       cpu.setup();                     // Setup cpu for simulation (i.e. the simulation environment)
       System.out.println("CPU simulator set up complete.");
@@ -208,7 +208,7 @@ public class ProcessorSimulator
       System.out.println("###########################################################");
       System.out.println("###              RUNNING THE CPU SIMULATOR              ###");
       System.out.println("###########################################################");
-      System.out.println("CPU simulator starting program execution.");
+      System.out.println("CPU simulator starting program execution. \n");
       // TODO This needs to be changed to check if the last instruction has been reached. Could use a special code/pattern in the executable file.
       for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)   // TODO this should be changed to run until the last instruction is reached in the .text section
       {  

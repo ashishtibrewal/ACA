@@ -24,9 +24,9 @@ public final class GlobalConstants
   public static final int PIPELINE_LENGTH = 5;
   public static final int INSTRUCTION_QUEUE_CAPACITY = 100;
   public static final int INSTRUCTION_LIST_START_INDEX = 0;
-  public static final int NUM_ITERATIONS = 10;
   public static final int BL_ITEMS_TO_PUSH = TOTAL_GP_REGISTERS + 1;    // Number of items to push to the stack when a BL, i.e. branch with link instruction, is found. Value = Total number of GP registers + 1, this + 1 is for the link register
   public static final int RET_ITEMS_TO_POP = TOTAL_GP_REGISTERS + 1;    // Number of items to pop off the stack when a RET, i.e. return instruction, is found. Value = Total number of GP registers + 1, this + 1 is for the link register
+  public static final int NUM_ITERATIONS = 9;
   // TODO Insert ALL constants to this class.
   
   // Process execution unit (EU) constants

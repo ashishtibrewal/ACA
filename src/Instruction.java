@@ -12,8 +12,9 @@
 public class Instruction
 {
   private int memoryFetchLocation;
+  private int instruction;              /** Instruction value. Useful for debugging/printing purposes */
   private String instructionType;
-  private String instructionName;
+  private String instructionMnemonic;
   private int numberOfCycles;
   private int opCode;
   private int sourceReg1Loc;
@@ -27,15 +28,16 @@ public class Instruction
   // TODO add flag(s) required for dependency checking
 
   // RRR and RRI type instructions
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RRR")     // RRR type
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
-      this.instructionName = instructionName;
+      this.instructionMnemonic = instructionMnemonic;
       this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
+      this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
       this.sourceReg1Loc = sourceReg1Loc;
       this.sourceReg2Loc = sourceReg2Loc;
@@ -47,9 +49,10 @@ public class Instruction
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
-      this.instructionName = instructionName;
+      this.instructionMnemonic = instructionMnemonic;
       this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
+      this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
       this.sourceReg1Loc = sourceReg1Loc;
       this.sourceReg2Loc = 0;           // Overwrite source register 2 value since this instruction type doesn't use it
@@ -60,15 +63,16 @@ public class Instruction
   }
 
   // RR and RI type instruction
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RR")      // RR type
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
-      this.instructionName = instructionName;
+      this.instructionMnemonic = instructionMnemonic;
       this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
+      this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
       this.sourceReg1Loc = sourceReg1Loc;
       this.destinationRegLoc = destinationRegLoc;
@@ -79,9 +83,10 @@ public class Instruction
     {
       this.opCode = opCode;
       this.instructionType = instructionType;
-      this.instructionName = instructionName;
+      this.instructionMnemonic = instructionMnemonic;
       this.executionUnit = executionUnit;
       this.memoryFetchLocation = memoryFetchLocation;
+      this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
       this.sourceReg1Loc = 0;       // Overwrite source register 1 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
@@ -91,17 +96,35 @@ public class Instruction
   }
 
   // I type instruction
-  public Instruction(String instructionType, String instructionName, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int numberOfCycles, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, int signedImmediateVal)
   {
     this.opCode = opCode;
     this.instructionType = instructionType;
-    this.instructionName = instructionName;
+    this.instructionMnemonic = instructionMnemonic;
     this.executionUnit = executionUnit;
     this.memoryFetchLocation = memoryFetchLocation;
+    this.instruction = instruction;
     this.numberOfCycles = numberOfCycles;    
-    this.destinationRegLoc = destinationRegLoc;
     this.signedImmediateVal = signedImmediateVal;
     this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
+  }
+
+  // Copy constructor. Could have used Java Object class' default clone() method but that but default only does a shallow clone and would reuire quite a bit of modification to do a deep clone. Hence, for simplicity this is being used.
+  public Instruction(Instruction _instruction)
+  {
+    // Copy/clone all the field values stored in instruction to the new Instruction object being created. Note that sourceReg1Val and sourceReg2Val have been avoided since it's not updated at this stage (i.e. not when the object is being created). These fields will contain defualt values of its respective (declared) type.
+    this.opCode = _instruction.opCode;
+    this.instructionType = _instruction.instructionType;
+    this.instructionMnemonic = _instruction.instructionMnemonic;
+    this.executionUnit = _instruction.executionUnit;
+    this.memoryFetchLocation = _instruction.memoryFetchLocation;
+    this.instruction = _instruction.instruction;
+    this.numberOfCycles = _instruction.numberOfCycles;
+    this.sourceReg1Loc = _instruction.sourceReg1Loc;
+    this.sourceReg2Loc = _instruction.sourceReg2Loc;
+    this.destinationRegLoc = _instruction.destinationRegLoc;
+    this.signedImmediateVal = _instruction.signedImmediateVal;
+    this.dependencyFlag = _instruction.dependencyFlag;
   }
 
   /**
@@ -228,5 +251,23 @@ public class Instruction
   public int getMemoryFetchLocation()
   {
     return memoryFetchLocation;
+  }
+
+  /**
+   * Method to obtain the instruction value
+   * @return Instruction value
+   */
+  public int getInstructionVal()
+  {
+    return instruction;
+  }
+
+  /**
+   * Method to obtain the instruction mnemonic
+   * @return Instruction mnemonic
+   */
+  public String getInstructionMnemonic()
+  {
+    return instructionMnemonic;
   }
 }

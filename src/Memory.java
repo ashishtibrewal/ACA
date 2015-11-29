@@ -186,8 +186,8 @@ public class Memory
     */
     // Have to explicity declare them as signed since they are 32 bit instructions (declared as binary strings) and need to stored in the main memory as a 2's complement 32 bit integer type
     memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001", true); // MOVI R1, 2 (Move 2 into R1)
-    memoryArray[5] = Utility.convertToInt("10001000000011111111111111000010", true); // MOVI R2, -4 (Move -4 into R2)
-    memoryArray[9] = Utility.convertToInt("00001000000000000000000100100001", true); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
+    memoryArray[1] = Utility.convertToInt("10001000000011111111111111000010", true); // MOVI R2, -4 (Move -4 into R2)
+    memoryArray[2] = Utility.convertToInt("00001000000000000000000100100001", true); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
   }
 
   /**

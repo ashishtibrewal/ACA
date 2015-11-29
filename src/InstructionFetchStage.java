@@ -22,8 +22,8 @@ public class InstructionFetchStage implements IProcessorPipelineStage
   // Class/Instance fields
   // private Register cpuRegisters;
   // private Memory cpuMemory;
-  private int currentPC;
-  private int currentInstruction;
+  private int programCounter;
+  private int instruction;
   private Register cpuRegisters;                 /** Reference to architectural registers */
   private Memory cpuMemory;                      /** Reference to main memory */
   private ProcessorPipelineContext pContext;     /** Reference to the processor pipeline context */
@@ -39,9 +39,10 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     pContext = (ProcessorPipelineContext) context;                          // Explicitly cast context to ProcessorPipelineContext type
     cpuRegisters = pContext.getCpuRegisters();                              // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     cpuMemory = pContext.getCpuMemory();                                    // Obtain and store the reference to the primary cpu memory object from the pipeline context (Doing this to avoid having to type it over and over again)
-    currentPC = cpuRegisters.readPC();                                      // Read value of the PC register
-    currentInstruction = cpuMemory.readValue(currentPC);                    // Read value from main memory at the location specified by the PC register
-    cpuRegisters.writeIR(currentInstruction);                               // Write value to the instruction register (IR)
+    programCounter = cpuRegisters.readPC();                                 // Read value of the PC register
+    instruction = cpuMemory.readValue(programCounter);                      // Read value from main memory at the location specified by the PC register
+    pContext.setNextIR(instruction);                                        // Write value to the (next/output) instruction register (IR)  
+    //cpuRegisters.writeIR(instruction);                                    // Write value to the instruction register (IR)
     cpuRegisters.incrementPC();                                             // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
   }
 
@@ -49,5 +50,25 @@ public class InstructionFetchStage implements IProcessorPipelineStage
   public void flush(IPipelineContext context)
   {
 
+  }
+
+  /**
+   * Method to obtain the value of the PC that has been read by the IF stage in the current (running) cycle.
+   * USED ONLY FOR PRINTING AND DEBUGGING.
+   * @return Current PC value that has been read by the IF stage
+   */
+  public int getCurrentPC()
+  {
+    return programCounter;
+  }
+
+  /**
+   * Method to obtain the value of the instruction that has been read (from main memory) by the IF stage in the current (running) cycle.
+   * USED ONLY FOR PRINTING AND DEBUGGING.
+   * @return Current instruction value that has been read by the IF stage
+   */
+  public int getCurrentInstructionRead()
+  {
+    return instruction;
   }
 }

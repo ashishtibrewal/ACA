@@ -20,6 +20,26 @@ import java.util.List;
  */
 public class SequentialProcessorPipeline extends SequentialPipeline
 {
+
+  /**
+   * Method to execute/run the pipeline.
+   * @param context Shared object (context object) used throughout all stages in the pipeline
+   */
+  @Override                                         // Overriding since this method exists in the SequentialPipeline class and the IPipeline interface
+  public void execute(IPipelineContext context)
+  {
+    /* execute the stages */
+    for (IStage stage:p_stages)   //i.e. for every stage in the pipeline
+    { 
+      stage.execute(context);     // Execute each stage in the pipeline 
+      // if (context.getErrors()!= null && !context.getErrors().isEmpty())
+      // {
+      //  break;
+      // }
+    }
+    this.shift(context);          // Shift the contents along the pipeline
+  }
+
   /**
    * Method to flush the pipeline
    * @param context Shared object (context object) used throughout all stages in the pipeline
@@ -34,5 +54,17 @@ public class SequentialProcessorPipeline extends SequentialPipeline
         ((IProcessorPipelineStage) stage).flush(context);         // Flush each stage in the pipeline. Note explicitly casting to IProcessorPipelineStage type since all pipeline stages stored in the SequentialPipeline class are are of the IStage type and this doesn't contain a flush() method.
       }
     }
+  }
+
+  /**
+   * Method to shift the contents of each stage along the pipleine
+   * @param context Shared object (context object) used throughout all stages in the pipeline
+   */
+  public void shift(IPipelineContext context)
+  {
+    ProcessorPipelineContext pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type.
+    // Should actually do all the shifting here by obtaining the values from the pipeline context (i.e. pContext) using its getter methods but for simplicity it's being done in the ProcessorPipelineContext class because it removes the hassle of obtaining each an every single value that needs to be shifted.
+    pContext.shiftPipeline();       // Call the shiftPipeline() method on the pContext object
+    //System.out.println("SHIFTING CONTENTS IN THE PIPELINE !!!!");
   }
 }

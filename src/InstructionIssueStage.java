@@ -25,7 +25,7 @@ import java.lang.*;
  */
 public class InstructionIssueStage implements IProcessorPipelineStage
 {
-  private Instruction currentInstruction;
+  private Instruction instruction;
   private ArrayList<Instruction> instructionList;   /** Reference to the processor instruction list */
   private Queue<Instruction> instructionQueue;      /** Reference to the current instruction queue */
   private Register cpuRegisters;                    /** Reference to architectural registers */
@@ -43,32 +43,32 @@ public class InstructionIssueStage implements IProcessorPipelineStage
     pContext = (ProcessorPipelineContext) context;              // Explicitly cast context to ProcessorPipelineContext type
     cpuRegisters = pContext.getCpuRegisters();                  // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     // TODO Add stage functionality here
-    currentInstruction = pContext.getCurrentInstruction();      // Obtain the current instruction from the pipeline context
-    instructionList.add(currentInstruction);                    // Add the current instruction to the list
+    instruction = pContext.getCurrentInstruction();             // Obtain the current instruction from the pipeline context
+    instructionList.add(instruction);                    // Add the current instruction to the list
 
     // TODO need to obtain source register values for all the instructions and update the instructions dependency flag depending on the dependency checking algorithm
     // Instrucions can remain in this stage for multiple clock cycles (Mainly due to dependencies)
     // TODO Do all the work and (flow) checking on the instruction list and only add the instructions that need to be executed in a specific order to the instruction queue
     // TODO Obtain the correct/updated source register values and set it in the instruction object before adding it to the queue. Would need to check for dependencies. NOTE THIS IS NOT DONE IN THE DECODE STAGE AND NEEDS TO BE DONE HERE !!!
     
-    if (currentInstruction.getDependencyFlag() == false)    // Only add the instruction to the instruction queue (and remove from the instruction list) if it doesn't have any dependencies (or if all it's dependencies have finished executing)
+    if (instruction.getDependencyFlag() == false)    // Only add the instruction to the instruction queue (and remove from the instruction list) if it doesn't have any dependencies (or if all it's dependencies have finished executing)
     {
-      switch(currentInstruction.getInstructionType())
+      switch(instruction.getInstructionType())
       {
         // RRR type
         case "RRR":
-          currentInstruction.setSourceReg1Val(cpuRegisters.readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
-          currentInstruction.setSourceReg2Val(cpuRegisters.readGP(currentInstruction.getSourceReg2Loc()));      // Read value for source register 2
+          instruction.setSourceReg1Val(cpuRegisters.readGP(instruction.getSourceReg1Loc()));      // Read value for source register 1
+          instruction.setSourceReg2Val(cpuRegisters.readGP(instruction.getSourceReg2Loc()));      // Read value for source register 2
           break;
 
         // RRI type
         case "RRI":
-          currentInstruction.setSourceReg1Val(cpuRegisters.readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
+          instruction.setSourceReg1Val(cpuRegisters.readGP(instruction.getSourceReg1Loc()));      // Read value for source register 1
           break;
 
         // RR type
         case "RR":
-          currentInstruction.setSourceReg1Val(cpuRegisters.readGP(currentInstruction.getSourceReg1Loc()));      // Read value for source register 1
+          instruction.setSourceReg1Val(cpuRegisters.readGP(instruction.getSourceReg1Loc()));      // Read value for source register 1
           break;
 
         // RI type
@@ -104,5 +104,15 @@ public class InstructionIssueStage implements IProcessorPipelineStage
   public Queue<Instruction> getInstructionQueue()
   {
     return instructionQueue;
+  }
+
+  /**
+   * Method to obtain the current instruction to be issued by the II stage in the current (running) cycle.
+   * USED ONLY FOR PRINTING AND DEBUGGING.
+   * @return Current instruction to be issued
+   */
+  public Instruction getCurrentInstruction()
+  {
+    return instruction;
   }
 }
