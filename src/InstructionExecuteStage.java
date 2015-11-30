@@ -24,7 +24,7 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
   private IExecutionUnit LSU;      /** Reference to the LSU */
   private IExecutionUnit BU;       /** Reference to the BU */
   private Instruction instruction;     /** Reference to the current instruction */   // TODO Should actually be a list of instructions when going superscalar
-  private ExecutionUnit requiredExecutionUnit;
+  private ExecutionUnit requiredExecutionUnit;      
   private Register cpuRegisters;                    /** Reference to architectural registers */
   private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
 
@@ -42,7 +42,7 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
     instruction = pContext.getCurrentInstructionFromInstructionQueue();   // Extract the current instruction from the instruction queue
     // TODO NOTE NEED TO CHECK IF THE INSTRUCTION IS A BRANCH INSTRUCTION, IF YES, ONLY RUN THE BU UNIT, IF NOT YOU CAN RUN BOTH THE ALU AND LSU UNITS. NOTE THAT ALL THE THREE UNITS CAN'T BE RUNNING TOGETHER IN THE SAME CLOCK CYCLE.
     requiredExecutionUnit = instruction.getExecutionUnit();
-    switch(requiredExecutionUnit)
+    switch(requiredExecutionUnit)     // Execute the requried functional/execution unit depending on the type of instruction.
     {
       // ALU instruction
       case ALU:
@@ -67,6 +67,12 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
 
     // THIS IS WHERE THE PC IS UPDATED
     cpuRegisters.updatePC(pContext.getBranchTaken());   // Update the primary/actual PC register with the correct/required value based on whether a branch was taken or not
+
+    cpuRegisters.incrementInstructionCounter();         // Increment the instruction counter register (variable)
+    if (instruction.getOpCode() == Isa.NOP)
+    {
+      cpuRegisters.incrementInstructionCounterNOP();    // Increment the NOP instruction counter register (variable)
+    }
   }
 
   // TODO need to fill function contents accordingly

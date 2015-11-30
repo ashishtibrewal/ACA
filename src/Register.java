@@ -38,11 +38,15 @@ public class Register
   private int memoryDataRegister;                     /** Memory Data Register: Holds the data that needs to be stored to memory address contained in the Memory Address Register */
   private Memory cpuMemory;                           /** Reference to the CPU memory */
   private static int clockCounter;                    /** Variable that holds the number of cycles completed by the simulator - Declared as a static varaible since the processor should only contain a single clockCounter register no matter how many Register objects have been instantiated */
+  private static int instructionCounter;              /** Could the number of instructions executed by the processor */
+  private static int instructionCounterNOP;          /** Could the number of NOP instructions executed by the processor */
 
   // Initialize static variables
   static
   {
     clockCounter = GlobalConstants.CLOCK_REGISTER_INITIALIZATION_VALUE;
+    instructionCounter = 0;
+    instructionCounterNOP = 0;
   }
 
   // Class constructors
@@ -391,6 +395,41 @@ public class Register
   {
     return clockCounter;       // Increment the clock by one (Should be done for each loop iteration) 
   }
+
+  /**
+   * Method to increment the instruction counter
+   */
+  public void incrementInstructionCounter()
+  {
+    instructionCounter++;
+  }
+
+  /**
+   * Method to increment the NOP instruction counter
+   */
+  public void incrementInstructionCounterNOP()
+  {
+    instructionCounterNOP++;
+  }
+
+  /**
+   * Method to obtain the value stored in the instruction counter register, i.e. total number of instructions executed during the simulation
+   * @return Total number of instructions executed by/during the simualtor
+   */
+  public int getInstructionCounter()
+  {
+    return instructionCounter;
+  }
+
+  /**
+   * Method to obtain the value stored in the NOP instruction counter register, i.e. total number of NOP instructions executed during the simulation
+   * @return Total number of NOP instructions executed by/during the simualtor
+   */
+  public int getInstructionCounterNOP()
+  {
+    return instructionCounterNOP;
+  } 
+
 
   /**
    * Method to dump contents of all the architectural registers. 

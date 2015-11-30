@@ -34,6 +34,8 @@ public class InstructionFetchStage implements IProcessorPipelineStage
   //     this.cpuMemory = cpuMemory;
   // }
 
+
+  // TODO Do some predecode to see if the fetched instruction is a branch instructions. Include branch predictor to predict if a branch is taken or not. The current desing assumes that a branch is always not taken (i.e. this is a static branch prediction scheme)
   public void execute(IPipelineContext context)
   {
     pContext = (ProcessorPipelineContext) context;                          // Explicitly cast context to ProcessorPipelineContext type

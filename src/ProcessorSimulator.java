@@ -127,6 +127,19 @@ public class ProcessorSimulator
     assembler.run();                          // Run the assembler
   }
 
+  private void printResults()
+  {
+    System.out.println("###########################################################");
+    System.out.println("###                 SIMULATOR RESULTS                   ###");
+    System.out.println("###########################################################");
+    System.out.println("Total instructions executed: " + cpuRegisters.getInstructionCounter());
+    System.out.println("Total NOP instructions executed: " + cpuRegisters.getInstructionCounterNOP());
+    System.out.println("Total valid instructions executed: " + (cpuRegisters.getInstructionCounter() - cpuRegisters.getInstructionCounterNOP()));
+    System.out.println("Total clock cycles simulated: " + cpuRegisters.readClockCounter());
+    System.out.println("Instructions per cycle (IPC): " + ((double) (cpuRegisters.getInstructionCounter() - cpuRegisters.getInstructionCounterNOP()) / (double) (cpuRegisters.readClockCounter())));
+    System.out.println();
+  }
+
   /**
    * Main entry point to the simulator/program
    * @param args Command-line arguments passed to the program. It should include the name of the assembly file that needs to be read and executed by the simulator.
@@ -210,6 +223,7 @@ public class ProcessorSimulator
       }
       //cpu.dumpState();      // Print end state after having finished running the simulator
       System.out.println("CPU simulator finished executing the program. \n");
+      cpu.printResults();     // Print the results of the simulation/simulator
     }
     catch (Exception ex)
     {
