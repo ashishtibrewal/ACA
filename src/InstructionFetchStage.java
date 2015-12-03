@@ -45,6 +45,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     instruction = cpuMemory.readValue(programCounter);                      // Read value from main memory at the location specified by the PC register
     pContext.setNextIR(instruction);                                        // Write value to the (next/output) instruction register (IR)  
     //cpuRegisters.writeIR(instruction);                                    // Write value to the instruction register (IR)
+    pContext.setMemoryFetchLoc(programCounter);                             // Store the current value of the PC (i.e. the location in memory from where the instruction was fetched) to be used by the ID stage
     cpuRegisters.incrementPC();                                             // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
   }
 

@@ -42,7 +42,7 @@ public class ProcessorPipelineStatus
     System.out.println("+-+-------------------------------+-+---------------------------------+-+--------------------------------+-+-----------------------------+-+");
     System.out.println("|+|           IF Stage            |+|           ID Stage              |+|            II Stage            |+|          IE Stage           |+|");
     System.out.println("|+|--------------------------------------------------------------------------------------------------------------------------------------|+|");
-    System.out.format ("|+| PC: %04d                      |+| PC: N/A                         |+| PC: N/A                        |+| PC: %04d (Branch: %5s)    |+|%n", instructionFetchStage.getCurrentPC(), cpuRegisters.readPC(), pContext.getBranchTaken());
+    System.out.format ("|+| PC: %04d                      |+| PC: N/A                         |+| PC: N/A                        |+| PC: %04d (Branch: %5s)    |+|%n", instructionFetchStage.getCurrentPC(), cpuRegisters.readPC(), pContext.getBranchTakenOld());
     System.out.format ("|+| Instruction: 0x%08x       |+| Instruction: 0x%08x         |+| Instruction (Head): 0x%08x |+| Instruction: 0x%08x     |+|%n", instructionFetchStage.getCurrentInstructionRead(), instructionDecodeStage.getCurrentInstruction(), instructionIssueStage.getCurrentInstruction().getInstructionVal(), instructionExecuteStage.getCurrentInstruction().getInstructionVal());
     System.out.format ("|+|                               |+| Mnemonic: %4s (%3s)            |+| Mnemonic  : %4s (%3s)         |+| Mnemonic: %4s (%3s)        |+|%n", instructionDecodeStage.getCurrentInstructionMnemonic(), instructionDecodeStage.getCurrentInstructionType(), instructionIssueStage.getCurrentInstruction().getInstructionMnemonic(), instructionIssueStage.getCurrentInstruction().getInstructionType(), instructionExecuteStage.getCurrentInstruction().getInstructionMnemonic(), instructionExecuteStage.getCurrentInstruction().getInstructionType());
     System.out.format ("|+|                               |+| SR1: R%02d                        |+| SR1 (Val) : R%02d (%08d)     |+| Execution Unit: %3s         |+|%n", instructionDecodeStage.getCurrentSourceReg1(), instructionIssueStage.getCurrentInstruction().getSourceReg1Loc(), instructionIssueStage.getCurrentInstruction().getSourceReg1Val(), instructionExecuteStage.getCurrentInstruction().getExecutionUnit());
@@ -52,7 +52,6 @@ public class ProcessorPipelineStatus
     System.out.format ("|+|                               |+|                                 |+| Dependency: %5s              |+|                             |+|%n", instructionIssueStage.getCurrentInstruction().getDependencyFlag());
     System.out.println("+-+-------------------------------+-+---------------------------------+-+--------------------------------+-+-----------------------------+-+");
 
-
     /*
     System.out.print("List of istructions (In reverse order when looking at the pipeline) : "); 
     for (Instruction instruction:pContext.getInstructionQueue())
@@ -61,5 +60,7 @@ public class ProcessorPipelineStatus
     }
     */
     System.out.println();
+
+    pContext.setBranchTakenOld(true);       // Set the old branch taken boolean value to its default value, i.e. set it to false
   }
 }

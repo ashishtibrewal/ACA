@@ -185,11 +185,12 @@ public class Register
   {
     if (branchTaken == false)   // Update the PC to the next instruction address
     {
-      programCounter = programCounterIncremented;
+      programCounter = programCounterIncremented;         // Set the actual program counter to the incremented program counter
     }
     else  // Update the PC to the branch target address
     {
-      programCounter = programCounterBranch;
+      programCounter = programCounterBranch;              // Set the actual program counter to the branch location/address
+      programCounterIncremented = programCounterBranch;   // Set the incremented program counter to programCounterBranch to avoid the incorrect value of programCounterIncremented being used in the next cycle
     }
   }
 

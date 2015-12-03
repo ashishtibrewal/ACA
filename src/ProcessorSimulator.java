@@ -221,7 +221,7 @@ public class ProcessorSimulator
         // TODO Add code to print state of every stage for current cycle
         //cpu.dumpState();    // Dump the state of the cpu every cycle
       }
-      //cpu.dumpState();      // Print end state after having finished running the simulator
+      cpu.dumpState();      // Print end state after having finished running the simulator
       System.out.println("CPU simulator finished executing the program. \n");
       cpu.printResults();     // Print the results of the simulation/simulator
     }
