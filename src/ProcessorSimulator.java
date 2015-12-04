@@ -38,7 +38,8 @@ public class ProcessorSimulator
   private IStage instructionIssueStage;                      /** Reference to the Instruction Issue Stage of the pipeline */
   private IStage instructionExecuteStage;                    /** Reference to the Instruction Execute Stage of the pipeline */
   private ProcessorPipelineStatus pipelineStatus;            /** Reference to the utility/debug stage in the pipleline/simulator */
-  private IPipelineContext pipelineContext;                           /** Reference to the sequential pipeline context */
+  private IPipelineContext pipelineContext;                  /** Reference to the sequential pipeline context */
+  private BranchPredictor branchPredictor;                   /** Reference to the processor's branch prediction unit */
 
   // Initialize static variables
   static
@@ -77,7 +78,8 @@ public class ProcessorSimulator
     instructionDecodeStage = new InstructionDecodeStage();      // Instantiate the Instruction Decode (ID) stage object
     instructionIssueStage = new InstructionIssueStage();        // TODO The instruction issue class needs to implement register re-naming and re-order buffer, etc.  
     instructionExecuteStage = new InstructionExecuteStage();    //TODO Note this object should contain one or more execution units (EUs)
-    pipelineStatus = new ProcessorPipelineStatus();        // Instantiate the pipelineStatus object. This class provides a function to print the current status of the pipeline.
+    pipelineStatus = new ProcessorPipelineStatus();             // Instantiate the pipelineStatus object. This class provides a function to print the current status of the pipeline.
+    branchPredictor = new BranchPredictor();                    // Instantiate the processor's branch prediction (BP) unit
     
     processorPipeline.addStage(instructionFetchStage);       // Add the IF stage to the pipeline
     processorPipeline.addStage(instructionDecodeStage);      // Add the ID stage to the pipeline
@@ -89,7 +91,8 @@ public class ProcessorSimulator
                                                   instructionFetchStage,
                                                   instructionDecodeStage,
                                                   instructionIssueStage,
-                                                  instructionExecuteStage);   // Instantiate the sequential pipeline context object. This is used to store data and share references between all stages in the pipeline. It can be thought of as the control unit (CU) of the cpu since it control all the values that are being updated.
+                                                  instructionExecuteStage,
+                                                  branchPredictor);     // Instantiate the sequential pipeline context object. This is used to store data and share references between all stages in the pipeline. It can be thought of as the control unit (CU) of the cpu since it control all the values that are being updated.
 
     //cpuMemory.initialize();   // Initialize contents of the main memory with the required instructions and data (Generated as an output from the Assembler)
     cpuMemory.testInitialize(); // Initializing contents of memory with hard-coded test instructions

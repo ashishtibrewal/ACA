@@ -49,7 +49,7 @@ public class InstructionIssueStage implements IProcessorPipelineStage
     
     if (instruction.getDependencyFlag() == false)    // Only add the instruction to the instruction queue (and remove from the instruction list) if it doesn't have any dependencies (or if all it's dependencies have finished executing)
     {
-      switch(instruction.getInstructionType())
+      switch (instruction.getInstructionType())
       {
         // RRR type
         case "RRR":

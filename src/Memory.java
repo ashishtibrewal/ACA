@@ -188,7 +188,8 @@ public class Memory
     memoryArray[0] = Utility.convertToInt("10001000000000000000000000100001", true); // MOVI R1, 2 (Move 2 into R1)
     memoryArray[1] = Utility.convertToInt("10001000000011111111111111000010", true); // MOVI R2, -4 (Move -4 into R2)
     //memoryArray[3] = Utility.convertToInt("00001000000000000000000100100001", true); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
-    memoryArray[3] = Utility.convertToInt("10110000000000000001000000010010", true);
+    //memoryArray[3] = Utility.convertToInt("10110000000000000001000000010010", true);  // BNE R1, R2, 16
+    memoryArray[3] = Utility.convertToInt("10011000000000000000000000010010", true);  // BU 18
   }
 
   /**

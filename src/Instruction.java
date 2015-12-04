@@ -25,10 +25,11 @@ public class Instruction
   private int signedImmediateVal;
   private ExecutionUnit executionUnit;
   private boolean dependencyFlag;         // Set to false by default. TODO This needs to be updated by the Instruction Issue stage after having checked for dependencies
+  private boolean branchPredictionResult; // Branch prediction result. Set by the processor's branch prediction unit. Only useful for branch instructions.
   // TODO add flag(s) required for dependency checking
 
   // RRR and RRI type instructions
-  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, boolean branchPredictionResult, int sourceReg1Loc, int sourceReg2Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RRR")     // RRR type
     {
@@ -39,11 +40,12 @@ public class Instruction
       this.memoryFetchLocation = memoryFetchLocation;
       this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
+      this.branchPredictionResult = branchPredictionResult;
       this.sourceReg1Loc = sourceReg1Loc;
       this.sourceReg2Loc = sourceReg2Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;      // Overwrite immediate value since this instruction type doesn't use it
-      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RRI type
     {
@@ -54,16 +56,17 @@ public class Instruction
       this.memoryFetchLocation = memoryFetchLocation;
       this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
+      this.branchPredictionResult = branchPredictionResult;
       this.sourceReg1Loc = sourceReg1Loc;
       this.sourceReg2Loc = 0;           // Overwrite source register 2 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
-      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
   }
 
   // RR and RI type instruction
-  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, int sourceReg1Loc, int destinationRegLoc, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, boolean branchPredictionResult, int sourceReg1Loc, int destinationRegLoc, int signedImmediateVal)
   {
     if (instructionType == "RR")      // RR type
     {
@@ -74,10 +77,11 @@ public class Instruction
       this.memoryFetchLocation = memoryFetchLocation;
       this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
+      this.branchPredictionResult = branchPredictionResult;
       this.sourceReg1Loc = sourceReg1Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;    // Overwrite source register 1 value since this instruction type doesn't use it
-      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RI type
     {
@@ -88,15 +92,16 @@ public class Instruction
       this.memoryFetchLocation = memoryFetchLocation;
       this.instruction = instruction;
       this.numberOfCycles = numberOfCycles;
+      this.branchPredictionResult = branchPredictionResult;
       this.sourceReg1Loc = 0;       // Overwrite source register 1 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
-      this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
   }
 
   // I type instruction
-  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, int signedImmediateVal)
+  public Instruction(String instructionType, String instructionMnemonic, ExecutionUnit executionUnit, int opCode, int memoryFetchLocation, int instruction, int numberOfCycles, boolean branchPredictionResult, int signedImmediateVal)
   {
     this.opCode = opCode;
     this.instructionType = instructionType;
@@ -104,9 +109,10 @@ public class Instruction
     this.executionUnit = executionUnit;
     this.memoryFetchLocation = memoryFetchLocation;
     this.instruction = instruction;
-    this.numberOfCycles = numberOfCycles;    
+    this.numberOfCycles = numberOfCycles;
+    this.branchPredictionResult = branchPredictionResult;
     this.signedImmediateVal = signedImmediateVal;
-    this.dependencyFlag = false;      // By default we set this to false and assume that an instruction doesn't have any dependencies
+    this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
   }
 
   // Copy constructor. Could have used Java Object class' default clone() method but that but default only does a shallow clone and would reuire quite a bit of modification to do a deep clone. Hence, for simplicity this is being used.
@@ -125,6 +131,7 @@ public class Instruction
     this.destinationRegLoc = _instruction.destinationRegLoc;
     this.signedImmediateVal = _instruction.signedImmediateVal;
     this.dependencyFlag = _instruction.dependencyFlag;
+    this.branchPredictionResult = _instruction.branchPredictionResult;
   }
 
   /**
@@ -269,5 +276,14 @@ public class Instruction
   public String getInstructionMnemonic()
   {
     return instructionMnemonic;
+  }
+
+  /**
+   * Method to obtain the branch predictor's result for this instruction. Only useful for branch instructions.
+   * @return Branch predictor's result for this instruction
+   */
+  public boolean getBranchPredictionResult()
+  {
+    return branchPredictionResult;
   }
 }

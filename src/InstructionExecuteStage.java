@@ -42,7 +42,7 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
     instruction = pContext.getCurrentInstructionFromInstructionQueue();   // Extract the current instruction from the instruction queue
     // TODO NOTE NEED TO CHECK IF THE INSTRUCTION IS A BRANCH INSTRUCTION, IF YES, ONLY RUN THE BU UNIT, IF NOT YOU CAN RUN BOTH THE ALU AND LSU UNITS. NOTE THAT ALL THE THREE UNITS CAN'T BE RUNNING TOGETHER IN THE SAME CLOCK CYCLE.
     requiredExecutionUnit = instruction.getExecutionUnit();
-    switch(requiredExecutionUnit)     // Execute the requried functional/execution unit depending on the type of instruction.
+    switch (requiredExecutionUnit)     // Execute the requried functional/execution unit depending on the type of instruction.
     {
       // ALU instruction
       case ALU:

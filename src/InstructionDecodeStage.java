@@ -202,7 +202,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
    */
   private void extractInformation(String instructionMnemonic, String instructionType)
   {
-    switch(instructionType)
+    switch (instructionType)
     {
       // RRR type
       case "RRR":
@@ -214,9 +214,10 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
                                                     instructionMnemonic,
                                                     executionUnit,
                                                     opCode, 
-                                                    pContext.getMemoryFetchLoc(),
+                                                    pContext.getCurrentMemoryFetchLoc(),
                                                     instruction,
                                                     Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
+                                                    pContext.getCurrentInstructionBranchPredictionResult(),
                                                     sourceReg1,
                                                     sourceReg2,
                                                     destinationReg,
@@ -242,9 +243,10 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
                                                     instructionMnemonic,
                                                     executionUnit,
                                                     opCode, 
-                                                    pContext.getMemoryFetchLoc(),
+                                                    pContext.getCurrentMemoryFetchLoc(),
                                                     instruction,
                                                     Isa.InstructionType.RRI.NUMBER_OF_CYCLES,
+                                                    pContext.getCurrentInstructionBranchPredictionResult(),
                                                     sourceReg1,
                                                     sourceReg2,
                                                     destinationReg,
@@ -262,9 +264,10 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
                                                     instructionMnemonic,
                                                     executionUnit,
                                                     opCode, 
-                                                    pContext.getMemoryFetchLoc(),
+                                                    pContext.getCurrentMemoryFetchLoc(),
                                                     instruction,
                                                     Isa.InstructionType.RR.NUMBER_OF_CYCLES,
+                                                    pContext.getCurrentInstructionBranchPredictionResult(),
                                                     sourceReg1,
                                                     destinationReg,
                                                     signedImmediate));
@@ -281,9 +284,10 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
                                                     instructionMnemonic,
                                                     executionUnit,
                                                     opCode, 
-                                                    pContext.getMemoryFetchLoc(),
+                                                    pContext.getCurrentMemoryFetchLoc(),
                                                     instruction,
                                                     Isa.InstructionType.RI.NUMBER_OF_CYCLES,
+                                                    pContext.getCurrentInstructionBranchPredictionResult(),
                                                     sourceReg1,
                                                     destinationReg,
                                                     signedImmediate));
@@ -300,18 +304,17 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
                                                     instructionMnemonic,
                                                     executionUnit,
                                                     opCode, 
-                                                    pContext.getMemoryFetchLoc(),
+                                                    pContext.getCurrentMemoryFetchLoc(),
                                                     instruction,
                                                     Isa.InstructionType.I.NUMBER_OF_CYCLES,
+                                                    pContext.getCurrentInstructionBranchPredictionResult(),
                                                     signedImmediate));
         // System.out.println("Decoded instruction details: " + instructionMnemonic + " I" + signedImmediate);
         break;
 
       // Shoudn't get here since it's an invalid instruction type
       default:
-        System.err.println("Invalid Instruction Type! Instruction information couldn't be extracted!");
-        // TODO Find how to throw a new exception
-        break;
+        throw new IllegalInstructionException("Invalid instruction yype! Instruction information couldn't be extracted!");
     }
   }
 

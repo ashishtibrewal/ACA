@@ -28,6 +28,14 @@ public final class GlobalConstants
   public static final int RET_ITEMS_TO_POP = TOTAL_GP_REGISTERS + 1;    // Number of items to pop off the stack when a RET, i.e. return instruction, is found. Value = Total number of GP registers + 1, this + 1 is for the link register
   public static final int NUM_ITERATIONS = 9;
   // TODO Insert ALL constants to this class.
+
+  // Processor default constants
+  public static final int DEFAULT_INSTRUCTION = Isa.NOP;                // Default instruction is the NOP instruction specefied in the ISA
+  public static final int DEFAULT_INSTRUCTION_OPCODE = (DEFAULT_INSTRUCTION >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);   // Default instruction OpCode
+  public static final int DEFAULT_MEM_FETCH_LOC = 0;                    // Default memory fetch location
+  public static final boolean DEFAULT_BRANCH_PREDICTION = false;        // Default branch prediction value is false
+  public static final String DEFAULT_INSTRUCTION_TYPE = "RRR";          // Default instruction type
+  public static final String DEFAULT_INSTRUCTION_MNEMONIC = "NOP";      // Default instruction mnemonic
   
   // Process execution unit (EU) constants
   public static final int TOTAL_ALU = 1;    //TODO Would need at least 4

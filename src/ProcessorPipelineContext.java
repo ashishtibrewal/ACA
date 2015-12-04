@@ -25,6 +25,7 @@ public class ProcessorPipelineContext implements IPipelineContext
   private IStage instructionDecodeStage;                  /** Reference to the Instruction Decode Stage of the pipeline. Useful if something is required from this stage by other stages. */
   private IStage instructionIssueStage;                   /** Reference to the Instruction Issue Stage of the pipeline. Useful if something is required from this stage by other stages. */
   private IStage instructionExecuteStage;                 /** Reference to the Instruction Execute Stage of the pipeline. Useful if something is required from this stage by other stages. */
+  private BranchPredictor branchPredictor;                /** Reference to the processor's branch prediction unit */
   private boolean branchTaken;                            /** Variable stating if the BU, i.e. Branch Unit evaluated that a branch needs to be taken. Based on this variable the pipeline would need to be flushed */
   private boolean branchTakenOld;                         /** Variable to store the previous value of branchTaken. ONLY USED FOR PRINTING/DEBUGGING PURPOSE. */
   private int branchTarget;                               /** Variable holding the branch target address */
@@ -34,9 +35,13 @@ public class ProcessorPipelineContext implements IPipelineContext
   private Instruction currentInstruction;                 /** Reference to the current instruction */   // TODO this should actually be a list of instructions when going superscalar becase in one cycle the instruction fetch unit would fetch multiple executions
   private Queue<Instruction> nextInstructionQueue;        /** Reference to the next instruction queue - Similar to a reservation station */
   private Queue<Instruction> currentInstructionQueue;     /** Reference to the current instruction queue - Similar to a reservation station */
-  private int memoryFetchLoc;                             /** Memory fetch location updated by the IF stage */
+  private int nextMemoryFetchLoc;                         /** Updated memory fetch location value set by the IF stage */
+  private int currentMemoryFetchLoc;                      /** Previous memory fetch location value read by the ID stage */
+  private boolean stallPipeline;                          /** Boolean variable stating if the pipeline should be stalled */   //TODO Check if individual variables to stall each stage would be a better way to handle this
+  private boolean nextInstructionBranchPredictionResult;
+  private boolean currentInstructionBranchPredictionResult;
 
-  public ProcessorPipelineContext(Register cpuRegisters, Memory cpuMemory, IStage instructionFetchStage, IStage instructionDecodeStage, IStage instructionIssueStage, IStage instructionExecuteStage)
+  public ProcessorPipelineContext(Register cpuRegisters, Memory cpuMemory, IStage instructionFetchStage, IStage instructionDecodeStage, IStage instructionIssueStage, IStage instructionExecuteStage, BranchPredictor branchPredictor)
   {
     this.cpuRegisters = cpuRegisters;
     this.cpuMemory = cpuMemory;
@@ -44,31 +49,36 @@ public class ProcessorPipelineContext implements IPipelineContext
     this.instructionDecodeStage = instructionDecodeStage;
     this.instructionIssueStage = instructionIssueStage;
     this.instructionExecuteStage = instructionExecuteStage;
-    this.currentIR = 0;         // Default IR value, declared as 0, hence, signifies a NOP operation
-    this.currentInstruction = new Instruction("RRR",
-                                              "NOP",
+    this.branchPredictor = branchPredictor;
+    this.currentIR = GlobalConstants.DEFAULT_INSTRUCTION;         // Default IR value, declared as 0, hence, signifies a NOP operation
+    this.currentInstruction = new Instruction(GlobalConstants.DEFAULT_INSTRUCTION_TYPE,
+                                              GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC,
                                               ExecutionUnit.ALU,
-                                              0, 
-                                              0,
-                                              0,
+                                              GlobalConstants.DEFAULT_INSTRUCTION_OPCODE, 
+                                              GlobalConstants.DEFAULT_MEM_FETCH_LOC,
+                                              GlobalConstants.DEFAULT_INSTRUCTION,
                                               Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
+                                              GlobalConstants.DEFAULT_BRANCH_PREDICTION,
                                               Isa.DEFAULT_REG_VALUE,
                                               Isa.DEFAULT_REG_VALUE,
                                               Isa.DEFAULT_REG_VALUE,
                                               Isa.DEFAULT_IMM_VALUE);         // Instantiate current instruction obeject as a NOP operation otherwise the Instruction Issue (II) stage throws a null pointer exception in the because it gets an Instruction object reference that hasn't been instantiated (i.e. this reference doesn't point to any object). Useful when the later stages of the pipeline are empty in the first few cycles of the simulation.
     this.currentInstructionQueue = new LinkedList<Instruction>();             // Instantiate current instruction queue object to avoid null pointer exceptions to be generated by the the II stage (Useful only for the first clock cycle).
-    this.currentInstructionQueue.add(new Instruction("RRR",
-                                                     "NOP",
+    this.currentInstructionQueue.add(new Instruction(GlobalConstants.DEFAULT_INSTRUCTION_TYPE,
+                                                     GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC,
                                                      ExecutionUnit.ALU,
-                                                     0, 
-                                                     0,
-                                                     0,
+                                                     GlobalConstants.DEFAULT_INSTRUCTION_OPCODE, 
+                                                     GlobalConstants.DEFAULT_MEM_FETCH_LOC,
+                                                     GlobalConstants.DEFAULT_INSTRUCTION,
                                                      Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
+                                                     GlobalConstants.DEFAULT_BRANCH_PREDICTION,
                                                      Isa.DEFAULT_REG_VALUE,
                                                      Isa.DEFAULT_REG_VALUE,
                                                      Isa.DEFAULT_REG_VALUE,
                                                      Isa.DEFAULT_IMM_VALUE)); // Insert a NOP operation to the current instruction queue read by the IE stage. This prevents a null pointer exception in the first execution cycle of the IE stage.
     this.nextInstructionQueue = new LinkedList<Instruction>();                // Instantiate the next instruction queue object to avoid null pointer exceptions to be generated by the II stage (Useful only for the first clock cycle).
+    this.currentMemoryFetchLoc = GlobalConstants.DEFAULT_MEM_FETCH_LOC;                                  // Default memory fetch location
+    this.currentInstructionBranchPredictionResult = GlobalConstants.DEFAULT_BRANCH_PREDICTION;           // Default branch prediction value 
   }
   
   /**
@@ -79,6 +89,8 @@ public class ProcessorPipelineContext implements IPipelineContext
     currentInstruction = new Instruction(nextInstruction);      // Use the copy constructor to "clone" the next instruction object to the current instruction object
     currentIR = nextIR;                                         // Clone the value contained in the instruction register
     currentInstructionQueue = nextInstructionQueue;             // Copy the reference of the nextInstructionQueue to the currentInstructionQueue
+    currentMemoryFetchLoc = nextMemoryFetchLoc;                 // Copy the memory fetch location value
+    currentInstructionBranchPredictionResult = nextInstructionBranchPredictionResult; // Copy the branch prediction result value
     //branchTaken = false;                                        // Revert the value of the branchTaken variable back to false for it to be used in the next cycle - This is currently being done in the IE stage
   }
 
@@ -234,6 +246,54 @@ public class ProcessorPipelineContext implements IPipelineContext
   }
 
   /**
+   * Method to set the memory fetch location for the latest fetched instruction. This value is set by the IF stage 
+   * @param _nextMemoryFetchLoc Memory fetch location of the instruction (Current PC value)
+   */
+  public void setNextMemoryFetchLoc(int _nextMemoryFetchLoc)
+  {
+    nextMemoryFetchLoc = _nextMemoryFetchLoc;
+  }
+
+  /**
+   * Method to obtain the memory fetch location for the latest decoded instruction (i.e. instruction fetched in the 
+   * previous cycle by the IF stage). This value is used by the ID stage.
+   * @return Memory location of the instruction (i.e. Memory location/address from where the instruction was fetched)
+   */
+  public int getCurrentMemoryFetchLoc()
+  {
+    return currentMemoryFetchLoc;
+  }
+
+  /**
+   * Method to obtain a reference to the processor's branch prediction (BP) unit. This method is used by the IF stage
+   * @return Reference to the processor's branch prediction (BP) unit
+   */
+  public BranchPredictor getBranchPredictor()
+  {
+    return branchPredictor;
+  }
+
+  /**
+   * Method to set the branch predictor's result for the next instruction. Only useful for (conditional) branch instructions.
+   * Used (i.e. value set by) by the IF stage.
+   * @param _nextInstructionBranchPredictionResult Branch predictor's result for this instruction
+   */
+  public void setNextInstructionBranchPredictionResult(boolean _nextInstructionBranchPredictionResult)
+  {
+    nextInstructionBranchPredictionResult = _nextInstructionBranchPredictionResult;
+  }
+
+  /**
+   * Method to obtain the branch predictor's result for the current instruction. Only useful for (conditional) branch instructions.
+   * Used (i.e. value read by) by the ID stage.
+   * @return Branch predictor's result for this instruction
+   */
+  public boolean getCurrentInstructionBranchPredictionResult()
+  {
+    return currentInstructionBranchPredictionResult;
+  }
+
+  /**
    * Method to obtain a reference to the Instruction Fetch (IF) Stage object, instructionFetchStage.
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Reference to the IF Stage obejct
@@ -271,24 +331,5 @@ public class ProcessorPipelineContext implements IPipelineContext
   public IStage getIE_Stage()
   {
     return instructionExecuteStage;
-  }
-
-  /**
-   * Method to set the memory fetch location for the latest fetched instruction. This value is set by the IF stage 
-   * @param _memoryFetchLoc Memory location of the instruction (Current PC value)
-   */
-  public void setMemoryFetchLoc(int _memoryFetchLoc)
-  {
-    memoryFetchLoc = _memoryFetchLoc;
-  }
-
-  /**
-   * Method to obtain the memory fetch location for the latest decoded instruction (i.e. instruction fetched in the 
-   * previous cycle by the IF stage). This value is used by the ID stage.
-   * @return Memory location of the instruction (i.e. Memory location/address from where the instruction was fetched)
-   */
-  public int getMemoryFetchLoc()
-  {
-    return (memoryFetchLoc - 1);      // The -1 is because the ID stage requires the previous PC value (i.e. the PC value for the previous cycle). // TODO Check if this works correctly for branch instructions
   }
 }
