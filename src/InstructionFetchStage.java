@@ -53,10 +53,14 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     cpuRegisters.incrementPC();                                             // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
   }
 
-  // TODO need to fill function contents accordingly
+  // TODO need to fill function contents accordingly - This would need to be execute when the branch prediction was incorrect
   public void flush(IPipelineContext context)
   {
-
+    // Effectively set all the class fields to it's default values
+    programCounter = GlobalConstants.DEFAULT_PC;
+    instruction = GlobalConstants.DEFAULT_INSTRUCTION;
+    branchInstruction = false;
+    branchPredictorResult = GlobalConstants.DEFAULT_BRANCH_PREDICTION;
   }
 
   /**
@@ -68,7 +72,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     BranchPredictor branchPredictor;
     Instruction instruction = new Instruction(GlobalConstants.DEFAULT_INSTRUCTION_TYPE,
                                               GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC,
-                                              ExecutionUnit.ALU,
+                                              GlobalConstants.DEFAULT_EXECUTION_UNIT,
                                               GlobalConstants.DEFAULT_INSTRUCTION_OPCODE, 
                                               GlobalConstants.DEFAULT_MEM_FETCH_LOC,
                                               GlobalConstants.DEFAULT_INSTRUCTION,
@@ -77,10 +81,10 @@ public class InstructionFetchStage implements IProcessorPipelineStage
                                               Isa.DEFAULT_REG_VALUE,
                                               Isa.DEFAULT_REG_VALUE,
                                               Isa.DEFAULT_REG_VALUE,
-                                              Isa.DEFAULT_IMM_VALUE);         // Need to insert a default value or else the compiler complains 
-    String instructionMnemonic = "BNE";             // Need to insert a default value or else the compiler complains 
-    String instructionType = "RRI";                 // Need to insert a default value or else the compiler complains
-    ExecutionUnit executionUnit = ExecutionUnit.BU; // Need to insert a default value or else the compiler complains
+                                              Isa.DEFAULT_IMM_VALUE);                   // Need to insert a default value or else the compiler complains 
+    String instructionMnemonic = GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC;          // Need to insert a default value or else the compiler complains 
+    String instructionType = GlobalConstants.DEFAULT_INSTRUCTION_TYPE;                  // Need to insert a default value or else the compiler complains
+    ExecutionUnit executionUnit = GlobalConstants.DEFAULT_EXECUTION_UNIT;               // Need to insert a default value or else the compiler complains
     int sourceReg1;    
     int sourceReg2;    
     int destinationReg;
@@ -157,12 +161,12 @@ public class InstructionFetchStage implements IProcessorPipelineStage
       // Non-branch instruction
       default:
         branchInstruction = false;        // The instruction fetched is not a branch instruction
-        break;
+        return this.instruction;          // Return back to the main execute function of the IF stage since the instruction fetched is a non-branch instruction
     }
 
-    if (branchInstruction == true)        // Only execute this section if the fetched instruction is a branch instruction
+    if (branchInstruction == true)        // Only execute this section if the fetched instruction is a branch instruction. Don't really need this check since the function returns to the caller before it can get here if it's not a branch instruction
     {
-      switch (instructionType)            // Branch instructions can either be of RRR or RRI or I type only. It cannot be of RR or RI type. Note all source register location "fetches" are irrelevant since they are not used here.
+      switch (instructionType)            // Branch instructions can either be of RRR or RRI or I type only. It cannot be of RR or RI type. Note all source register location "fetches" are irrelevant since they are not used here - Only being done to be able to create an instruction object.
       {
         // RRR type
         case "RRR":
@@ -187,8 +191,8 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         // RRI type
         case "RRI":
           sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
-          sourceReg2 = Isa.DEFAULT_REG_VALUE;
-          destinationReg = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
+          sourceReg2 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
+          destinationReg =  Isa.DEFAULT_REG_VALUE;
           signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
           instruction = new Instruction(instructionType,
                                         instructionMnemonic,
@@ -223,15 +227,12 @@ public class InstructionFetchStage implements IProcessorPipelineStage
 
         // Shoudn't get here since it's an invalid instruction type
         default:
-          throw new IllegalInstructionException("Invalid instruction type for the fetched branch instruction! Instruction information couldn't be extracted!");
+          throw new IllegalInstructionException("Invalid instruction type for the fetched branch instruction! Instruction information couldn't be extracted! Check the executable/binary files for possible issues!");
       }
       branchPredictor = pContext.getBranchPredictor();                              // Obtain a reference to the processor's branch prediction unit
       branchPredictorResult = branchPredictor.predict(instruction);                 // Call the predict method in the processor's branch predictor unit
-      pContext.setNextInstructionBranchPredictionResult(branchPredictorResult);
-      //instruction.setBranchPredictionResult(branchPredictorResult);
-      System.out.println("Branch predictor result for the fetched branch instruction: " + instruction.getBranchPredictionResult());
-      // If branch predictor predicts true for the fetched instruction - Update temporary PC to branch target
-      if (branchPredictorResult == true)
+      pContext.setNextInstructionBranchPredictionResult(branchPredictorResult);  
+      if (branchPredictorResult == true)      // If branch predictor predicts true for the fetched instruction - Update temporary PC to branch target in the IF stage itself, otherwise carry on with normal execution
       {
         switch (instruction.getOpCode())
         {
@@ -291,7 +292,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
           case Isa.BEQ:
             signedImmediateVal = instruction.getSignedImmediateVal();
             calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate, i.e. using the PC value (memory location from where the instruction was fetched) stored in the instruction object
-            pContext.setBranchTaken(true);                  // Assert that a branch needs to be taken
+            pContext.setBranchTaken(branchPredictorResult);
             pContext.setBranchTarget(calculationResult);    // Set the branch target (i.e. PC = PC + Ix)
             break;
 
@@ -299,7 +300,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
           case Isa.BNE:
             signedImmediateVal = instruction.getSignedImmediateVal();
             calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate 
-            pContext.setBranchTaken(true);                  // Assert that a branch needs to be taken
+            pContext.setBranchTaken(branchPredictorResult);
             pContext.setBranchTarget(calculationResult);    // Set the branch target (i.e. PC = PC + Ix)
             break;
 
@@ -307,7 +308,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
           case Isa.BLT:
             signedImmediateVal = instruction.getSignedImmediateVal();
             calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate 
-            pContext.setBranchTaken(true);                  // Assert that a branch needs to be taken
+            pContext.setBranchTaken(branchPredictorResult);
             pContext.setBranchTarget(calculationResult);    // Set the branch target (i.e. PC = PC + Ix)
             break;
 
@@ -315,22 +316,28 @@ public class InstructionFetchStage implements IProcessorPipelineStage
           case Isa.BGT:
             signedImmediateVal = instruction.getSignedImmediateVal();
             calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate 
-            pContext.setBranchTaken(true);                  // Assert that a branch needs to be taken
+            pContext.setBranchTaken(branchPredictorResult);
             pContext.setBranchTarget(calculationResult);    // Set the branch target (i.e. PC = PC + Ix)
             break;
+
+          // Shouldn't get here since all different types of branches have been covered
+          default:
+            throw new IllegalInstructionException("Invalid pre-decoded branch instruction! Check the executable/binary files for possible issues!");
         } 
       }
-      // If branch predictor predicts false for the fetched instruction - DO NOTHING. THIS IS ONLY USEFUL FOR CONDITIONAL INSTRUCTIONS AND IS TAKEN CARE OF IN THE INSTRUCTION EXECUTE STAGE.
+      // If branch predictor predicts false for the fetched instruction - DO NOTHING. THIS IS ONLY USEFUL FOR CONDITIONAL INSTRUCTIONS AND IS TAKEN CARE OF IN THE INSTRUCTION EXECUTE STAGE SINCE A UNCONDITIONAL BRANCH IS ALWAYS PREDICTED TO BE TAKEN.
     }
 
-    if (instruction.getOpCode() == Isa.BU || instruction.getOpCode() == Isa.BL || instruction.getOpCode() == Isa.RET)     // Unconditional branch instructions
+    /*if (instruction.getOpCode() == Isa.BU || instruction.getOpCode() == Isa.BL || instruction.getOpCode() == Isa.RET)     // Unconditional branch instructions
     {
+      // TODO return the original instruction and check if the branch prediction was correct in the execute stage. Cannot convert this to a NOP since a branch is still effectively a valid instruction
       return GlobalConstants.DEFAULT_INSTRUCTION;    // Set the next IR value to a NOP instruction since the unconditional branch has been taken care of here
     }
     else                      // All other instructions (Including conditional branch instructions)
     {
       return this.instruction;    // Set the next IR value to the fetched instruction
-    }
+    }*/
+    return this.instruction;
   }
 
   /**
@@ -361,6 +368,14 @@ public class InstructionFetchStage implements IProcessorPipelineStage
   public boolean getBranchPredictorResult()
   {
     return branchPredictorResult;
+  }
+
+  /**
+   * Method to reset the value of the branchPredictorResult field back to its default value
+   */
+  public void resetBranchPredictorResult()
+  {
+    branchPredictorResult = GlobalConstants.DEFAULT_BRANCH_PREDICTION;
   }
 
   /**

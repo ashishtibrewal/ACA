@@ -235,10 +235,22 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
       
       // RRI type
       case "RRI":
-        sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
-        sourceReg2 = Isa.DEFAULT_REG_VALUE;
-        destinationReg = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
-        signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
+        if (instructionMnemonic == "BEQ" || instructionMnemonic == "BNE" || instructionMnemonic == "BLT" || instructionMnemonic == "BGT")
+        {
+          sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
+          sourceReg2 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
+          destinationReg =  Isa.DEFAULT_REG_VALUE;
+          signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
+          // System.out.println("Decoded instruction details: " + instructionMnemonic + " R" + sourceReg1 + ", R" + sourceReg2 + ", I" + signedImmediate);
+        }
+        else
+        {
+          sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
+          sourceReg2 = Isa.DEFAULT_REG_VALUE;
+          destinationReg = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
+          signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
+          // System.out.println("Decoded instruction details: " + instructionMnemonic + " R" + destinationReg + ", R" + sourceReg1 + ", I" + signedImmediate);
+        }
         pContext.setNextInstruction(new Instruction(instructionType,
                                                     instructionMnemonic,
                                                     executionUnit,
@@ -251,7 +263,6 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
                                                     sourceReg2,
                                                     destinationReg,
                                                     signedImmediate));
-        // System.out.println("Decoded instruction details: " + instructionMnemonic + " R" + destinationReg + ", R" + sourceReg1 + ", I" + signedImmediate);
         break;
 
       // RR type
@@ -524,7 +535,16 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
   // TODO need to fill function contents accordingly
   public void flush(IPipelineContext context)
   {
-
+    instruction = GlobalConstants.DEFAULT_INSTRUCTION;
+    instructionBinary = Utility.convertToBin(GlobalConstants.DEFAULT_INSTRUCTION, 0);   
+    opCode = GlobalConstants.DEFAULT_INSTRUCTION_OPCODE;              
+    sourceReg1 = Isa.DEFAULT_REG_VALUE;          
+    sourceReg2 = Isa.DEFAULT_REG_VALUE;          
+    destinationReg = Isa.DEFAULT_REG_VALUE;      
+    signedImmediate = Isa.DEFAULT_IMM_VALUE;     
+    instructionMnemonic = GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC; 
+    instructionType = GlobalConstants.DEFAULT_INSTRUCTION_TYPE;     
+    executionUnit = GlobalConstants.DEFAULT_EXECUTION_UNIT;
   }
 
   /**

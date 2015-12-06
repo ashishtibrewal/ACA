@@ -45,23 +45,42 @@ public class Instruction
       this.sourceReg2Loc = sourceReg2Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;      // Overwrite immediate value since this instruction type doesn't use it
-      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RRI type
     {
-      this.opCode = opCode;
-      this.instructionType = instructionType;
-      this.instructionMnemonic = instructionMnemonic;
-      this.executionUnit = executionUnit;
-      this.memoryFetchLocation = memoryFetchLocation;
-      this.instruction = instruction;
-      this.numberOfCycles = numberOfCycles;
-      this.branchPredictionResult = branchPredictionResult;
-      this.sourceReg1Loc = sourceReg1Loc;
-      this.sourceReg2Loc = 0;           // Overwrite source register 2 value since this instruction type doesn't use it
-      this.destinationRegLoc = destinationRegLoc;
-      this.signedImmediateVal = signedImmediateVal;
-      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      if (opCode == Isa.BEQ || opCode == Isa.BNE || opCode == Isa.BLT || opCode == Isa.BGT)
+      {
+        this.opCode = opCode;
+        this.instructionType = instructionType;
+        this.instructionMnemonic = instructionMnemonic;
+        this.executionUnit = executionUnit;
+        this.memoryFetchLocation = memoryFetchLocation;
+        this.instruction = instruction;
+        this.numberOfCycles = numberOfCycles;
+        this.branchPredictionResult = branchPredictionResult;
+        this.sourceReg1Loc = sourceReg1Loc;
+        this.sourceReg2Loc = sourceReg2Loc;           // Overwrite source register 2 value since this instruction type doesn't use it
+        this.destinationRegLoc = Isa.DEFAULT_REG_VALUE;
+        this.signedImmediateVal = signedImmediateVal;
+        this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      }
+      else
+      {
+        this.opCode = opCode;
+        this.instructionType = instructionType;
+        this.instructionMnemonic = instructionMnemonic;
+        this.executionUnit = executionUnit;
+        this.memoryFetchLocation = memoryFetchLocation;
+        this.instruction = instruction;
+        this.numberOfCycles = numberOfCycles;
+        this.branchPredictionResult = branchPredictionResult;
+        this.sourceReg1Loc = sourceReg1Loc;
+        this.sourceReg2Loc = Isa.DEFAULT_REG_VALUE;           // Overwrite source register 2 value since this instruction type doesn't use it
+        this.destinationRegLoc = destinationRegLoc;
+        this.signedImmediateVal = signedImmediateVal;
+        this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      }
     }
   }
 
@@ -81,7 +100,7 @@ public class Instruction
       this.sourceReg1Loc = sourceReg1Loc;
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;    // Overwrite source register 1 value since this instruction type doesn't use it
-      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
     else      // RI type
     {
@@ -96,7 +115,7 @@ public class Instruction
       this.sourceReg1Loc = 0;       // Overwrite source register 1 value since this instruction type doesn't use it
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
-      this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
     }
   }
 
@@ -112,7 +131,7 @@ public class Instruction
     this.numberOfCycles = numberOfCycles;
     this.branchPredictionResult = branchPredictionResult;
     this.signedImmediateVal = signedImmediateVal;
-    this.dependencyFlag = false;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+    this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
   }
 
   // Copy constructor. Could have used Java Object class' default clone() method but that but default only does a shallow clone and would reuire quite a bit of modification to do a deep clone. Hence, for simplicity this is being used.

@@ -54,6 +54,7 @@ public class SequentialProcessorPipeline extends SequentialPipeline
         ((IProcessorPipelineStage) stage).flush(context);         // Flush each stage in the pipeline. Note explicitly casting to IProcessorPipelineStage type since all pipeline stages stored in the SequentialPipeline class are are of the IStage type and this doesn't contain a flush() method.
       }
     }
+    pContext.flush();     // Flush the pipeline registers (i.e. the current and next value registers that connect the different stages in the pipeline)      
   }
 
   /**

@@ -37,6 +37,45 @@ public class ProcessorPipelineStatus
     instructionExecuteStage = (InstructionExecuteStage) pContext.getIE_Stage();   // Explicitly cast to InstructionExecuteStage type of be able to call its methods
     cpuRegisters = pContext.getCpuRegisters();
     //cpuMemory = pContext.getCpuMemory();
+    
+    String bpResult = "N/A";        // String to print the branch prediction's prediction from the IF stage
+    int opCode = (instructionFetchStage.getCurrentInstructionRead() >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
+    if (opCode == Isa.BU  || opCode == Isa.BL  || opCode == Isa.RET || opCode == Isa.BEQ || opCode == Isa.BNE || opCode == Isa.BLT || opCode == Isa.BGT)
+    {
+      if (instructionFetchStage.getBranchPredictorResult() == true)
+      {
+        bpResult = "Taken";
+      }
+      else
+      {
+        bpResult = "Not taken";
+      }
+    }
+    else
+    {
+      bpResult = "N/A";
+    }
+
+    String predictionCorrect = "N/A";   // String to print the prediction result evluated from the IE stage 
+    if (instructionExecuteStage.getCurrentInstruction().getOpCode() == Isa.BU  || instructionExecuteStage.getCurrentInstruction().getOpCode() == Isa.BL  || 
+        instructionExecuteStage.getCurrentInstruction().getOpCode() == Isa.RET || instructionExecuteStage.getCurrentInstruction().getOpCode() == Isa.BEQ || 
+        instructionExecuteStage.getCurrentInstruction().getOpCode() == Isa.BNE || instructionExecuteStage.getCurrentInstruction().getOpCode() == Isa.BLT || 
+        instructionExecuteStage.getCurrentInstruction().getOpCode() == Isa.BGT)
+    {
+      if (pContext.getCorrectBranchPrediction() == true)
+      {
+        predictionCorrect = "Correct";
+      }
+      else
+      {
+        predictionCorrect = "Incorrect"; 
+      }
+    }
+    else
+    {
+      predictionCorrect = "N/A";
+    }
+
     System.out.println("Clock Cycle: " + (cpuRegisters.readClockCounter() - 1));  // Subtracting 1 because the clock counter value has already been incremented in this cycle before its being printed here
     System.out.println(">>> Current state of the process pipeline (At the end of the current cycle) <<<");
     System.out.println("+-+-------------------------------+-+---------------------------------+-+--------------------------------+-+-----------------------------+-+");
@@ -45,8 +84,8 @@ public class ProcessorPipelineStatus
     System.out.format ("|+| PC: %04d                      |+| PC: N/A                         |+| PC: N/A                        |+| PC: %04d (Branch: %5s)    |+|%n", instructionFetchStage.getCurrentPC(), cpuRegisters.readPC(), pContext.getBranchTakenOld());
     System.out.format ("|+| Instruction: 0x%08x       |+| Instruction: 0x%08x         |+| Instruction (Head): 0x%08x |+| Instruction: 0x%08x     |+|%n", instructionFetchStage.getCurrentInstructionRead(), instructionDecodeStage.getCurrentInstruction(), instructionIssueStage.getCurrentInstruction().getInstructionVal(), instructionExecuteStage.getCurrentInstruction().getInstructionVal());
     System.out.format ("|+| Branch Instruction: %5s     |+| Mnemonic: %4s (%3s)            |+| Mnemonic  : %4s (%3s)         |+| Mnemonic: %4s (%3s)        |+|%n", instructionFetchStage.getBranchInstruction(), instructionDecodeStage.getCurrentInstructionMnemonic(), instructionDecodeStage.getCurrentInstructionType(), instructionIssueStage.getCurrentInstruction().getInstructionMnemonic(), instructionIssueStage.getCurrentInstruction().getInstructionType(), instructionExecuteStage.getCurrentInstruction().getInstructionMnemonic(), instructionExecuteStage.getCurrentInstruction().getInstructionType());
-    System.out.format ("|+| Branch predictor  : %5s     |+| SR1: R%02d                        |+| SR1 (Val) : R%02d (%08d)     |+| Execution Unit: %3s         |+|%n", instructionFetchStage.getBranchPredictorResult(), instructionDecodeStage.getCurrentSourceReg1(), instructionIssueStage.getCurrentInstruction().getSourceReg1Loc(), instructionIssueStage.getCurrentInstruction().getSourceReg1Val(), instructionExecuteStage.getCurrentInstruction().getExecutionUnit());
-    System.out.format ("|+| PC/Branch target  : %04d      |+| SR2: R%02d                        |+| SR2 (Val) : R%02d (%08d)     |+|                             |+|%n", cpuRegisters.readPC(), instructionDecodeStage.getCurrentSourceReg2(), instructionIssueStage.getCurrentInstruction().getSourceReg2Loc(), instructionIssueStage.getCurrentInstruction().getSourceReg2Val());
+    System.out.format ("|+| Branch predictor  : %9s |+| SR1: R%02d                        |+| SR1 (Val) : R%02d (%08d)     |+| Execution Unit: %3s         |+|%n", bpResult, instructionDecodeStage.getCurrentSourceReg1(), instructionIssueStage.getCurrentInstruction().getSourceReg1Loc(), instructionIssueStage.getCurrentInstruction().getSourceReg1Val(), instructionExecuteStage.getCurrentInstruction().getExecutionUnit());
+    System.out.format ("|+| PC/Branch target  : %04d      |+| SR2: R%02d                        |+| SR2 (Val) : R%02d (%08d)     |+| Prediction Result: %9s|+|%n", cpuRegisters.readPC(), instructionDecodeStage.getCurrentSourceReg2(), instructionIssueStage.getCurrentInstruction().getSourceReg2Loc(), instructionIssueStage.getCurrentInstruction().getSourceReg2Val(), predictionCorrect);
     System.out.format ("|+|                               |+| DR : R%02d                        |+| DR        : R%02d                |+|                             |+|%n", instructionDecodeStage.getCurrentDestinationReg(), instructionIssueStage.getCurrentInstruction().getDestinationRegLoc());
     System.out.format ("|+|                               |+| Imm: %08d                   |+| Imm:      : %08d           |+|                             |+|%n", instructionDecodeStage.getCurrentSignedImmediate(), instructionIssueStage.getCurrentInstruction().getSignedImmediateVal());
     System.out.format ("|+|                               |+|                                 |+| Dependency: %5s              |+|                             |+|%n", instructionIssueStage.getCurrentInstruction().getDependencyFlag());

@@ -106,6 +106,15 @@ public class ProcessorSimulator
     Register.incrementClockCounter();               // Increment the clock counter on every cycle run
     processorPipeline.execute(pipelineContext);     // Execute/run the pipeline for the current cycle
     pipelineStatus.print(pipelineContext);          // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
+    if (!((ProcessorPipelineContext)pipelineContext).getCorrectBranchPrediction())  // If the branch predictor mispredicted
+    {
+      System.out.println("+++++++++++++++++++++++++++++++++++++++++");
+      System.out.println("+ ----->>>> Flushing pipeline <<<<----- +");
+      System.out.println("+++++++++++++++++++++++++++++++++++++++++\n");
+      ((SequentialProcessorPipeline)processorPipeline).flush(pipelineContext);     // Flush the pipeline (i.e. flush each stage in the pipeline)
+      ((ProcessorPipelineContext)pipelineContext).setCorrectBranchPrediction(GlobalConstants.CORRECT_BRANCH_PREDICTION_RESULT);     // Revert the variable back to it's default value after the pipeline has been flushed
+    }
+    ((InstructionFetchStage)((ProcessorPipelineContext)pipelineContext).getIF_Stage()).resetBranchPredictorResult();     // Reset the branch predictor result in the IF stage back to its default value at the end of every cycle
     //this.dumpState();                             // Dump the state of the cpu every cycle
   }
 

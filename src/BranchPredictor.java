@@ -13,7 +13,7 @@ public class BranchPredictor
    * Not taken = false
    * @param  instruction Branch instruction on which a prediction must be made
    * @param  context     Processor pipeline context
-   * @return Branch prediction result
+   * @return Branch prediction result (True = predict taken, false = predict not taken)
    */
   public boolean predict(Instruction instruction)
   { 
@@ -25,8 +25,16 @@ public class BranchPredictor
     }
     else    // If the instruction is a conditional branch
     {
-      //TODO check immediate value for conditional branch instructions. If negative, predict true since it's probably a loop else predict false. Look for other factors that can improve performance.
-      predictionResult = false;   // Predict that conditional branches are always not taken
+      //TODO check immediate value for conditional branch instructions. If negative, predict true since it's probably a loop else predict false. Look for other factors that can improve performance. Uncomment the following section
+      if (instruction.getSignedImmediateVal() < 0)      // Check if it is a backward branch (i.e. if the immediate is a negative value) - Most likely to be a loop, hence predict taken
+      {
+        predictionResult = true;
+      }
+      else                                              // Forward branch, hence, predict always not taken
+      {
+        predictionResult = false;
+      }
+      //predictionResult = false;   // Predict that conditional branches are always not taken
     }
     return predictionResult;
   }

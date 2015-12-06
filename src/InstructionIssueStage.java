@@ -59,7 +59,15 @@ public class InstructionIssueStage implements IProcessorPipelineStage
 
         // RRI type
         case "RRI":
-          instruction.setSourceReg1Val(cpuRegisters.readGP(instruction.getSourceReg1Loc()));      // Read value for source register 1
+          if (instruction.getOpCode() == Isa.BEQ || instruction.getOpCode() == Isa.BNE || instruction.getOpCode() == Isa.BLT || instruction.getOpCode() == Isa.BGT)
+          {
+            instruction.setSourceReg1Val(cpuRegisters.readGP(instruction.getSourceReg1Loc()));      // Read value for source register 1
+            instruction.setSourceReg2Val(cpuRegisters.readGP(instruction.getSourceReg2Loc()));      // Read value for source register 2
+          }
+          else
+          {
+            instruction.setSourceReg1Val(cpuRegisters.readGP(instruction.getSourceReg1Loc()));      // Read value for source register 1
+          }
           break;
 
         // RR type
