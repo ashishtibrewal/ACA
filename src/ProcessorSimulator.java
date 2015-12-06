@@ -38,7 +38,7 @@ public class ProcessorSimulator
   private IStage instructionIssueStage;                      /** Reference to the Instruction Issue Stage of the pipeline */
   private IStage instructionExecuteStage;                    /** Reference to the Instruction Execute Stage of the pipeline */
   private ProcessorPipelineStatus pipelineStatus;            /** Reference to the utility/debug stage in the pipleline/simulator */
-  private IPipelineContext pipelineContext;                  /** Reference to the sequential pipeline context */
+  private static IPipelineContext pipelineContext;           /** Reference to the sequential pipeline context */
   private BranchPredictor branchPredictor;                   /** Reference to the processor's branch prediction unit */
 
   // Initialize static variables
@@ -108,9 +108,9 @@ public class ProcessorSimulator
     pipelineStatus.print(pipelineContext);          // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
     if (!((ProcessorPipelineContext)pipelineContext).getCorrectBranchPrediction())  // If the branch predictor mispredicted
     {
-      System.out.println("+++++++++++++++++++++++++++++++++++++++++");
-      System.out.println("+ ----->>>> Flushing pipeline <<<<----- +");
-      System.out.println("+++++++++++++++++++++++++++++++++++++++++\n");
+      System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+      System.out.println("+ ----->>>> Flushing pipeline (Branch was mispredicted) <<<<----- +");
+      System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
       ((SequentialProcessorPipeline)processorPipeline).flush(pipelineContext);     // Flush the pipeline (i.e. flush each stage in the pipeline)
       ((ProcessorPipelineContext)pipelineContext).setCorrectBranchPrediction(GlobalConstants.CORRECT_BRANCH_PREDICTION_RESULT);     // Revert the variable back to it's default value after the pipeline has been flushed
     }
@@ -141,8 +141,9 @@ public class ProcessorSimulator
 
   private void printResults()
   {
+    //TODO Add counter for correct and incorrect branch predictions
     System.out.println("###########################################################");
-    System.out.println("###                 SIMULATOR RESULTS                   ###");
+    System.out.println("###           SIMULATOR PERFORMANCE RESULTS             ###");
     System.out.println("###########################################################");
     System.out.println("Total instructions executed: " + cpuRegisters.getInstructionCounter());
     System.out.println("Total NOP instructions executed: " + cpuRegisters.getInstructionCounterNOP());
@@ -226,8 +227,8 @@ public class ProcessorSimulator
       System.out.println("###              RUNNING THE CPU SIMULATOR              ###");
       System.out.println("###########################################################");
       System.out.println("CPU simulator starting program execution. \n");
-      // TODO This needs to be changed to check if the last instruction has been reached. Could use a special code/pattern in the executable file.
-      for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)   // TODO this should be changed to run until the last instruction is reached in the .text section
+      //for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)
+      while (((ProcessorPipelineContext) pipelineContext).getCpuRegisters().readGP(GlobalConstants.SVC_REGISTER) != GlobalConstants.SVC_SUSPEND)
       {  
         cpu.step();           // Step/Run the cpu simulator by one clock cycle
         // TODO Add code to print state of every stage for current cycle

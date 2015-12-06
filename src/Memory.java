@@ -194,10 +194,11 @@ public class Memory
     memoryArray[2] = Utility.convertToInt("10001000000000000000000100000011", true); // MOVI R3, 16 (Move 16 into R3)
     memoryArray[3] = Utility.convertToInt("10001000000000000000000100000100", true); // MOVI R4, 16 (Move 16 into R4)
     memoryArray[4] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid dependency hazard)
-    memoryArray[5] = Utility.convertToInt("10101000000000000000111101000011", true); // BEQ R3, R4, 29
+    memoryArray[5] = Utility.convertToInt("10101000000000000000111101000011", true); // BEQ R3, R4, 15 , therefore PC = 15 + 5
     memoryArray[6] = Utility.convertToInt("00001000000000000000000100100001", true); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
     memoryArray[7] = Utility.convertToInt("00001000000000000000001000100010", true); // ADDR R2, R2, R2 (Add R2 and R2 and store the result in R2)
     memoryArray[20] = Utility.convertToInt("00011000000000000000001000100010", true); // MULT R2, R2, R2 (Multiply R2 and R2 and store the result in R2)
+    memoryArray[21] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated
   }
 
   /**

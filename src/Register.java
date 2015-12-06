@@ -24,7 +24,7 @@ public class Register
   // Class/Instance fields
   private final int registerInitializationValue = GlobalConstants.REGISTER_INITIALIZATION_VALUE;  /** Initialization value for all the processor registers */
   private final int statusRegisterLength = GlobalConstants.STATUS_REGISTER_LENGTH;         /** Number of bits/flags stored in the status register: Z C N O */
-  private int[] generalPurposeRegisters;              /** Array that holds all the processor register values */
+  private int[] generalPurposeRegisters;              /** Array that holds all the processor register values, note R16 is a special purporse supervisor call register */
   private int accumulator;                            /** Temporary storage location for operations */
   private int programCounter;                         /** Program counter register: Holds address to the next instruction in memory */
   private int programCounterIncremented;              /** Program counter incremented register: Holds the temporary incremented program counter value */
