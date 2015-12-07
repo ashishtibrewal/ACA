@@ -59,7 +59,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     // Effectively set all the class fields to it's default values
     programCounter = GlobalConstants.DEFAULT_PC;
     instruction = GlobalConstants.DEFAULT_INSTRUCTION;
-    branchInstruction = false;
+    branchInstruction = false;      // The default assumption is that the fetched instruction is not a branch instruction
     branchPredictorResult = GlobalConstants.DEFAULT_BRANCH_PREDICTION;
   }
 

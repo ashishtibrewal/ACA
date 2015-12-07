@@ -27,7 +27,7 @@ public final class GlobalConstants
   public static final int INSTRUCTION_LIST_START_INDEX = 0;
   public static final int BL_ITEMS_TO_PUSH = TOTAL_GP_REGISTERS + 1;    // Number of items to push to the stack when a BL, i.e. branch with link instruction, is found. Value = Total number of GP registers + 1, this + 1 is for the link register
   public static final int RET_ITEMS_TO_POP = TOTAL_GP_REGISTERS + 1;    // Number of items to pop off the stack when a RET, i.e. return instruction, is found. Value = Total number of GP registers + 1, this + 1 is for the link register
-  public static final int NUM_ITERATIONS = 10;                          // Only used for testing/debugging purposes
+  public static final int NUM_ITERATIONS = 20;                          // Only used for testing/debugging purposes
   public static final int SVC_REGISTER = 15;                            // Reserve R15 as the SVC register.
   public static final int SVC_SUSPEND = 255;                            // Supervisor call to end/halt/terminate the simulation. Value needs to be moved to R15
   // TODO Insert ALL constants to this class.

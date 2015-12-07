@@ -141,15 +141,34 @@ public class ProcessorSimulator
 
   private void printResults()
   {
-    //TODO Add counter for correct and incorrect branch predictions
+    //TODO Add other results
     System.out.println("###########################################################");
     System.out.println("###           SIMULATOR PERFORMANCE RESULTS             ###");
     System.out.println("###########################################################");
+    System.out.println("\n-----------------------------------");
+    System.out.println(">>> Overall performance resutls <<<");
+    System.out.println("-----------------------------------\n");
     System.out.println("Total instructions executed: " + cpuRegisters.getInstructionCounter());
     System.out.println("Total NOP instructions executed: " + cpuRegisters.getInstructionCounterNOP());
     System.out.println("Total valid instructions executed: " + (cpuRegisters.getInstructionCounter() - cpuRegisters.getInstructionCounterNOP()));
     System.out.println("Total clock cycles simulated: " + cpuRegisters.readClockCounter());
     System.out.println("Instructions per cycle (IPC): " + ((double) (cpuRegisters.getInstructionCounter() - cpuRegisters.getInstructionCounterNOP()) / (double) (cpuRegisters.readClockCounter())));
+    System.out.println("\n-----------------------------------");
+    System.out.println(">>>  Branch prediction resutls  <<<");
+    System.out.println("-----------------------------------\n");
+    System.out.println("Total branch instructions executed: ?");
+    System.out.println("Branches predicted correct: ?");
+    System.out.println("Branches predicted incorrect: ?");
+    System.out.println("\n-----------------------------------");
+    System.out.println(">>>         ALU resutls         <<<");
+    System.out.println("-----------------------------------\n");
+    System.out.println("Total ALU instructions executed: ?");
+    System.out.println("\n-----------------------------------");
+    System.out.println(">>>         LSU resutls         <<<");
+    System.out.println("-----------------------------------\n");
+    System.out.println("Total LSU instructions executed: ?");
+    System.out.println("Total loads executed: ?");
+    System.out.println("Total stores executed: ?");
     System.out.println();
   }
 

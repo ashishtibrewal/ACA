@@ -98,7 +98,19 @@ public class InstructionIssueStage implements IProcessorPipelineStage
   // TODO need to fill function contents accordingly
   public void flush(IPipelineContext context)
   {
-
+   instruction = new Instruction(GlobalConstants.DEFAULT_INSTRUCTION_TYPE,
+                                 GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC,
+                                 ExecutionUnit.ALU,
+                                 GlobalConstants.DEFAULT_INSTRUCTION_OPCODE, 
+                                 GlobalConstants.DEFAULT_MEM_FETCH_LOC,
+                                 GlobalConstants.DEFAULT_INSTRUCTION,
+                                 Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
+                                 GlobalConstants.DEFAULT_BRANCH_PREDICTION,
+                                 Isa.DEFAULT_REG_VALUE,
+                                 Isa.DEFAULT_REG_VALUE,
+                                 Isa.DEFAULT_REG_VALUE,
+                                 Isa.DEFAULT_IMM_VALUE);
+   instructionList.clear();     // Clear the instruction (array) list
   }
 
   /**

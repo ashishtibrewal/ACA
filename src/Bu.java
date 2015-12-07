@@ -108,9 +108,9 @@ public class Bu implements IExecutionUnit
         {
           if (!(sourceReg1Val == sourceReg2Val))
           {
-            pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
-            pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
-            pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
+            pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
+            pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
           }
           // else do nothing, since the branch predictor predicted correct
         }
@@ -136,9 +136,9 @@ public class Bu implements IExecutionUnit
         {
           if (!(sourceReg1Val != sourceReg2Val))
           {
-            pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
-            pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
-            pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
+            pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
+            pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
           }
           // else do nothing, since the branch predictor predicted correct
         }
@@ -164,9 +164,9 @@ public class Bu implements IExecutionUnit
         {
           if (!(sourceReg1Val < sourceReg2Val))
           {
-            pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
-            pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
-            pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
+            pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
+            pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
           }
           // else do nothing, since the branch predictor predicted correct
         }
@@ -192,9 +192,9 @@ public class Bu implements IExecutionUnit
         {
           if (!(sourceReg1Val > sourceReg2Val))
           {
-            pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
-            pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
-            pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
+            pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
+            pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
           }
           // else do nothing, since the branch predictor predicted correct
         }
