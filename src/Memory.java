@@ -226,7 +226,7 @@ public class Memory
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* N-th Fibonacci number correct way to write it in assembly */
-    
+    /*
     memoryArray[0] = Utility.convertToInt("10001000000000000000000000010001", true); // MOVI R1, 1 (Move 1 into R1)
     memoryArray[1] = Utility.convertToInt("10001000000000000000000000010010", true); // MOVI R2, 1 (Move 1 into R2)
     memoryArray[2] = Utility.convertToInt("10001000000000000000000000110011", true); // MOVI R3, 3 (Move 3 into R3)
@@ -239,6 +239,7 @@ public class Memory
     memoryArray[9] = Utility.convertToInt("00101000000000000000000100110011", true); // ADDI R3, R3, 1 (Add 1 to R3 and store the result in R3)
     memoryArray[10] = Utility.convertToInt("10011000000000001111111111111011", true); // BU -5
     memoryArray[11] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated 
+    */
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -257,6 +258,21 @@ public class Memory
     memoryArray[9] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated
     */
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+    memoryArray[0] = Utility.convertToInt("10001000000000000001001011000001", true); // MOVI R1, 1 (Move 300 into R1)
+    memoryArray[1] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard) 
+    memoryArray[2] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard) 
+    memoryArray[3] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard)
+    // Note need at least three NOP instruction's before calling a method to make sure that all values are written to registers before pushing them onto the stack
+    memoryArray[4] = Utility.convertToInt("10100000000000000000000000001000", true); // BL 8 (Branch with link to memory address 8)   
+    memoryArray[5] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated 
+    memoryArray[12] = Utility.convertToInt("10001000000000000000000000111101", true); // MOVI R13, 3 (Move 3 into R13)
+    memoryArray[13] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard) 
+    memoryArray[14] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard) 
+    memoryArray[15] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard)
+    // Note need at least three NOP instruction's before returning from the method.
+    memoryArray[16] = Utility.convertToInt("11001000000000000000000000000000", true); // RET (Return from function call)
+
   }
 
   /**
@@ -286,11 +302,17 @@ public class Memory
     else
     {
       System.out.println("Contents being printed in the reverse order. Top of stack is printed first (LIFO).");
-      while (!memoryStack.empty())
+      Integer[] stackArray = new Integer[memoryStack.size()];
+      memoryStack.toArray(stackArray);    // Convert the stack to an Integer array for printing
+      for (int stackItem = (stackArray.length -1); stackItem >= 0; stackItem--)
       {
-        Integer topOfStackElement = new Integer(memoryStack.pop());
+        System.out.format("0x%08x (%s) \n", stackArray[stackItem], Utility.convertToBin(stackArray[stackItem].intValue(), 4));
+      }
+      /*while (!memoryStack.empty())
+      {
+        Integer topOfStackElement = new Integer(memoryStack.pop());     // Cannot use this for printing because this removes/pops the element from the stack which is required later when returning from a method (i.e. by the RET instruction)
         System.out.format("0x%08x (%s) \n", topOfStackElement, Utility.convertToBin(topOfStackElement.intValue(), 4));
-      } 
+      }*/
     } 
     System.out.println(">>> Memory dump complete <<< \n");
   }

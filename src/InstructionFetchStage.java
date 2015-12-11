@@ -272,15 +272,22 @@ public class InstructionFetchStage implements IProcessorPipelineStage
           // RET --- Return from a function call - Used to return to the caller function
           case Isa.RET:
             // Pop register contents off the stack. Stack pointer decremented implicitly for simplicity
-            for (int regNumber = (GlobalConstants.RET_ITEMS_TO_POP - 1); regNumber <= 0 ; regNumber--)
+            for (int regNumber = (GlobalConstants.RET_ITEMS_TO_POP - 1); regNumber >= 0 ; regNumber--)
             {
               if (regNumber == GlobalConstants.TOTAL_GP_REGISTERS)     // Pop the value of the LR register off the stack
               {
-                calculationResult = cpuMemory.stackPop(); 
+                calculationResult = cpuMemory.stackPop();
               }
               else          // Pop the values of all GP registers off the stack (Starting from R15 ... to R0). This is because the value of R15 is stored on top of the stack and the value of RO is stored at the bottom of the stack.
               {
-                cpuRegisters.writeGP(regNumber, cpuMemory.stackPop()); 
+                if (regNumber != 0)     // Check to make sure that a value is not written to R0 since R0 is write protected
+                {
+                  cpuRegisters.writeGP(regNumber, cpuMemory.stackPop()); 
+                }
+                else
+                {
+                  cpuMemory.stackPop();         // Pop the value for R0 off the stack but don't write it back to R0
+                }
               }
             }
             pContext.setBranchTaken(branchPredictorResult); // Assert that a branch needs to be taken
