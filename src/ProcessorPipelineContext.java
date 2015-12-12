@@ -372,21 +372,22 @@ public class ProcessorPipelineContext implements IPipelineContext
   }
 
   /**
+   * Method to set the next instruction to be used by the instruction writeback (WB) stage.
+   * Set by the IE stage.
+   * @param _nextInstructionWriteBack Lastest executed instruction
+   */
+  public void setNextInstructionWriteBack(Instruction _nextInstructionWriteBack)
+  {
+    nextInstructionWriteBack = _nextInstructionWriteBack;
+  }
+
+  /**
    * Method to obtain the instruction to be used by the instruction writeback (WB) stage
    * @return Instruction to be used to write back values to registers for the current cycle
    */
   public Instruction getCurrentInstructionWriteBack()
   {
     return currentInstructionWriteBack;
-  }
-
-  /**
-   * Method to set the next instruction to be used by the instruction writeback (WB) stage
-   * @param _nextInstructionWriteBack Lastest executed instruction
-   */
-  public void setNextInstructionWriteBack(Instruction _nextInstructionWriteBack)
-  {
-    nextInstructionWriteBack = _nextInstructionWriteBack;
   }
 
   /**
@@ -421,7 +422,7 @@ public class ProcessorPipelineContext implements IPipelineContext
 
   /**
    * Method to obtain a reference to the Instruction Execute (IE) Stage object, instructionExecuteStage.
-   * USED ONLY FOR PRINTING AND DEBUGGING.
+   * USED ONLY FOR PRINTING AND DEBUGGING AND FOR RESULT PASSING.
    * @return Reference to the IE Stage obejct
    */
   public IStage getIE_Stage()

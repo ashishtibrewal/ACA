@@ -21,6 +21,22 @@ public class InstructionWritebackStage implements IProcessorPipelineStage
 {
   Instruction instruction;
 
+  public InstructionWritebackStage()
+  {
+    this.instruction = new Instruction(GlobalConstants.DEFAULT_INSTRUCTION_TYPE,
+                                       GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC,
+                                       ExecutionUnit.ALU,
+                                       GlobalConstants.DEFAULT_INSTRUCTION_OPCODE, 
+                                       GlobalConstants.DEFAULT_MEM_FETCH_LOC,
+                                       GlobalConstants.DEFAULT_INSTRUCTION,
+                                       Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
+                                       GlobalConstants.DEFAULT_BRANCH_PREDICTION,
+                                       Isa.DEFAULT_REG_VALUE,
+                                       Isa.DEFAULT_REG_VALUE,
+                                       Isa.DEFAULT_REG_VALUE,
+                                       Isa.DEFAULT_IMM_VALUE);                        // Instantiate new instruction object to avoid getting a null pointer exception in the IE stage when performing result passing. Only useful in the first cycle of the simulation
+  }
+
   public void execute(IPipelineContext context)
   {
     ProcessorPipelineContext pContext = (ProcessorPipelineContext) context;             // Explicitly cast context to ProcessorPipelineContext type

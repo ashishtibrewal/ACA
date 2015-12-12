@@ -19,6 +19,44 @@ public class Bu implements IExecutionUnit
     cpuRegisters = pContext.getCpuRegisters();                 // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     cpuMemory = pContext.getCpuMemory();                       // Obtain and store the reference to the primary cpu memory object from the pipeline context (Doing this to avoid having to type it over and over again)
     opCode = instruction.getOpCode();
+    // SR1 result passing
+    if (instruction.getSourceReg1Val() != cpuRegisters.readGP(instruction.getSourceReg1Loc()))                              // Check if the current value held in the register is the same as that evaluated by the II unit
+    {
+      sourceReg1Val = cpuRegisters.readGP(instruction.getSourceReg1Loc());
+      instruction.setSourceReg1Val(sourceReg1Val);
+    }
+    else
+    {
+      sourceReg1Val = instruction.getSourceReg1Val();
+    }
+    if (instruction.getSourceReg1Loc() == pContext.getCurrentInstructionWriteBack().getDestinationRegLoc())       // Check if the WB stage is going to write to a register that needs to be read by the ALU in the IE stage
+    {
+      sourceReg1Val = pContext.getCurrentInstructionWriteBack().getWritebackVal();
+      instruction.setSourceReg1Val(sourceReg1Val);
+    }
+    else
+    {
+      sourceReg1Val = instruction.getSourceReg1Val();
+    }
+    // SR2 result passing
+    if (instruction.getSourceReg2Val() != cpuRegisters.readGP(instruction.getSourceReg2Loc()))                              // Check if the current value held in the register is the same as that evaluated by the II unit
+    {
+      sourceReg2Val = cpuRegisters.readGP(instruction.getSourceReg2Loc());
+      instruction.setSourceReg2Val(sourceReg2Val);
+    }
+    else
+    {
+      sourceReg2Val = instruction.getSourceReg2Val();
+    }
+    if (instruction.getSourceReg2Loc() == pContext.getCurrentInstructionWriteBack().getDestinationRegLoc())                 // Check if the WB stage is going to write to a register that needs to be read by the ALU in the IE stage
+    {
+      sourceReg2Val = pContext.getCurrentInstructionWriteBack().getWritebackVal();
+      instruction.setSourceReg2Val(sourceReg2Val);
+    }
+    else
+    {
+      sourceReg2Val = instruction.getSourceReg2Val();
+    }
     switch (opCode)
     {
       // Unconditional branches
@@ -90,8 +128,6 @@ public class Bu implements IExecutionUnit
       // Conditional branches
       // BEQ sr1, sr2, Ix --- Branch if two registers are equal
       case Isa.BEQ:
-        sourceReg1Val = instruction.getSourceReg1Val();        // Obtain value for sr1
-        sourceReg2Val = instruction.getSourceReg2Val();        // Obtaing value for sr2
         signedImmediateVal = instruction.getSignedImmediateVal();
         calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate, i.e. using the PC value (memory location from where the instruction was fetched) stored in the instruction object
         if (!instruction.getBranchPredictionResult())         // If this branch was predicted to be not taken
@@ -118,8 +154,6 @@ public class Bu implements IExecutionUnit
 
       // BEQ sr1, sr2, Ix --- Branch if two registers are not equal
       case Isa.BNE:
-        sourceReg1Val = instruction.getSourceReg1Val();        // Obtain value for sr1
-        sourceReg2Val = instruction.getSourceReg2Val();        // Obtaing value for sr2
         signedImmediateVal = instruction.getSignedImmediateVal();
         calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate 
         if (!instruction.getBranchPredictionResult())         // If this branch was predicted to be not taken
@@ -146,8 +180,6 @@ public class Bu implements IExecutionUnit
 
       // BEQ sr1, sr2, Ix --- Branch if sr1 < sr2
       case Isa.BLT:
-        sourceReg1Val = instruction.getSourceReg1Val();        // Obtain value for sr1
-        sourceReg2Val = instruction.getSourceReg2Val();        // Obtaing value for sr2
         signedImmediateVal = instruction.getSignedImmediateVal();
         calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate 
         if (!instruction.getBranchPredictionResult())         // If this branch was predicted to be not taken
@@ -174,8 +206,6 @@ public class Bu implements IExecutionUnit
 
       // BEQ sr1, sr2, Ix --- Branch if sr1 > sr2
       case Isa.BGT:
-        sourceReg1Val = instruction.getSourceReg1Val();        // Obtain value for sr1
-        sourceReg2Val = instruction.getSourceReg2Val();        // Obtaing value for sr2
         signedImmediateVal = instruction.getSignedImmediateVal();
         calculationResult = instruction.getMemoryFetchLocation() + signedImmediateVal;     // Add instruction relative PC with the signed immediate 
         if (!instruction.getBranchPredictionResult())         // If this branch was predicted to be not taken

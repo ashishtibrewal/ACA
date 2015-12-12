@@ -20,11 +20,29 @@ public class Lsu implements IExecutionUnit
     cpuRegisters = pContext.getCpuRegisters();                 // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     cpuMemory = pContext.getCpuMemory();                       // Obtain and store the reference to the primary cpu memory object from the pipeline context (Doing this to avoid having to type it over and over again)
     opCode = instruction.getOpCode();
+    // SR1 result passing
+    if (instruction.getSourceReg1Val() != cpuRegisters.readGP(instruction.getSourceReg1Loc()))                              // Check if the current value held in the register is the same as that evaluated by the II unit
+    {
+      sourceReg1Val = cpuRegisters.readGP(instruction.getSourceReg1Loc());
+      instruction.setSourceReg1Val(sourceReg1Val);
+    }
+    else
+    {
+      sourceReg1Val = instruction.getSourceReg1Val();
+    }
+    if (instruction.getSourceReg1Loc() == pContext.getCurrentInstructionWriteBack().getDestinationRegLoc())       // Check if the WB stage is going to write to a register that needs to be read by the ALU in the IE stage
+    {
+      sourceReg1Val = pContext.getCurrentInstructionWriteBack().getWritebackVal();
+      instruction.setSourceReg1Val(sourceReg1Val);
+    }
+    else
+    {
+      sourceReg1Val = instruction.getSourceReg1Val();
+    }
     switch (opCode)
     {
       // LW dr, sr1, Ix --- dr = mem[sr1 + Ix]    (Load word from memory, i.e. read from main memory)
       case Isa.LW:
-      sourceReg1Val = instruction.getSourceReg1Val();
       //signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(instruction.getSignedImmediateVal())), false);
       signedImmediateVal = instruction.getSignedImmediateVal();
       calculationResult = sourceReg1Val + signedImmediateVal;       // Evaluate the memory address
@@ -39,7 +57,6 @@ public class Lsu implements IExecutionUnit
 
       // SW sr1, dr, Ix --- mem[dr + Ix] = sr1    (Store word to memory, i.e. write to main memory)
       case Isa.SW:
-      sourceReg1Val = instruction.getSourceReg1Val();
       //signedImmediateVal = Utility.convertToInt(Utility.signExtend(Integer.toBinaryString(instruction.getSignedImmediateVal())), false);
       signedImmediateVal = instruction.getSignedImmediateVal();
       destinationRegLoc = instruction.getDestinationRegLoc();                                // Obtain the location of the destination register from the current instruction object
@@ -60,7 +77,6 @@ public class Lsu implements IExecutionUnit
 
       // MOVR dr, sr1
       case Isa.MOVR:
-      sourceReg1Val = instruction.getSourceReg1Val();
       destinationRegLoc = instruction.getDestinationRegLoc();                                // Obtain the location of the destination register from the current instruction object
       instruction.setWritebackVal(sourceReg1Val);
       break;
