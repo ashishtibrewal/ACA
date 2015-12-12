@@ -23,6 +23,7 @@ public class Instruction
   private int sourceReg1Val;
   private int sourceReg2Val;
   private int signedImmediateVal;
+  private int writebackVal;           /** Result value that is used by the writeback stage to update the registers */
   private ExecutionUnit executionUnit;
   private boolean dependencyFlag;         // Set to false by default. TODO This needs to be updated by the Instruction Issue stage after having checked for dependencies
   private boolean branchPredictionResult; // Branch prediction result. Set by the processor's branch prediction unit. Only useful for branch instructions.
@@ -46,6 +47,7 @@ public class Instruction
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;      // Overwrite immediate value since this instruction type doesn't use it
       this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.writebackVal = Isa.DEFAULT_REG_VALUE;
     }
     else      // RRI type
     {
@@ -64,6 +66,7 @@ public class Instruction
         this.destinationRegLoc = Isa.DEFAULT_REG_VALUE;
         this.signedImmediateVal = signedImmediateVal;
         this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+        this.writebackVal = Isa.DEFAULT_REG_VALUE;
       }
       else
       {
@@ -80,6 +83,7 @@ public class Instruction
         this.destinationRegLoc = destinationRegLoc;
         this.signedImmediateVal = signedImmediateVal;
         this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+        this.writebackVal = Isa.DEFAULT_REG_VALUE;
       }
     }
   }
@@ -101,6 +105,7 @@ public class Instruction
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = Isa.DEFAULT_IMM_VALUE;    // Overwrite source register 1 value since this instruction type doesn't use it
       this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.writebackVal = Isa.DEFAULT_REG_VALUE;
     }
     else      // RI type
     {
@@ -116,6 +121,7 @@ public class Instruction
       this.destinationRegLoc = destinationRegLoc;
       this.signedImmediateVal = signedImmediateVal;
       this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+      this.writebackVal = Isa.DEFAULT_REG_VALUE;
     }
   }
 
@@ -132,6 +138,7 @@ public class Instruction
     this.branchPredictionResult = branchPredictionResult;
     this.signedImmediateVal = signedImmediateVal;
     this.dependencyFlag = GlobalConstants.DEFAULT_DEPENDENCY_FLAG;            // By default we set this to false and assume that an instruction doesn't have any dependencies
+    this.writebackVal = Isa.DEFAULT_REG_VALUE;
   }
 
   // Copy constructor. Could have used Java Object class' default clone() method but that but default only does a shallow clone and would reuire quite a bit of modification to do a deep clone. Hence, for simplicity this is being used.
@@ -151,6 +158,7 @@ public class Instruction
     this.signedImmediateVal = _instruction.signedImmediateVal;
     this.dependencyFlag = _instruction.dependencyFlag;
     this.branchPredictionResult = _instruction.branchPredictionResult;
+    this.writebackVal = Isa.DEFAULT_REG_VALUE;
   }
 
   /**
@@ -304,5 +312,23 @@ public class Instruction
   public boolean getBranchPredictionResult()
   {
     return branchPredictionResult;
+  }
+
+  /**
+   * Method to set the writeback value (i.e. instruction result). Used by the instruction execute (IE) stage.
+   * @param _writebackVal Writeback value (i.e. instruction result)
+   */
+  public void setWritebackVal(int _writebackVal)
+  {
+    writebackVal = _writebackVal;
+  }
+
+  /**
+   * Method to obtain the writeback value (i.e. instruction result). Used by the instruction writeback (WB) stage.
+   * @return Writeback value (i.e. instruction result)
+   */
+  public int getWritebackVal()
+  {
+    return writebackVal;
   }
 }

@@ -65,6 +65,8 @@ public class InstructionExecuteStage implements IProcessorPipelineStage
         break;
     }
 
+    pContext.setNextInstructionWriteBack(instruction);    // Update the pipeline context with the currently executed instruction for it to be used by the instruction writeback stage in the next cycle
+
     // THIS IS WHERE THE PC IS UPDATED
     cpuRegisters.updatePC(pContext.getBranchTaken());   // Update the primary/actual PC register with the correct/required value based on whether a branch was taken or not
     pContext.setBranchTakenOld(false);                  // Function to store the current value of the branchTaken variable in the pipeline context. THIS IS ONLY USEFUL FOR DEBUGGING/PRINTING PURPOSES.

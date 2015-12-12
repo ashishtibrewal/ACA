@@ -37,6 +37,7 @@ public class ProcessorSimulator
   private IStage instructionDecodeStage;                     /** Reference to the Instruction Decode Stage of the pipeline */
   private IStage instructionIssueStage;                      /** Reference to the Instruction Issue Stage of the pipeline */
   private IStage instructionExecuteStage;                    /** Reference to the Instruction Execute Stage of the pipeline */
+  private IStage instructionWritebackStage;                  /** Reference to the Instruction Writeback Stage of the pipeline */
   private ProcessorPipelineStatus pipelineStatus;            /** Reference to the utility/debug stage in the pipleline/simulator */
   private static IPipelineContext pipelineContext;           /** Reference to the sequential pipeline context */
   private BranchPredictor branchPredictor;                   /** Reference to the processor's branch prediction unit */
@@ -74,17 +75,19 @@ public class ProcessorSimulator
 
     processorPipeline = new SequentialProcessorPipeline();     // Instantiate the sequential processor pipeline object.
 
-    instructionFetchStage = new InstructionFetchStage();        // Instantiate the Instruction Fetch (IF) stage object
-    instructionDecodeStage = new InstructionDecodeStage();      // Instantiate the Instruction Decode (ID) stage object
-    instructionIssueStage = new InstructionIssueStage();        // TODO The instruction issue class needs to implement register re-naming and re-order buffer, etc.  
-    instructionExecuteStage = new InstructionExecuteStage();    //TODO Note this object should contain one or more execution units (EUs)
-    pipelineStatus = new ProcessorPipelineStatus();             // Instantiate the pipelineStatus object. This class provides a function to print the current status of the pipeline.
-    branchPredictor = new BranchPredictor();                    // Instantiate the processor's branch prediction (BP) unit
+    instructionFetchStage = new InstructionFetchStage();          // Instantiate the Instruction Fetch (IF) stage object
+    instructionDecodeStage = new InstructionDecodeStage();        // Instantiate the Instruction Decode (ID) stage object
+    instructionIssueStage = new InstructionIssueStage();          // Instantiate the Instruction Issue (II) stage object        // TODO The instruction issue class needs to implement register re-naming and reservation station, etc.  
+    instructionExecuteStage = new InstructionExecuteStage();      // Instantiate the Instruction Execute (IE) stage object      // TODO Note this object should contain one or more execution units (EUs)
+    instructionWritebackStage = new InstructionWritebackStage();  // Instantiate the Instruction Writeback (WB) stage objects   // TODO Need to implement a re-order buffer
+    pipelineStatus = new ProcessorPipelineStatus();               // Instantiate the pipelineStatus object. This class provides a function to print the current status of the pipeline.
+    branchPredictor = new BranchPredictor();                      // Instantiate the processor's branch prediction (BP) unit
     
     processorPipeline.addStage(instructionFetchStage);       // Add the IF stage to the pipeline
     processorPipeline.addStage(instructionDecodeStage);      // Add the ID stage to the pipeline
     processorPipeline.addStage(instructionIssueStage);       // Add the II stage to the pipeline
     processorPipeline.addStage(instructionExecuteStage);     // Add the IE stage to the pipeline
+    processorPipeline.addStage(instructionWritebackStage);   // Add the WB stage to the pipeline
 
     pipelineContext = new ProcessorPipelineContext(cpuRegisters,
                                                   cpuMemory,
@@ -92,6 +95,7 @@ public class ProcessorSimulator
                                                   instructionDecodeStage,
                                                   instructionIssueStage,
                                                   instructionExecuteStage,
+                                                  instructionWritebackStage,
                                                   branchPredictor);     // Instantiate the sequential pipeline context object. This is used to store data and share references between all stages in the pipeline. It can be thought of as the control unit (CU) of the cpu since it control all the values that are being updated.
 
     //cpuMemory.initialize();   // Initialize contents of the main memory with the required instructions and data (Generated as an output from the Assembler)
