@@ -159,5 +159,6 @@ public class Alu implements IExecutionUnit
         System.out.println("Fatal error! Incorrect execution unit (EU) used for the instruction!");
         break;
     }
+    cpuRegisters.incrementInstructionAluCounter();            // Increment the ALU instruction counter
   }
 }

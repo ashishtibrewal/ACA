@@ -53,6 +53,7 @@ public class Lsu implements IExecutionUnit
       //cpuRegisters.writeGP(destinationRegLoc, cpuRegisters.readMDR());                              // Write the value to the required GP register
       //instruction.setWritebackVal(cpuRegisters.readMDR());
       instruction.setWritebackVal(cpuMemory.readValue(calculationResult));
+      cpuRegisters.incrementInstructionLoadCounter();         // Increment load instruction counter
       break;
 
       // SW sr1, dr, Ix --- mem[dr + Ix] = sr1    (Store word to memory, i.e. write to main memory)
@@ -65,6 +66,7 @@ public class Lsu implements IExecutionUnit
       cpuRegisters.writeMDR(sourceReg1Val);           // Write the required source register value to the memory data register (MDR)
       //cpuMemory.writeValue(cpuRegisters.readMAR(), sourceReg1Val);    // Write the required value to memory directly using the source register value 
       cpuMemory.writeValue(cpuRegisters.readMAR(), cpuRegisters.readMDR());    // Write the required value to memory using the value stored in the memory data register (MDR)
+      cpuRegisters.incrementInstructionStoreCounter();      // Increment store instruction coutner
       break;
 
       // MOVI dr, Ix
@@ -73,6 +75,7 @@ public class Lsu implements IExecutionUnit
       signedImmediateVal = instruction.getSignedImmediateVal();  
       destinationRegLoc = instruction.getDestinationRegLoc();                                // Obtain the location of the destination register from the current instruction object
       instruction.setWritebackVal(signedImmediateVal);
+      cpuRegisters.incrementInstructionEncodedLoadCounter();      // Increment instruction encoded load counter 
       break;
 
       // MOVR dr, sr1

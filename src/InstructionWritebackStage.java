@@ -50,6 +50,10 @@ public class InstructionWritebackStage implements IProcessorPipelineStage
         cpuRegisters.writeGP(instruction.getDestinationRegLoc(), instruction.getWritebackVal());
       }
     }
+    // THIS IS WHERE THE PC IS UPDATED
+    cpuRegisters.updatePC(pContext.getBranchTaken());   // Update the primary/actual PC register with the correct/required value based on whether a branch was taken or not
+    pContext.setBranchTakenOld(false);                  // Function to store the current value of the branchTaken variable in the pipeline context. THIS IS ONLY USEFUL FOR DEBUGGING/PRINTING PURPOSES.
+    pContext.setBranchTaken(false);                     // Revert the branch taken variable back to false
   }
 
   // This flush method should do nothing (be empty) since this stage is ahead of the instruction execute stage in the pipeline. Only stages before/behind the instruction execute stage need to be flushed.

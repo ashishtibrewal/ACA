@@ -110,15 +110,15 @@ public class ProcessorSimulator
     Register.incrementClockCounter();               // Increment the clock counter on every cycle run
     processorPipeline.execute(pipelineContext);     // Execute/run the pipeline for the current cycle
     pipelineStatus.print(pipelineContext);          // Execute the utility stage to print the current status of the pipeline (Executing it separately/manually since it's not been added to the actual pipeline)
-    if (!((ProcessorPipelineContext)pipelineContext).getCorrectBranchPrediction())  // If the branch predictor mispredicted
+    if (!((ProcessorPipelineContext) pipelineContext).getCorrectBranchPrediction())  // If the branch predictor mispredicted
     {
       System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
       System.out.println("+ ----->>>> Flushing pipeline (Branch was mispredicted) <<<<----- +");
       System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n");
-      ((SequentialProcessorPipeline)processorPipeline).flush(pipelineContext);     // Flush the pipeline (i.e. flush each stage in the pipeline)
-      ((ProcessorPipelineContext)pipelineContext).setCorrectBranchPrediction(GlobalConstants.CORRECT_BRANCH_PREDICTION_RESULT);     // Revert the variable back to it's default value after the pipeline has been flushed
+      ((SequentialProcessorPipeline) processorPipeline).flush(pipelineContext);     // Flush the pipeline (i.e. flush each stage in the pipeline)
+      ((ProcessorPipelineContext) pipelineContext).setCorrectBranchPrediction(GlobalConstants.CORRECT_BRANCH_PREDICTION_RESULT);     // Revert the variable back to it's default value after the pipeline has been flushed
     }
-    ((InstructionFetchStage)((ProcessorPipelineContext)pipelineContext).getIF_Stage()).resetBranchPredictorResult();     // Reset the branch predictor result in the IF stage back to its default value at the end of every cycle
+    ((InstructionFetchStage) ((ProcessorPipelineContext) pipelineContext).getIF_Stage()).resetBranchPredictorResult();     // Reset the branch predictor result in the IF stage back to its default value at the end of every cycle
     //this.dumpState();                             // Dump the state of the cpu every cycle
   }
 
@@ -149,30 +149,35 @@ public class ProcessorSimulator
     System.out.println("###########################################################");
     System.out.println("###           SIMULATOR PERFORMANCE RESULTS             ###");
     System.out.println("###########################################################");
-    System.out.println("\n-----------------------------------");
-    System.out.println(">>> Overall performance resutls <<<");
-    System.out.println("-----------------------------------\n");
+    System.out.println();
+    System.out.println("--------------------------------------");
+    System.out.println(">>>  Overall performance resutls   <<<");
+    System.out.println("--------------------------------------");
     System.out.println("Total instructions executed: " + cpuRegisters.getInstructionCounter());
     System.out.println("Total NOP instructions executed: " + cpuRegisters.getInstructionCounterNOP());
     System.out.println("Total valid instructions executed: " + (cpuRegisters.getInstructionCounter() - cpuRegisters.getInstructionCounterNOP()));
     System.out.println("Total clock cycles simulated: " + cpuRegisters.readClockCounter());
     System.out.println("Instructions per cycle (IPC): " + ((double) (cpuRegisters.getInstructionCounter() - cpuRegisters.getInstructionCounterNOP()) / (double) (cpuRegisters.readClockCounter())));
-    System.out.println("\n-----------------------------------");
-    System.out.println(">>>  Branch prediction resutls  <<<");
-    System.out.println("-----------------------------------\n");
-    System.out.println("Total branch instructions executed: ?");
-    System.out.println("Branches predicted correct: ?");
-    System.out.println("Branches predicted incorrect: ?");
-    System.out.println("\n-----------------------------------");
-    System.out.println(">>>         ALU resutls         <<<");
-    System.out.println("-----------------------------------\n");
-    System.out.println("Total ALU instructions executed: ?");
-    System.out.println("\n-----------------------------------");
-    System.out.println(">>>         LSU resutls         <<<");
-    System.out.println("-----------------------------------\n");
-    System.out.println("Total LSU instructions executed: ?");
-    System.out.println("Total loads executed: ?");
-    System.out.println("Total stores executed: ?");
+    System.out.println();
+    System.out.println("--------------------------------------");
+    System.out.println(">>> BU & Branch prediction results <<<");
+    System.out.println("--------------------------------------");
+    System.out.println("Total branch instructions executed: " + cpuRegisters.getInstructionBranchCounter());
+    System.out.println("Branches predicted correct: " + cpuRegisters.getBranchPredictionsCorrect());
+    System.out.println("Branches predicted incorrect: " + cpuRegisters.getBranchPredictionsIncorrect());
+    System.out.println();
+    System.out.println("--------------------------------------");
+    System.out.println(">>>          ALU results           <<<");
+    System.out.println("--------------------------------------");
+    System.out.println("Total ALU instructions executed: " + cpuRegisters.getInstructionAluCounter());
+    System.out.println();
+    System.out.println("--------------------------------------");
+    System.out.println(">>>          LSU results           <<<");
+    System.out.println("--------------------------------------");
+    System.out.println("Total LSU instructions executed: " + (cpuRegisters.getInstructionLoadCounter() + cpuRegisters.getInstructionStoreCounter() + cpuRegisters.getInstructionEncodedLoadCounter()));
+    System.out.println("Total loads executed: " + cpuRegisters.getInstructionLoadCounter());
+    System.out.println("Total stores executed: " + cpuRegisters.getInstructionStoreCounter());
+    System.out.println("Total instruction encoded loads (i.e. MOVIs): " + cpuRegisters.getInstructionEncodedLoadCounter());
     System.out.println();
   }
 

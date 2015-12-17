@@ -54,7 +54,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
     {
       throw new IllegalInstructionException("Illegal instruction (Instruction with OpCode \"" + Utility.convertToBin(opCode, 0).substring((Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH), Isa.INSTRUCTION_LENGTH) + "\" is not specified in the ISA)."); 
     }
-    this.printInstructionMnemonic(opCode);
+    this.generateInstructionInformation(opCode);
     this.extractInformation(instructionMnemonic, instructionType);
     /*switch (opCode)
     {
@@ -331,10 +331,10 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
 
 
   /**
-   * * Method to print the instruction mnemonic depending on the OpCode
+   * * Method to generate instruction information depending on the OpCode
    * @param opCode Instruction OpCode
    */
-  private void printInstructionMnemonic(int opCode)
+  private void generateInstructionInformation(int opCode)
   {
     switch (opCode)
     {

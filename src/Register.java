@@ -39,7 +39,14 @@ public class Register
   private Memory cpuMemory;                           /** Reference to the CPU memory */
   private static int clockCounter;                    /** Variable that holds the number of cycles completed by the simulator - Declared as a static varaible since the processor should only contain a single clockCounter register no matter how many Register objects have been instantiated */
   private static int instructionCounter;              /** Could the number of instructions executed by the processor */
-  private static int instructionCounterNOP;          /** Could the number of NOP instructions executed by the processor */
+  private static int instructionCounterNOP;           /** Could the number of NOP instructions executed by the processor */
+  private static int instructionBranchCounter;        /** Branch instruction counter */
+  private static int branchPredictionsCorrect;        /** Correct branch prediction counter */
+  private static int branchPredictionsIncorrect;      /** Incorrect branch prediction counter */
+  private static int instructionLoadCounter;          /** Load instruction counter */
+  private static int instructionStoreCounter;         /** Store instruction counter */
+  private static int instructionAluCounter;           /** ALU instruction counter */
+  private static int instructionEncodedLoadCounter;   /** Encoded load instruction counter, i.e. instructions such as MOVI */
 
   // Initialize static variables
   static
@@ -429,8 +436,119 @@ public class Register
   public int getInstructionCounterNOP()
   {
     return instructionCounterNOP;
-  } 
+  }
 
+  /**
+   * Method to increment the branch instruction counter
+   */
+  public void incrementInstructionBranchCounter()
+  {
+    instructionBranchCounter++;
+  }
+
+  /**
+   * Method to increment the branch prediction correct counter
+   */
+  public void incrementBranchPredictionsCorrect()
+  {
+    branchPredictionsCorrect++;
+  }
+  
+  /**
+   * Method to increment the branch prediction incorrect counter
+   */
+  public void incrementBranchPredictionsIncorrect()
+  {
+    branchPredictionsIncorrect++;
+  }
+
+  /**
+   * Method to increment the load instruction counter
+   */
+  public void incrementInstructionLoadCounter()
+  {
+    instructionLoadCounter++;
+  }
+
+  /**
+   * Method to increment the store instruction counter
+   */
+  public void incrementInstructionStoreCounter()
+  {
+    instructionStoreCounter++;
+  }
+
+  /**
+   * Method to increment the encoded load instruction counter
+   */
+  public void incrementInstructionEncodedLoadCounter()
+  {
+    instructionEncodedLoadCounter++;
+  }
+  
+  /**
+   * Method to increment the ALU instruction counter
+   */
+  public void incrementInstructionAluCounter()
+  {
+    instructionAluCounter++;
+  }
+
+  /**
+   * Method to obtain the value stored in the branch instruction counter
+   */
+  public int getInstructionBranchCounter()
+  {
+    return instructionBranchCounter;
+  }
+
+  /**
+   * Method to obtain the value stored in the branch prediction correct counter
+   */
+  public int getBranchPredictionsCorrect()
+  {
+    return branchPredictionsCorrect;
+  }
+  
+  /**
+   * Method to obtain the value stored in the branch prediction incorrect counter
+   */
+  public int getBranchPredictionsIncorrect()
+  {
+    return branchPredictionsIncorrect;
+  }
+
+  /**
+   * Method to obtain the value stored in the load instruction counter
+   */
+  public int getInstructionLoadCounter()
+  {
+    return instructionLoadCounter;
+  }
+
+  /**
+   * Method to obtain the value stored in the store instruction counter
+   */
+  public int getInstructionStoreCounter()
+  {
+    return instructionStoreCounter;
+  }
+
+  /**
+   * Method to obtain the value stored in the encoded load instruction counter
+   */
+  public int getInstructionEncodedLoadCounter()
+  {
+    return instructionEncodedLoadCounter;
+  }
+
+  /**
+   * Method to obtain the value stored in the ALU instruction counter
+   */
+  public int getInstructionAluCounter()
+  {
+    return instructionAluCounter;
+  }
 
   /**
    * Method to dump contents of all the architectural registers. 

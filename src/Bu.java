@@ -70,8 +70,12 @@ public class Bu implements IExecutionUnit
           pContext.setBranchTaken(!instruction.getBranchPredictionResult());
           pContext.setBranchTarget(calculationResult);
           pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+          cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
         }
-        // else do nothing, since the branch predictor predicted correct
+        else              // else do nothing, since the branch predictor predicted correct
+        {
+          cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+        }
         break;
 
       // BL Ix --- Unconditional branch with link --- Used in function calls (i.e. jumping to different labels in assembly code)
@@ -98,8 +102,12 @@ public class Bu implements IExecutionUnit
           pContext.setBranchTaken(!instruction.getBranchPredictionResult());                // Assert that a branch needs to be taken
           pContext.setBranchTarget(calculationResult);                        // Set the branch target (i.e. PC = PC + Ix)
           pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+          cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
         }
-        // else do nothing, since the branch predictor predicted correct
+        else              // else do nothing, since the branch predictor predicted correct
+        {
+          cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+        }
         break;
 
       // RET --- Return from a function call - Used to return to the caller function
@@ -121,8 +129,12 @@ public class Bu implements IExecutionUnit
           pContext.setBranchTaken(!instruction.getBranchPredictionResult());                // Assert that a branch needs to be taken
           pContext.setBranchTarget(calculationResult);    // Set the branch target (i.e. PC = LR)
           pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+          cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
         }
-        // else do nothing, since the branch predictor predicted correct
+        else              // else do nothing, since the branch predictor predicted correct
+        {
+          cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+        }
         break;
 
       // Conditional branches
@@ -137,8 +149,12 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
             pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         else        // If this branch was predicted taken
         {
@@ -147,8 +163,12 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
             pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         break;
 
@@ -163,8 +183,12 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
             pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         else        // If this branch was predicted taken
         {
@@ -173,8 +197,12 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
             pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         break;
 
@@ -189,8 +217,12 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
             pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         else        // If this branch was predicted taken
         {
@@ -199,8 +231,12 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
             pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         break;
 
@@ -215,8 +251,12 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(!instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(calculationResult);                          // Set the branch target (i.e. PC = PC + Ix)
             pContext.setCorrectBranchPrediction(instruction.getBranchPredictionResult());     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         else        // If this branch was predicted taken
         {
@@ -225,10 +265,15 @@ public class Bu implements IExecutionUnit
             pContext.setBranchTaken(instruction.getBranchPredictionResult());    // Assert that a branch needs to be taken
             pContext.setBranchTarget(instruction.getMemoryFetchLocation() + 1);   // Set the branch target (i.e. PC = Fetch location + 1)
             pContext.setCorrectBranchPrediction(!(instruction.getBranchPredictionResult()));     // Assert the BP global variable in the pipeline context for the simulator to check if the pipeline needs to be flushed
+            cpuRegisters.incrementBranchPredictionsIncorrect();               // Increment incorrect branch prediction counter
           }
-          // else do nothing, since the branch predictor predicted correct
+          else              // else do nothing, since the branch predictor predicted correct
+          {
+            cpuRegisters.incrementBranchPredictionsCorrect();               // Increment correct branch prediction counter
+          }
         }
         break;
     }
+    cpuRegisters.incrementInstructionBranchCounter();         // Increment the branch instruction counter
   }
 }

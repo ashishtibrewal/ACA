@@ -422,7 +422,7 @@ public class ProcessorPipelineContext implements IPipelineContext
 
   /**
    * Method to obtain a reference to the Instruction Execute (IE) Stage object, instructionExecuteStage.
-   * USED ONLY FOR PRINTING AND DEBUGGING AND FOR RESULT PASSING.
+   * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Reference to the IE Stage obejct
    */
   public IStage getIE_Stage()
