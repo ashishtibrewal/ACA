@@ -23,7 +23,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
   // private Register cpuRegisters;
   // private Memory cpuMemory;
   private int programCounter;
-  private int instruction;
+  private int[] instruction;
   private boolean branchInstruction;             /** Variable stating whether the fetched instruction is a branch instruction */
   private boolean branchPredictorResult;         /** Branch predictor's result */
   private Register cpuRegisters;                 /** Reference to architectural registers */
@@ -44,12 +44,29 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     cpuRegisters = pContext.getCpuRegisters();                              // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     cpuMemory = pContext.getCpuMemory();                                    // Obtain and store the reference to the primary cpu memory object from the pipeline context (Doing this to avoid having to type it over and over again)
     programCounter = cpuRegisters.readPC();                                 // Read value of the PC register
-    instruction = cpuMemory.readValue(programCounter);                      // Read value from main memory at the location specified by the PC register
-    //this.preDecode();                                                       // Pre-decode the instruction
-    //pContext.setNextIR(instruction);                                        // Write value to the (next/output) instruction register (IR)
-    pContext.setNextIR(this.preDecode());                                   // Write value to the (next/output) instruction register (IR)
-    //cpuRegisters.writeIR(instruction);                                    // Write value to the instruction register (IR)
-    pContext.setNextMemoryFetchLoc(programCounter);                         // Store the next value of the PC (i.e. the location in memory from where the instruction was fetched) to be used by the ID stage
+    instruction = new int[GlobalConstants.BUS_WIDTH];                       // Instantiate instruction array object
+    int[] memFetchLoc = new int[GlobalConstants.BUS_WIDTH];
+    boolean branchInstructionPredictedTaken = false;
+    for (int i = 0; i < GlobalConstants.BUS_WIDTH; i++)
+    {
+      instruction[i] = cpuMemory.readValue(programCounter + i);                      // Read value from main memory at the location specified by the PC register
+      memFetchLoc[i] = programCounter + i;
+      this.preDecode(instruction[i]);                                                       // Pre-decode the instruction
+      if (branchInstruction == true && branchPredictorResult == true)       // If this is branch instruction and the branch predictor predicts it to be taken
+      {
+        branchInstructionPredictedTaken = true;
+        continue;       // Skip to the next iteration of the loop
+      }
+      if (branchInstructionPredictedTaken == true)
+      {
+        // Store a NOP instruction for all the instructions fetched after the branch instruction (if and only if the branch instruction was predicted to be taken)
+        instruction[i] = GlobalConstants.DEFAULT_INSTRUCTION;
+        memFetchLoc[i] = GlobalConstants.DEFAULT_MEM_FETCH_LOC;
+      }
+    }
+    branchInstructionPredictedTaken = false;                            // Set it back to it's default value
+    pContext.setNextIR(instruction);                                   // Write value to the (next/output) instruction register (IR)
+    pContext.setNextMemoryFetchLoc(memFetchLoc);                         // Store the next value of the PC (i.e. the location in memory from where the instruction was fetched) to be used by the ID stage
     cpuRegisters.incrementPC();                                             // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
   }
 
@@ -58,16 +75,15 @@ public class InstructionFetchStage implements IProcessorPipelineStage
   {
     // Effectively set all the class fields to it's default values
     programCounter = GlobalConstants.DEFAULT_PC;
-    instruction = GlobalConstants.DEFAULT_INSTRUCTION;
+    Arrays.fill(instruction, GlobalConstants.DEFAULT_INSTRUCTION);
     branchInstruction = false;      // The default assumption is that the fetched instruction is not a branch instruction
     branchPredictorResult = GlobalConstants.DEFAULT_BRANCH_PREDICTION;
   }
 
   /**
    * Method to pre-decode the current instruction. Only useful when (pre) decoding branch instructions and when using the branch predictor
-   * @return Next value to be stored in the instruction register (IR)
    */
-  private int preDecode()
+  private void preDecode(int _instruction)
   {
     BranchPredictor branchPredictor;
     Instruction instruction = new Instruction(GlobalConstants.DEFAULT_INSTRUCTION_TYPE,
@@ -91,8 +107,8 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     int signedImmediate;
     int signedImmediateVal;
     int calculationResult = 0;                      // Need to insert a default value or else the compiler complains
-    String instructionBinary = Utility.convertToBin(this.instruction, 0);   // Not using the Integer.toBinaryString() method because it truncates leading binary zero characters.
-    int opCode = (this.instruction >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
+    String instructionBinary = Utility.convertToBin(_instruction, 0);   // Not using the Integer.toBinaryString() method because it truncates leading binary zero characters.
+    int opCode = (_instruction >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
     if(opCode > (Isa.ISA_TOTAL_INSTRUCTIONS - 1))     // Check if the opCode is valid (i.e. check if it's a valid instruction)
     {
       throw new IllegalInstructionException("Illegal instruction (Instruction with OpCode \"" + Utility.convertToBin(opCode, 0).substring((Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH), Isa.INSTRUCTION_LENGTH) + "\" is not specified in the ISA)."); 
@@ -161,7 +177,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
       // Non-branch instruction
       default:
         branchInstruction = false;        // The instruction fetched is not a branch instruction
-        return this.instruction;          // Return back to the main execute function of the IF stage since the instruction fetched is a non-branch instruction
+        return;                           // Return back to the main execute function of the IF stage since the instruction fetched is a non-branch instruction
     }
 
     if (branchInstruction == true)        // Only execute this section if the fetched instruction is a branch instruction. Don't really need this check since the function returns to the caller before it can get here if it's not a branch instruction
@@ -179,7 +195,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
                                       executionUnit,
                                       opCode, 
                                       programCounter,
-                                      this.instruction,
+                                      _instruction,
                                       Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
                                       GlobalConstants.DEFAULT_BRANCH_PREDICTION,
                                       sourceReg1,
@@ -199,7 +215,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
                                         executionUnit,
                                         opCode, 
                                         programCounter,
-                                        this.instruction,
+                                        _instruction,
                                         Isa.InstructionType.RRI.NUMBER_OF_CYCLES,
                                         GlobalConstants.DEFAULT_BRANCH_PREDICTION,
                                         sourceReg1,
@@ -219,7 +235,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
                                         executionUnit,
                                         opCode, 
                                         programCounter,
-                                        this.instruction,
+                                        _instruction,
                                         Isa.InstructionType.I.NUMBER_OF_CYCLES,
                                         GlobalConstants.DEFAULT_BRANCH_PREDICTION,
                                         signedImmediate);
@@ -334,17 +350,6 @@ public class InstructionFetchStage implements IProcessorPipelineStage
       }
       // If branch predictor predicts false for the fetched instruction - DO NOTHING. THIS IS ONLY USEFUL FOR CONDITIONAL INSTRUCTIONS AND IS TAKEN CARE OF IN THE INSTRUCTION EXECUTE STAGE SINCE A UNCONDITIONAL BRANCH IS ALWAYS PREDICTED TO BE TAKEN.
     }
-
-    /*if (instruction.getOpCode() == Isa.BU || instruction.getOpCode() == Isa.BL || instruction.getOpCode() == Isa.RET)     // Unconditional branch instructions
-    {
-      // TODO return the original instruction and check if the branch prediction was correct in the execute stage. Cannot convert this to a NOP since a branch is still effectively a valid instruction
-      return GlobalConstants.DEFAULT_INSTRUCTION;    // Set the next IR value to a NOP instruction since the unconditional branch has been taken care of here
-    }
-    else                      // All other instructions (Including conditional branch instructions)
-    {
-      return this.instruction;    // Set the next IR value to the fetched instruction
-    }*/
-    return this.instruction;
   }
 
   /**
@@ -390,7 +395,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Current instruction value that has been read by the IF stage
    */
-  public int getCurrentInstructionRead()
+  public int[] getCurrentInstructionRead()
   {
     return instruction;
   }

@@ -30,6 +30,7 @@ public final class GlobalConstants
   public static final int NUM_ITERATIONS = 20;                          // Only used for testing/debugging purposes
   public static final int SVC_REGISTER = 15;                            // Reserve R15 as the SVC register.
   public static final int SVC_SUSPEND = 255;                            // Supervisor call to end/halt/terminate the simulation. Value needs to be moved to R15
+  public static final int BUS_WIDTH = 4;                                // Processor bus width - Useful during the superscalar implementation
   // TODO Insert ALL constants to this class.
 
   // Processor default constants

@@ -33,7 +33,7 @@ public class Register
   private int framePointer;                           /** Frame pointer register: Holds address of the start of the current frame in the stack */
   private int linkRegister;                           /** Link register: Holds return address values */
   private boolean[] statusRegister;                   /** Status register: Holds values of architectural status flags */
-  private int instructionRegister;                    /** Instruction register: Holds the value of the last decoded instruction */
+  private int[] instructionRegister;                    /** Instruction register: Holds the value of the last decoded instruction */
   private int memoryAddressRegister;                  /** Memory Address Register: Holds the memory address to which the data contained in the Memory Data Register needs to be stored */
   private int memoryDataRegister;                     /** Memory Data Register: Holds the data that needs to be stored to memory address contained in the Memory Address Register */
   private Memory cpuMemory;                           /** Reference to the CPU memory */
@@ -65,6 +65,7 @@ public class Register
   {
     generalPurposeRegisters = new int[GlobalConstants.TOTAL_GP_REGISTERS];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
+    instructionRegister = new int[GlobalConstants.BUS_WIDTH];
     programCounter = registerInitializationValue;
     programCounterIncremented = registerInitializationValue;
     programCounterBranch = registerInitializationValue;
@@ -91,6 +92,7 @@ public class Register
   {
     generalPurposeRegisters = new int[numberOfRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
+    instructionRegister = new int[GlobalConstants.BUS_WIDTH];
     programCounter = registerInitializationValue;
     programCounterIncremented = registerInitializationValue;
     programCounterBranch = registerInitializationValue;
@@ -111,6 +113,7 @@ public class Register
   {
     generalPurposeRegisters = new int[numberOfRegisters];
     Arrays.fill(generalPurposeRegisters, registerInitializationValue);
+    instructionRegister = new int[GlobalConstants.BUS_WIDTH];
     programCounter = registerInitializationValue;
     programCounterIncremented = registerInitializationValue;
     programCounterBranch = registerInitializationValue;
@@ -164,7 +167,7 @@ public class Register
     }
     else
     {
-      programCounterIncremented++;
+      programCounterIncremented = programCounterIncremented + GlobalConstants.BUS_WIDTH;
     }
   }
 
@@ -205,10 +208,9 @@ public class Register
    * Method to write a new value to the instruction register (IR)
    * @param newValue Value that needs to be written to the IR register
    */
-  public void writeIR(int newValue)
-  {
-    int opCode = (newValue >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
-
+  public void writeIR(int[] newValue)
+  {  
+    // int opCode = (newValue >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
     // Note this check for an invalid instruction is made in the Instruction Decode Stage class.
     // if(opCode > (Isa.ISA_TOTAL_INSTRUCTIONS - 1))
     // {
@@ -328,7 +330,7 @@ public class Register
    * Method to read the current value stored in the instruction register (IR)
    * @return Value stored in the PC register
    */
-  public int readIR()
+  public int[] readIR()
   {
     return instructionRegister;
   }  
@@ -566,7 +568,7 @@ public class Register
     {
       System.out.format("| R%02d   \t      0x%08x (%s)        |%n", registerNumber, generalPurposeRegisters[registerNumber], Utility.convertToBin(generalPurposeRegisters[registerNumber], 4));
     }
-    System.out.format("| IR     \t      0x%08x (%s)        |%n", instructionRegister, Utility.convertToBin(instructionRegister, 4));
+    System.out.format("| IR     \t      0x%08x             |%n", Arrays.toString(instructionRegister));
     System.out.format("| PC     \t      0x%08x (%s)        |%n", programCounter, Utility.convertToBin(programCounter, 4));
     System.out.format("| SP     \t      0x%08x (%s)        |%n", stackPointer, Utility.convertToBin(stackPointer, 4));
     System.out.format("| LR     \t      0x%08x (%s)        |%n", linkRegister, Utility.convertToBin(linkRegister, 4));
