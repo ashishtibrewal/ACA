@@ -45,15 +45,11 @@ public class InstructionWritebackStage implements IProcessorPipelineStage
     // TODO Insert check to only writeback those instructions that are valid for a writeback operation
     if (instruction.getExecutionUnit() == ExecutionUnit.ALU || instruction.getExecutionUnit() == ExecutionUnit.LSU)       // The writeback stage is only valid for ALU and LSU instructions in this design (BU updates required registers in the IE stage)
     {
-      if (instruction.getOpCode() != Isa.NOP)       // Prevent any writes to registers for the NOP instruction
+      if (instruction.getOpCode() != Isa.NOP && instruction.getOpCode() != Isa.SW)       // Prevent any writes to registers for the NOP and store instructions
       {
         cpuRegisters.writeGP(instruction.getDestinationRegLoc(), instruction.getWritebackVal());
       }
     }
-    // THIS IS WHERE THE PC IS UPDATED
-    cpuRegisters.updatePC(pContext.getBranchTaken());   // Update the primary/actual PC register with the correct/required value based on whether a branch was taken or not
-    pContext.setBranchTakenOld(false);                  // Function to store the current value of the branchTaken variable in the pipeline context. THIS IS ONLY USEFUL FOR DEBUGGING/PRINTING PURPOSES.
-    pContext.setBranchTaken(false);                     // Revert the branch taken variable back to false
   }
 
   // This flush method should do nothing (be empty) since this stage is ahead of the instruction execute stage in the pipeline. Only stages before/behind the instruction execute stage need to be flushed.
