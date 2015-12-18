@@ -226,7 +226,7 @@ public class Memory
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     /* N-th Fibonacci number correct way to write it in assembly */
-    ///*
+    /*
     memoryArray[0] = Utility.convertToInt("10001000000000000000000000010001", true); // MOVI R1, 1 (Move 1 into R1)
     memoryArray[1] = Utility.convertToInt("10001000000000000000000000010010", true); // MOVI R2, 1 (Move 1 into R2)
     memoryArray[2] = Utility.convertToInt("10001000000000000000000000110011", true); // MOVI R3, 3 (Move 3 into R3)
@@ -238,7 +238,7 @@ public class Memory
     memoryArray[8] = Utility.convertToInt("00101000000000000000000100110011", true); // ADDI R3, R3, 1 (Add 1 to R3 and store the result in R3)
     memoryArray[9] = Utility.convertToInt("10011000000000001111111111111011", true); // BU -5
     memoryArray[10] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated 
-    //*/
+    */
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -275,6 +275,16 @@ public class Memory
     memoryArray[16] = Utility.convertToInt("11001000000000000000000000000000", true); // RET (Return from function call)
     */
    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+   
+    /* Used to test superscalar execution */
+    // memoryArray[0] = Utility.convertToInt("10011000000000000000000000000111", true); // BU 7
+    memoryArray[0] = Utility.convertToInt("10001100000000000000000000100001", true); // MOVI R1, 2 (Move 2 into R1)
+    memoryArray[1] = Utility.convertToInt("10001100000000000000000001000010", true); // MOVI R2, 4 (Move 4 into R2) 
+    memoryArray[2] = Utility.convertToInt("00001000000000000000001000010001", true); // ADDR R1, R1, R2 (Add R1 and R2 and store the result in R1)
+    // memoryArray[2] = Utility.convertToInt("10011000000000000000000000001010", true); // BU 10
+    memoryArray[3] = Utility.convertToInt("00001000000000000000010000110011", true); // ADDR R3, R3, R4 (Add R3 and R4 and store the result in R3)
+    memoryArray[4] = Utility.convertToInt("00001000000000000000011001010101", true); // ADDR R5, R5, R6 (Add R5 and R6 and store the result in R5)
+    memoryArray[5] = Utility.convertToInt("00001000000000000000100001110111", true); // ADDR R7, R7, R8 (Add R7 and R8 and store the result in R7)
   }
 
   /**

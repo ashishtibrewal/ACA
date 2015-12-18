@@ -158,16 +158,32 @@ public class Register
 
   /**
    * Method to increment the program counter (PC) register to point to the next location in memory
+   * @param modifiedPC Modified PC value
+   * @param override   Boolean value stating if the PC needs to be updated with the modifiedPC value rather than the bus width
    */
-  public void incrementPC()
+  public void incrementPC(int modifiedPC, boolean override)
   {
-    if((programCounterIncremented + 1) < 0 || (programCounterIncremented + 1) >= cpuMemory.getMemorySize()) // TODO change to check it doesnt enter the data region in memory
+    if ((programCounterIncremented + 1) < 0 || (programCounterIncremented + 1) >= cpuMemory.getMemorySize() || modifiedPC < 0 || modifiedPC >= cpuMemory.getMemorySize()) // TODO change to check it doesnt enter the data region in memory
     {
-      throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toHexString(programCounterIncremented + 1) + " doesn't exist in memory)."); 
+      if (override == false)
+      {
+        throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toHexString(programCounterIncremented + 1) + " doesn't exist in memory)."); 
+      }
+      else
+      {
+        throw new RegisterAccessException("Illegal PC value (Location 0x" + Integer.toHexString(modifiedPC) + " doesn't exist in memory).");  
+      }
     }
     else
     {
-      programCounterIncremented = programCounterIncremented + GlobalConstants.BUS_WIDTH;
+      if (override == false)
+      {
+        programCounterIncremented = programCounterIncremented + GlobalConstants.BUS_WIDTH;
+      }
+      else
+      {
+        programCounterIncremented = modifiedPC;
+      }
     }
   }
 
@@ -568,7 +584,10 @@ public class Register
     {
       System.out.format("| R%02d   \t      0x%08x (%s)        |%n", registerNumber, generalPurposeRegisters[registerNumber], Utility.convertToBin(generalPurposeRegisters[registerNumber], 4));
     }
-    System.out.format("| IR     \t      0x%08x             |%n", Arrays.toString(instructionRegister));
+    for (int i = 0; i < GlobalConstants.BUS_WIDTH; i++)
+    {
+      System.out.format("| IR%d     \t      0x%08x (%s)        |%n", i, instructionRegister[i], Utility.convertToBin(instructionRegister[i], 4));
+    }
     System.out.format("| PC     \t      0x%08x (%s)        |%n", programCounter, Utility.convertToBin(programCounter, 4));
     System.out.format("| SP     \t      0x%08x (%s)        |%n", stackPointer, Utility.convertToBin(stackPointer, 4));
     System.out.format("| LR     \t      0x%08x (%s)        |%n", linkRegister, Utility.convertToBin(linkRegister, 4));

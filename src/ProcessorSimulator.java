@@ -255,8 +255,8 @@ public class ProcessorSimulator
       System.out.println("###              RUNNING THE CPU SIMULATOR              ###");
       System.out.println("###########################################################");
       System.out.println("CPU simulator starting program execution. \n");
-      //for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)
-      while (((ProcessorPipelineContext) pipelineContext).getCpuRegisters().readGP(GlobalConstants.SVC_REGISTER) != GlobalConstants.SVC_SUSPEND)
+      for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)
+      //while (((ProcessorPipelineContext) pipelineContext).getCpuRegisters().readGP(GlobalConstants.SVC_REGISTER) != GlobalConstants.SVC_SUSPEND)
       {  
         cpu.step();           // Step/Run the cpu simulator by one clock cycle
         // TODO Add code to print state of every stage for current cycle

@@ -24,10 +24,11 @@ public class InstructionFetchStage implements IProcessorPipelineStage
   // private Memory cpuMemory;
   private int programCounter;
   private int[] instruction;
-  private boolean branchInstruction;             /** Variable stating whether the fetched instruction is a branch instruction */
+  private boolean[] branchInstruction;           /** Variable stating whether the fetched instruction is a branch instruction */
   private boolean branchPredictorResult;         /** Branch predictor's result */
   private Register cpuRegisters;                 /** Reference to architectural registers */
   private Memory cpuMemory;                      /** Reference to main memory */
+  private BranchPredictor branchPredictor;       /** Reference to the branch predictor */
   private ProcessorPipelineContext pContext;     /** Reference to the processor pipeline context */
 
   // public InstructionFetch(Register cpuRegisters, Memory cpuMemory)
@@ -43,16 +44,34 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     pContext = (ProcessorPipelineContext) context;                          // Explicitly cast context to ProcessorPipelineContext type
     cpuRegisters = pContext.getCpuRegisters();                              // Obtain and store the reference to the primary cpu registers object from the pipeline context (Doing this to avoid having to type it over and over again)
     cpuMemory = pContext.getCpuMemory();                                    // Obtain and store the reference to the primary cpu memory object from the pipeline context (Doing this to avoid having to type it over and over again)
+    branchPredictor = pContext.getBranchPredictor();                              // Obtain a reference to the processor's branch prediction unit
     programCounter = cpuRegisters.readPC();                                 // Read value of the PC register
     instruction = new int[GlobalConstants.BUS_WIDTH];                       // Instantiate instruction array object
+    branchInstruction = new boolean[GlobalConstants.BUS_WIDTH];
     int[] memFetchLoc = new int[GlobalConstants.BUS_WIDTH];
-    boolean branchInstructionPredictedTaken = false;
-    for (int i = 0; i < GlobalConstants.BUS_WIDTH; i++)
+    int modifiedPC = GlobalConstants.DEFAULT_PC;
+    boolean overridePC = false;
+    boolean branchInstructionPredictedTaken = false;                        // Flag that is set when a branch instruction occurs and is predicted to be taken
+    instructionIterator: for (int i = 0; i < GlobalConstants.BUS_WIDTH; i++)
     {
       instruction[i] = cpuMemory.readValue(programCounter + i);                      // Read value from main memory at the location specified by the PC register
       memFetchLoc[i] = programCounter + i;
-      this.preDecode(instruction[i]);                                                       // Pre-decode the instruction
-      if (branchInstruction == true && branchPredictorResult == true)       // If this is branch instruction and the branch predictor predicts it to be taken
+      this.preDecode(i, instruction[i]);                                             // Pre-decode the instruction
+      if (branchInstruction[i] == true)
+      {
+        // Check if multiple branch instructions occur in the same fetch cycle, if true avoid the second branch instruction. This is being done for simplicity and to avoid having to use an array to store branch prediction results (Doing this can make everything more complicated, hence, it's being avoided)
+        for (int j = (i - 1); j >= 0; j--)
+        {
+          if (branchInstruction[j] == true)
+          {
+            instruction[i] = GlobalConstants.DEFAULT_INSTRUCTION;     // Store a NOP instead of the fetched branch instruction (i.e. the second branch instruction)
+            modifiedPC = programCounter + i;
+            overridePC = true;
+            break instructionIterator;      // Break out of the main loop
+          }
+        }
+      }
+      if (branchInstruction[i] == true && branchPredictorResult == true)       // If this is branch instruction and the branch predictor predicts it to be taken
       {
         branchInstructionPredictedTaken = true;
         continue;       // Skip to the next iteration of the loop
@@ -67,7 +86,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     branchInstructionPredictedTaken = false;                            // Set it back to it's default value
     pContext.setNextIR(instruction);                                   // Write value to the (next/output) instruction register (IR)
     pContext.setNextMemoryFetchLoc(memFetchLoc);                         // Store the next value of the PC (i.e. the location in memory from where the instruction was fetched) to be used by the ID stage
-    cpuRegisters.incrementPC();                                             // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
+    cpuRegisters.incrementPC(modifiedPC, overridePC);                   // Increment value stored in the (temporary/shadow) PC register. Actual value is set in the instruction execute or memory access stage.
   }
 
   // TODO need to fill function contents accordingly - This would need to be execute when the branch prediction was incorrect
@@ -76,16 +95,17 @@ public class InstructionFetchStage implements IProcessorPipelineStage
     // Effectively set all the class fields to it's default values
     programCounter = GlobalConstants.DEFAULT_PC;
     Arrays.fill(instruction, GlobalConstants.DEFAULT_INSTRUCTION);
-    branchInstruction = false;      // The default assumption is that the fetched instruction is not a branch instruction
+    Arrays.fill(branchInstruction, false);      // The default assumption is that the fetched instruction is not a branch instruction
     branchPredictorResult = GlobalConstants.DEFAULT_BRANCH_PREDICTION;
   }
 
   /**
    * Method to pre-decode the current instruction. Only useful when (pre) decoding branch instructions and when using the branch predictor
+   * @param iteratorVal  Iterator value
+   * @param _instruction Instruction to be pre-decoded
    */
-  private void preDecode(int _instruction)
+  private void preDecode(int iteratorVal, int _instruction)
   {
-    BranchPredictor branchPredictor;
     Instruction instruction = new Instruction(GlobalConstants.DEFAULT_INSTRUCTION_TYPE,
                                               GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC,
                                               GlobalConstants.DEFAULT_EXECUTION_UNIT,
@@ -122,7 +142,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         instructionMnemonic = "BU";
         instructionType = "I";
         executionUnit = ExecutionUnit.BU;
-        branchInstruction = true;
+        branchInstruction[iteratorVal] = true;
         break;
 
       // BL Ix
@@ -130,7 +150,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         instructionMnemonic = "BL";
         instructionType = "I";
         executionUnit = ExecutionUnit.BU;
-        branchInstruction = true;
+        branchInstruction[iteratorVal] = true;
         break;
 
       // RET
@@ -138,7 +158,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         instructionMnemonic = "RET";
         instructionType = "RRR";
         executionUnit = ExecutionUnit.BU;
-        branchInstruction = true;
+        branchInstruction[iteratorVal] = true;
         break;
 
       // Conditional branches
@@ -147,7 +167,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         instructionMnemonic = "BEQ";
         instructionType = "RRI";
         executionUnit = ExecutionUnit.BU;
-        branchInstruction = true;
+        branchInstruction[iteratorVal] = true;
         break;
 
       // BNE sr1, sr2, Ix
@@ -155,7 +175,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         instructionMnemonic = "BNE";
         instructionType = "RRI";
         executionUnit = ExecutionUnit.BU;
-        branchInstruction = true;
+        branchInstruction[iteratorVal] = true;
         break;
 
       // BLT sr1, sr2, Ix
@@ -163,7 +183,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         instructionMnemonic = "BLT";
         instructionType = "RRI";
         executionUnit = ExecutionUnit.BU;
-        branchInstruction = true;
+        branchInstruction[iteratorVal] = true;
         break;
 
       // BGT sr1, sr2, Ix
@@ -171,17 +191,26 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         instructionMnemonic = "BGT";
         instructionType = "RRI";
         executionUnit = ExecutionUnit.BU;
-        branchInstruction = true;
+        branchInstruction[iteratorVal] = true;
         break;
 
       // Non-branch instruction
       default:
-        branchInstruction = false;        // The instruction fetched is not a branch instruction
+        branchInstruction[iteratorVal] = false;        // The instruction fetched is not a branch instruction
         return;                           // Return back to the main execute function of the IF stage since the instruction fetched is a non-branch instruction
     }
 
-    if (branchInstruction == true)        // Only execute this section if the fetched instruction is a branch instruction. Don't really need this check since the function returns to the caller before it can get here if it's not a branch instruction
+    if (branchInstruction[iteratorVal] == true)
     {
+      // Only execute this section if the fetched instruction is a branch instruction and if the none of the previous fetched instructions was for the current fetch cycle was a branch instruction. (This is being done to avoid complexity in storing an array of branch prediction results)
+      for (int j = (iteratorVal - 1); j >= 0; j--)
+      {
+        if (branchInstruction[j] == true)
+        {
+          return;     // Return from method since another branch instruction has been found in the current fetch cycle
+        }
+      }
+      
       switch (instructionType)            // Branch instructions can either be of RRR or RRI or I type only. It cannot be of RR or RI type. Note all source register location "fetches" are irrelevant since they are not used here - Only being done to be able to create an instruction object.
       {
         // RRR type
@@ -245,7 +274,6 @@ public class InstructionFetchStage implements IProcessorPipelineStage
         default:
           throw new IllegalInstructionException("Invalid instruction type for the fetched branch instruction! Instruction information couldn't be extracted! Check the executable/binary files for possible issues!");
       }
-      branchPredictor = pContext.getBranchPredictor();                              // Obtain a reference to the processor's branch prediction unit
       branchPredictorResult = branchPredictor.predict(instruction);                 // Call the predict method in the processor's branch predictor unit
       pContext.setNextInstructionBranchPredictionResult(branchPredictorResult);  
       if (branchPredictorResult == true)      // If branch predictor predicts true for the fetched instruction - Update temporary PC to branch target in the IF stage itself, otherwise carry on with normal execution
@@ -367,7 +395,7 @@ public class InstructionFetchStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Boolean variable stating if the latest fetched instruction is a branch instruction
    */
-  public boolean getBranchInstruction()
+  public boolean[] getBranchInstruction()
   {
     return branchInstruction;
   }

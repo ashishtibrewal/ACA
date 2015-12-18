@@ -23,15 +23,15 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
   // private Register cpuRegisters;
   // private Memory cpuMemory;
   private int[] instruction;                      /** Instruction to decode */
-  private String instructionBinary;
-  private int opCode;                           /** Stores decoded OpCode for an instruction */
-  private int sourceReg1;                       /** Source register 1 number - NOT THE VALUE STORED IN THIS REGISTER */            
-  private int sourceReg2;                       /** Source register 2 number - NOT THE VALUE STORED IN THIS REGISTER */            
-  private int destinationReg;                   /** Destination register number - NOT THE VALUE STORED IN THIS REGISTER */            
-  private int signedImmediate;                  /** Stores the signed immediate value encoded/embedded in the instruction */
-  private String instructionMnemonic;           /** Stores the instruction mnemonic */
-  private String instructionType;               /** Stores the type of the instruction */
-  private ExecutionUnit executionUnit;          /** Stores which EU should be used to execute the instruction */
+  private String[] instructionBinary;
+  private int[] opCode;                           /** Stores decoded OpCode for an instruction */
+  private int[] sourceReg1;                       /** Source register 1 number - NOT THE VALUE STORED IN THIS REGISTER */            
+  private int[] sourceReg2;                       /** Source register 2 number - NOT THE VALUE STORED IN THIS REGISTER */            
+  private int[] destinationReg;                   /** Destination register number - NOT THE VALUE STORED IN THIS REGISTER */            
+  private int[] signedImmediate;                  /** Stores the signed immediate value encoded/embedded in the instruction */
+  private String[] instructionMnemonic;           /** Stores the instruction mnemonic */
+  private String[] instructionType;               /** Stores the type of the instruction */
+  private ExecutionUnit[] executionUnit;          /** Stores which EU should be used to execute the instruction */
   private Register cpuRegisters;                /** Reference to architectural registers */
   private ProcessorPipelineContext pContext;    /** Reference to the processor pipeline context */
 
@@ -40,6 +40,19 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
   //     this.cpuRegisters = cpuRegisters;
   //     this.cpuMemory = cpuMemory;
   // }
+
+  public InstructionDecodeStage()
+  {
+    this.instructionBinary = new String[GlobalConstants.BUS_WIDTH];           // Instantiate array to avoid a null pointer exception
+    this.opCode = new int[GlobalConstants.BUS_WIDTH];                         // Instantiate array to avoid a null pointer exception
+    this.sourceReg1 = new int[GlobalConstants.BUS_WIDTH];                     // Instantiate array to avoid a null pointer exception       
+    this.sourceReg2 = new int[GlobalConstants.BUS_WIDTH];                     // Instantiate array to avoid a null pointer exception
+    this.destinationReg = new int[GlobalConstants.BUS_WIDTH];                 // Instantiate array to avoid a null pointer exception
+    this.signedImmediate = new int[GlobalConstants.BUS_WIDTH];;               // Instantiate array to avoid a null pointer exception
+    this.instructionMnemonic = new String[GlobalConstants.BUS_WIDTH];         // Instantiate array to avoid a null pointer exception
+    this.instructionType = new String[GlobalConstants.BUS_WIDTH];             // Instantiate array to avoid a null pointer exception
+    this.executionUnit = new ExecutionUnit[GlobalConstants.BUS_WIDTH];        // Instantiate array to avoid a null pointer exception
+  }
 
   public void execute(IPipelineContext context)
   {
@@ -66,47 +79,45 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
     }
     for (int i = 0; i < GlobalConstants.BUS_WIDTH; i++)
     {
-      instructionBinary = Utility.convertToBin(instruction[i], 0);   // Not using the Integer.toBinaryString() method because it truncates leading binary zero characters.
-      opCode = (instruction[i] >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
-      if(opCode > (Isa.ISA_TOTAL_INSTRUCTIONS - 1))     // Check if the opCode is valid (i.e. check if it's a valid instruction)
+      instructionBinary[i] = Utility.convertToBin(instruction[i], 0);   // Not using the Integer.toBinaryString() method because it truncates leading binary zero characters.
+      opCode[i] = (instruction[i] >> (Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH)) & (int)(Math.pow(2, Isa.OPCODE_LENGTH) - 1);     // Extract instruction OpCode (Logical AND with 31 since its 11111 in binary and opcode length is )
+      if(opCode[i] > (Isa.ISA_TOTAL_INSTRUCTIONS - 1))     // Check if the opCode is valid (i.e. check if it's a valid instruction)
       {
-        throw new IllegalInstructionException("Illegal instruction (Instruction with OpCode \"" + Utility.convertToBin(opCode, 0).substring((Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH), Isa.INSTRUCTION_LENGTH) + "\" is not specified in the ISA)."); 
+        throw new IllegalInstructionException("Illegal instruction (Instruction with OpCode \"" + Utility.convertToBin(opCode[i], 0).substring((Isa.INSTRUCTION_LENGTH - Isa.OPCODE_LENGTH), Isa.INSTRUCTION_LENGTH) + "\" is not specified in the ISA)."); 
       }
-      this.generateInstructionInformation(opCode);
-      nextInst[i] = this.extractInformation(i, instructionMnemonic, instructionType);
+      this.generateInstructionInformation(i);
+      nextInst[i] = this.extractInformation(i);
     }
     pContext.setNextInstruction(nextInst);        // Set the next set of instrutions to be used by the II stage
   }
 
   /**
    * Method to extract information for each type of instruction
-   * @param iteratorVal         Raw instruction
-   * @param instructionMnemonic Instruction mnemonic
-   * @param instructionType     Instruction type
-   * @return                    Decoded instruction object  
+   * @param iteratorVal Iterator value
+   * @return            Decoded instruction object  
    */
-  private Instruction extractInformation(int iteratorVal, String instructionMnemonic, String instructionType)
+  private Instruction extractInformation(int iteratorVal)
   {
-    switch (instructionType)
+    switch (instructionType[iteratorVal])
     {
       // RRR type
       case "RRR":
-        sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRR.S1_START, Isa.InstructionType.RRR.S1_END), false);
-        sourceReg2 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRR.S2_START, Isa.InstructionType.RRR.S2_END), false);
-        destinationReg = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRR.D_START, Isa.InstructionType.RRR.D_END), false);
-        signedImmediate = Isa.DEFAULT_IMM_VALUE;
-        return new Instruction(instructionType,
-                               instructionMnemonic,
-                               executionUnit,
-                               opCode, 
+        sourceReg1[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRR.S1_START, Isa.InstructionType.RRR.S1_END), false);
+        sourceReg2[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRR.S2_START, Isa.InstructionType.RRR.S2_END), false);
+        destinationReg[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRR.D_START, Isa.InstructionType.RRR.D_END), false);
+        signedImmediate[iteratorVal] = Isa.DEFAULT_IMM_VALUE;
+        return new Instruction(instructionType[iteratorVal],
+                               instructionMnemonic[iteratorVal],
+                               executionUnit[iteratorVal],
+                               opCode[iteratorVal], 
                                pContext.getCurrentMemoryFetchLoc()[iteratorVal],
                                instruction[iteratorVal],
                                Isa.InstructionType.RRR.NUMBER_OF_CYCLES,
                                pContext.getCurrentInstructionBranchPredictionResult(),
-                               sourceReg1,
-                               sourceReg2,
-                               destinationReg,
-                               signedImmediate);
+                               sourceReg1[iteratorVal],
+                               sourceReg2[iteratorVal],
+                               destinationReg[iteratorVal],
+                               signedImmediate[iteratorVal]);
         // TODO Check is the NOP instruction needs to be handled in a different manner when creating the Instruction object. Note that the way it's being done above should work for both. 
         // if (instructionMnemonic == "NOP")   // Check exceptional case for the instruction being NOP.
         // {
@@ -119,88 +130,88 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
       
       // RRI type
       case "RRI":
-        if (instructionMnemonic == "BEQ" || instructionMnemonic == "BNE" || instructionMnemonic == "BLT" || instructionMnemonic == "BGT")
+        if (instructionMnemonic[iteratorVal] == "BEQ" || instructionMnemonic[iteratorVal] == "BNE" || instructionMnemonic[iteratorVal] == "BLT" || instructionMnemonic[iteratorVal] == "BGT")
         {
-          sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
-          sourceReg2 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
-          destinationReg =  Isa.DEFAULT_REG_VALUE;
-          signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
+          sourceReg1[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
+          sourceReg2[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
+          destinationReg[iteratorVal] =  Isa.DEFAULT_REG_VALUE;
+          signedImmediate[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
           // System.out.println("Decoded instruction details: " + instructionMnemonic + " R" + sourceReg1 + ", R" + sourceReg2 + ", I" + signedImmediate);
         }
         else
         {
-          sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
-          sourceReg2 = Isa.DEFAULT_REG_VALUE;
-          destinationReg = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
-          signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
+          sourceReg1[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRI.S1_START, Isa.InstructionType.RRI.S1_END), false);
+          sourceReg2[iteratorVal] = Isa.DEFAULT_REG_VALUE;
+          destinationReg[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRI.D_START, Isa.InstructionType.RRI.D_END), false);
+          signedImmediate[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RRI.IMM_START, Isa.InstructionType.RRI.IMM_END), true);
           // System.out.println("Decoded instruction details: " + instructionMnemonic + " R" + destinationReg + ", R" + sourceReg1 + ", I" + signedImmediate);
         }
-        return new Instruction(instructionType,
-                               instructionMnemonic,
-                               executionUnit,
-                               opCode, 
+        return new Instruction(instructionType[iteratorVal],
+                               instructionMnemonic[iteratorVal],
+                               executionUnit[iteratorVal],
+                               opCode[iteratorVal], 
                                pContext.getCurrentMemoryFetchLoc()[iteratorVal],
                                instruction[iteratorVal],
                                Isa.InstructionType.RRI.NUMBER_OF_CYCLES,
                                pContext.getCurrentInstructionBranchPredictionResult(),
-                               sourceReg1,
-                               sourceReg2,
-                               destinationReg,
-                               signedImmediate);
+                               sourceReg1[iteratorVal],
+                               sourceReg2[iteratorVal],
+                               destinationReg[iteratorVal],
+                               signedImmediate[iteratorVal]);
 
       // RR type
       case "RR":
-        sourceReg1 = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RR.S1_START, Isa.InstructionType.RR.S1_END), false);
-        sourceReg2 = Isa.DEFAULT_REG_VALUE;
-        destinationReg = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RR.D_START, Isa.InstructionType.RR.D_END), false);
-        signedImmediate = Isa.DEFAULT_IMM_VALUE;
-        return new Instruction(instructionType,
-                               instructionMnemonic,
-                               executionUnit,
-                               opCode, 
+        sourceReg1[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RR.S1_START, Isa.InstructionType.RR.S1_END), false);
+        sourceReg2[iteratorVal] = Isa.DEFAULT_REG_VALUE;
+        destinationReg[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RR.D_START, Isa.InstructionType.RR.D_END), false);
+        signedImmediate[iteratorVal] = Isa.DEFAULT_IMM_VALUE;
+        return new Instruction(instructionType[iteratorVal],
+                               instructionMnemonic[iteratorVal],
+                               executionUnit[iteratorVal],
+                               opCode[iteratorVal], 
                                pContext.getCurrentMemoryFetchLoc()[iteratorVal],
                                instruction[iteratorVal],
                                Isa.InstructionType.RR.NUMBER_OF_CYCLES,
                                pContext.getCurrentInstructionBranchPredictionResult(),
-                               sourceReg1,
-                               destinationReg,
-                               signedImmediate);
+                               sourceReg1[iteratorVal],
+                               destinationReg[iteratorVal],
+                               signedImmediate[iteratorVal]);
         // System.out.println("Decoded instruction details: " + instructionMnemonic + " R" + destinationReg + ", R" + sourceReg1);
 
       // RI type
       case "RI":
-        sourceReg1 = Isa.DEFAULT_REG_VALUE;
-        sourceReg2 = Isa.DEFAULT_REG_VALUE;
-        destinationReg = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RI.D_START, Isa.InstructionType.RI.D_END), false);
-        signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.RI.IMM_START, Isa.InstructionType.RI.IMM_END), true);
-        return new Instruction(instructionType,
-                               instructionMnemonic,
-                               executionUnit,
-                               opCode, 
+        sourceReg1[iteratorVal] = Isa.DEFAULT_REG_VALUE;
+        sourceReg2[iteratorVal] = Isa.DEFAULT_REG_VALUE;
+        destinationReg[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RI.D_START, Isa.InstructionType.RI.D_END), false);
+        signedImmediate[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.RI.IMM_START, Isa.InstructionType.RI.IMM_END), true);
+        return new Instruction(instructionType[iteratorVal],
+                               instructionMnemonic[iteratorVal],
+                               executionUnit[iteratorVal],
+                               opCode[iteratorVal],
                                pContext.getCurrentMemoryFetchLoc()[iteratorVal],
                                instruction[iteratorVal],
                                Isa.InstructionType.RI.NUMBER_OF_CYCLES,
                                pContext.getCurrentInstructionBranchPredictionResult(),
-                               sourceReg1,
-                               destinationReg,
-                               signedImmediate);
+                               sourceReg1[iteratorVal],
+                               destinationReg[iteratorVal],
+                               signedImmediate[iteratorVal]);
         // System.out.println("Decoded instruction details: " + instructionMnemonic + " R" + destinationReg + ", I" + signedImmediate);
 
       // I type
       case "I":
-        sourceReg1 = Isa.DEFAULT_REG_VALUE;
-        sourceReg2 = Isa.DEFAULT_REG_VALUE;
-        destinationReg = Isa.DEFAULT_REG_VALUE;
-        signedImmediate = Utility.convertToInt(instructionBinary.substring(Isa.InstructionType.I.IMM_START, Isa.InstructionType.I.IMM_END), true);
-        return new Instruction(instructionType,
-                               instructionMnemonic,
-                               executionUnit,
-                               opCode, 
+        sourceReg1[iteratorVal] = Isa.DEFAULT_REG_VALUE;
+        sourceReg2[iteratorVal] = Isa.DEFAULT_REG_VALUE;
+        destinationReg[iteratorVal] = Isa.DEFAULT_REG_VALUE;
+        signedImmediate[iteratorVal] = Utility.convertToInt(instructionBinary[iteratorVal].substring(Isa.InstructionType.I.IMM_START, Isa.InstructionType.I.IMM_END), true);
+        return new Instruction(instructionType[iteratorVal],
+                               instructionMnemonic[iteratorVal],
+                               executionUnit[iteratorVal],
+                               opCode[iteratorVal], 
                                pContext.getCurrentMemoryFetchLoc()[iteratorVal],
                                instruction[iteratorVal],
                                Isa.InstructionType.I.NUMBER_OF_CYCLES,
                                pContext.getCurrentInstructionBranchPredictionResult(),
-                               signedImmediate);
+                               signedImmediate[iteratorVal]);
         // System.out.println("Decoded instruction details: " + instructionMnemonic + " I" + signedImmediate);
 
       // Shoudn't get here since it's an invalid instruction type
@@ -212,197 +223,197 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
 
   /**
    * * Method to generate instruction information depending on the OpCode
-   * @param opCode Instruction OpCode
+   * @param iteratorVal Iterator value
    */
-  private void generateInstructionInformation(int opCode)
+  private void generateInstructionInformation(int iteratorVal)
   {
-    switch (opCode)
+    switch (opCode[iteratorVal])
     {
       // NOP
       case Isa.NOP:
-        instructionMnemonic = "NOP";
-        instructionType = "RRR";    // Note that for simplicity, the NOP operation is classified as a RRR type instruction
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "NOP";
+        instructionType[iteratorVal] = "RRR";    // Note that for simplicity, the NOP operation is classified as a RRR type instruction
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
       
       // ADD dr, sr1, sr2
       case Isa.ADD:
-        instructionMnemonic = "ADD";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal]= "ADD";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // SUB dr, sr1, sr2
       case Isa.SUB:
-        instructionMnemonic = "SUB";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "SUB";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // MULT dr, sr1, sr2
       case Isa.MULT:
-        instructionMnemonic = "MULT";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "MULT";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // DIV dr, sr1, sr2
       case Isa.DIV:
-        instructionMnemonic = "DIV";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "DIV";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // ADDI dr, sr1, Ix
       case Isa.ADDI:
-        instructionMnemonic = "ADDI";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "ADDI";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // SUBI dr, sr1, Ix
       case Isa.SUBI:
-        instructionMnemonic = "SUBI";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "SUBI";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // AND dr, sr1, sr2
       case Isa.AND:
-        instructionMnemonic = "AND";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "AND";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // OR dr, sr1, sr2 
       case Isa.OR:
-        instructionMnemonic = "OR";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "OR";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // XOR dr, sr1, sr2
       case Isa.XOR:
-        instructionMnemonic = "XOR";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "XOR";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // NOT dr, sr1
       case Isa.NOT:
-        instructionMnemonic = "NOT";
-        instructionType = "RR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "NOT";
+        instructionType[iteratorVal] = "RR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // SLL dr, sr1, Ix
       case Isa.SLL:
-        instructionMnemonic = "SLL";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "SLL";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // SLR dr, sr1, Ix
       case Isa.SLR:
-        instructionMnemonic = "SLR";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "SLR";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // SLLV dr, s1, sr2
       case Isa.SLLV:
-        instructionMnemonic = "SLLV";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "SLLV";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // SRA dr, sr1, Ix
       case Isa.SRA:
-        instructionMnemonic = "SRA";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.ALU;
+        instructionMnemonic[iteratorVal] = "SRA";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.ALU;
         break;
 
       // LW dr, sr1, Ix
       case Isa.LW:
-        instructionMnemonic = "LW";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.LSU;
+        instructionMnemonic[iteratorVal] = "LW";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.LSU;
         break;
 
       // SW sr1, dr, Ix
       case Isa.SW:
-        instructionMnemonic = "SW";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.LSU;
+        instructionMnemonic[iteratorVal] = "SW";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.LSU;
         break;
 
       // MOVI dr, Ix
       case Isa.MOVI:
-        instructionMnemonic = "MOVI";
-        instructionType = "RI";
-        executionUnit = ExecutionUnit.LSU;
+        instructionMnemonic[iteratorVal] = "MOVI";
+        instructionType[iteratorVal] = "RI";
+        executionUnit[iteratorVal] = ExecutionUnit.LSU;
         break;
 
       // MOVR dr, sr1
       case Isa.MOVR:
-        instructionMnemonic = "MOVR";
-        instructionType = "RR";
-        executionUnit = ExecutionUnit.LSU;
+        instructionMnemonic[iteratorVal] = "MOVR";
+        instructionType[iteratorVal] = "RR";
+        executionUnit[iteratorVal] = ExecutionUnit.LSU;
         break;
 
       // BU Ix
       case Isa.BU:
-        instructionMnemonic = "BU";
-        instructionType = "I";
-        executionUnit = ExecutionUnit.BU;
+        instructionMnemonic[iteratorVal] = "BU";
+        instructionType[iteratorVal] = "I";
+        executionUnit[iteratorVal] = ExecutionUnit.BU;
         break;
 
       // BL Ix
       case Isa.BL:
-        instructionMnemonic = "BL";
-        instructionType = "I";
-        executionUnit = ExecutionUnit.BU;
+        instructionMnemonic[iteratorVal] = "BL";
+        instructionType[iteratorVal] = "I";
+        executionUnit[iteratorVal] = ExecutionUnit.BU;
         break;
 
       // BEQ sr1, sr2, Ix
       case Isa.BEQ:
-        instructionMnemonic = "BEQ";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.BU;
+        instructionMnemonic[iteratorVal] = "BEQ";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.BU;
         break;
 
       // BNE sr1, sr2, Ix
       case Isa.BNE:
-        instructionMnemonic = "BNE";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.BU;
+        instructionMnemonic[iteratorVal] = "BNE";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.BU;
         break;
 
       // BLT sr1, sr2, Ix
       case Isa.BLT:
-        instructionMnemonic = "BLT";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.BU;
+        instructionMnemonic[iteratorVal] = "BLT";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.BU;
         break;
 
       // BGT sr1, sr2, Ix
       case Isa.BGT:
-        instructionMnemonic = "BGT";
-        instructionType = "RRI";
-        executionUnit = ExecutionUnit.BU;
+        instructionMnemonic[iteratorVal] = "BGT";
+        instructionType[iteratorVal] = "RRI";
+        executionUnit[iteratorVal] = ExecutionUnit.BU;
         break;
 
       // RET
       case Isa.RET:
-        instructionMnemonic = "RET";
-        instructionType = "RRR";
-        executionUnit = ExecutionUnit.BU;
+        instructionMnemonic[iteratorVal] = "RET";
+        instructionType[iteratorVal] = "RRR";
+        executionUnit[iteratorVal] = ExecutionUnit.BU;
         break;
 
       // Default case. This condition should never be reached (Primarily because an invalid instruction can never be written to the IR).
       default:
-        instructionMnemonic = "INVALID";
+        instructionMnemonic[iteratorVal] = "INVALID";
         System.err.println("Invalid Instruction! Instruction couldn't be decoded!");
         // TODO Find how to throw a new exception
         break;
@@ -416,15 +427,15 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
   public void flush(IPipelineContext context)
   {
     Arrays.fill(instruction, GlobalConstants.DEFAULT_INSTRUCTION);
-    instructionBinary = Utility.convertToBin(GlobalConstants.DEFAULT_INSTRUCTION, 0);   
-    opCode = GlobalConstants.DEFAULT_INSTRUCTION_OPCODE;              
-    sourceReg1 = Isa.DEFAULT_REG_VALUE;          
-    sourceReg2 = Isa.DEFAULT_REG_VALUE;          
-    destinationReg = Isa.DEFAULT_REG_VALUE;      
-    signedImmediate = Isa.DEFAULT_IMM_VALUE;     
-    instructionMnemonic = GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC; 
-    instructionType = GlobalConstants.DEFAULT_INSTRUCTION_TYPE;     
-    executionUnit = GlobalConstants.DEFAULT_EXECUTION_UNIT;
+    Arrays.fill(instructionBinary, Utility.convertToBin(GlobalConstants.DEFAULT_INSTRUCTION, 0));
+    Arrays.fill(opCode, GlobalConstants.DEFAULT_INSTRUCTION_OPCODE);
+    Arrays.fill(sourceReg1, Isa.DEFAULT_REG_VALUE);
+    Arrays.fill(sourceReg2, Isa.DEFAULT_REG_VALUE);
+    Arrays.fill(destinationReg, Isa.DEFAULT_REG_VALUE);
+    Arrays.fill(signedImmediate, Isa.DEFAULT_IMM_VALUE);
+    Arrays.fill(instructionMnemonic, GlobalConstants.DEFAULT_INSTRUCTION_MNEMONIC);
+    Arrays.fill(instructionType, GlobalConstants.DEFAULT_INSTRUCTION_TYPE);
+    Arrays.fill(executionUnit, GlobalConstants.DEFAULT_EXECUTION_UNIT);
   }
 
   /**
@@ -442,7 +453,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Current decoded instruction mnemonic 
    */
-  public String getCurrentInstructionMnemonic()
+  public String[] getCurrentInstructionMnemonic()
   {
     return instructionMnemonic;
   }
@@ -452,7 +463,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Current decoded instruction type
    */
-  public String getCurrentInstructionType()
+  public String[] getCurrentInstructionType()
   {
     return instructionType;
   }
@@ -462,7 +473,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Current decoded source register 1 location
    */
-  public int getCurrentSourceReg1()
+  public int[] getCurrentSourceReg1()
   {
     return sourceReg1;
   }
@@ -472,7 +483,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Current decoded source register 2 location
    */
-  public int getCurrentSourceReg2()
+  public int[] getCurrentSourceReg2()
   {
     return sourceReg2;
   }
@@ -483,7 +494,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Current decoded destination register location
    */
-  public int getCurrentDestinationReg()
+  public int[] getCurrentDestinationReg()
   {
     return destinationReg;
   }
@@ -493,7 +504,7 @@ public class InstructionDecodeStage implements IProcessorPipelineStage
    * USED ONLY FOR PRINTING AND DEBUGGING.
    * @return Current decoded signed immediate value
    */
-  public int getCurrentSignedImmediate()
+  public int[] getCurrentSignedImmediate()
   {
     return signedImmediate;
   }
