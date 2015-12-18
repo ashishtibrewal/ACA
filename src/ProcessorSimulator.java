@@ -119,7 +119,7 @@ public class ProcessorSimulator
       ((ProcessorPipelineContext) pipelineContext).setCorrectBranchPrediction(GlobalConstants.CORRECT_BRANCH_PREDICTION_RESULT);     // Revert the variable back to it's default value after the pipeline has been flushed
     }
     ((InstructionFetchStage) ((ProcessorPipelineContext) pipelineContext).getIF_Stage()).resetBranchPredictorResult();     // Reset the branch predictor result in the IF stage back to its default value at the end of every cycle
-    //this.dumpState();                             // Dump the state of the cpu every cycle
+    // this.dumpState();                             // Dump the state of the cpu every cycle
   }
 
   /**
@@ -255,6 +255,9 @@ public class ProcessorSimulator
       System.out.println("###              RUNNING THE CPU SIMULATOR              ###");
       System.out.println("###########################################################");
       System.out.println("CPU simulator starting program execution. \n");
+      System.err.println(">>>>>>>>>>>> Dumping initial state of CPU <<<<<<<<<<<< ");
+      cpu.dumpState();
+      System.out.println();
       //for(int numCycles = 0; numCycles < GlobalConstants.NUM_ITERATIONS; numCycles++)
       while (((ProcessorPipelineContext) pipelineContext).getCpuRegisters().readGP(GlobalConstants.SVC_REGISTER) != GlobalConstants.SVC_SUSPEND)
       {  

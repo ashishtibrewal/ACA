@@ -225,12 +225,12 @@ public class Memory
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* N-th Fibonacci number correct way to write it in assembly */
-    ///*
+    /* N-th Fibonacci number correct way to write it in assembly (N = 46)*/
+    /*
     memoryArray[0] = Utility.convertToInt("10001000000000000000000000010001", true); // MOVI R1, 1 (Move 1 into R1)
     memoryArray[1] = Utility.convertToInt("10001000000000000000000000010010", true); // MOVI R2, 1 (Move 1 into R2)
     memoryArray[2] = Utility.convertToInt("10001000000000000000000000110011", true); // MOVI R3, 3 (Move 3 into R3)
-    memoryArray[3] = Utility.convertToInt("10001000000000000000000101000100", true); // MOVI R4, 20 (Move 20 into R4)
+    memoryArray[3] = Utility.convertToInt("10001000000000000000001011100100", true); // MOVI R4, 46 (Move 46 into R4)
     memoryArray[4] = Utility.convertToInt("11000000000000000000011000110100", true); // BGT R3, R4, 6
     memoryArray[5] = Utility.convertToInt("00001000000000000000001000010101", true); // ADD R5, R1, R2 (Add R1 and R2 and store results in R5)
     memoryArray[6] = Utility.convertToInt("10010000000000000000000000100001", true); // MOVR R1, R2 (Move R2 into R1)
@@ -238,7 +238,7 @@ public class Memory
     memoryArray[8] = Utility.convertToInt("00101000000000000000000100110011", true); // ADDI R3, R3, 1 (Add 1 to R3 and store the result in R3)
     memoryArray[9] = Utility.convertToInt("10011000000000001111111111111011", true); // BU -5
     memoryArray[10] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated 
-    //*/
+    */
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,14 +246,14 @@ public class Memory
     /*
     memoryArray[0] = Utility.convertToInt("10001000000000000001001011000001", true); // MOVI R1, 1 (Move 300 into R1)
     memoryArray[1] = Utility.convertToInt("10001000000000000000111000010010", true); // MOVI R2, 1 (Move 225 into R2)   
-    memoryArray[2] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard) 
-    memoryArray[3] = Utility.convertToInt("10101000000000000000011000010010", true); // BEQ R1, R2, 6
-    memoryArray[4] = Utility.convertToInt("11000000000000000000001100010010", true); // BGT R1, R2, 3
-    memoryArray[5] = Utility.convertToInt("00010000000000000000000100100010", true); // SUB R2, R2, R1
-    memoryArray[6] = Utility.convertToInt("10011000000000000000000000000010", true); // BU 2
-    memoryArray[7] = Utility.convertToInt("00010000000000000000001000010001", true); // SUB R1, R1, R2
-    memoryArray[8] = Utility.convertToInt("10011000000000001111111111111011", true); // BU -5
-    memoryArray[9] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated
+    //memoryArray[2] = Utility.convertToInt("00000000000000000000000000000000", true); // NOP (Inserting a NOP to avoid control dependency hazard) 
+    memoryArray[2] = Utility.convertToInt("10101000000000000000011000010010", true); // BEQ R1, R2, 6
+    memoryArray[3] = Utility.convertToInt("11000000000000000000001100010010", true); // BGT R1, R2, 3
+    memoryArray[4] = Utility.convertToInt("00010000000000000000000100100010", true); // SUB R2, R2, R1
+    memoryArray[5] = Utility.convertToInt("10011000000000000000000000000010", true); // BU 2
+    memoryArray[6] = Utility.convertToInt("00010000000000000000001000010001", true); // SUB R1, R1, R2
+    memoryArray[7] = Utility.convertToInt("10011000000000001111111111111011", true); // BU -5
+    memoryArray[8] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated
     */
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
   
@@ -274,7 +274,39 @@ public class Memory
     // Note need at least three NOP instruction's before returning from the method.
     memoryArray[16] = Utility.convertToInt("11001000000000000000000000000000", true); // RET (Return from function call)
     */
-   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+   
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* Bubble sort (Ascending order) */
+    // n = 5
+    // Start            -> 10,4,11,1,3
+    // Expected finish  -> 1,3,4,a,b
+   
+    // Load array values into memory (.data section)
+    memoryArray[200] = Utility.convertToInt("00000000000000000000000000001010", true);  //10 (0xa)
+    memoryArray[201] = Utility.convertToInt("00000000000000000000000000000100", true);  //4  (0x4)
+    memoryArray[202] = Utility.convertToInt("00000000000000000000000000001011", true);  //11 (0xb)
+    memoryArray[203] = Utility.convertToInt("00000000000000000000000000000001", true);  //1  (0x1)
+    memoryArray[204] = Utility.convertToInt("00000000000000000000000000000011", true);  //3  (0x3)
+
+    // Main program (.text section)
+    memoryArray[0] = Utility.convertToInt("10001000000000000000000000110011", true); // MOVI R3, 3 (n - 2)
+    memoryArray[1] = Utility.convertToInt("10001000000000000000000000000001", true); // MOVI R1, 0
+    memoryArray[2] = Utility.convertToInt("11000000000000000000111000010011", true); // BGT R1, R3, 14
+    memoryArray[3] = Utility.convertToInt("00101000000000000000000100010001", true); // ADDI R1, R1, 1
+    memoryArray[4] = Utility.convertToInt("10001000000000000000000000000010", true); // MOVI R2, 0
+    memoryArray[5] = Utility.convertToInt("11000000111111111111110100100011", true); // BGT R2, R3, -3
+    memoryArray[6] = Utility.convertToInt("01111000000000001100100000100101", true); // LW R5, R2, 200
+    memoryArray[7] = Utility.convertToInt("00101000000000000000000100100111", true); // ADDI R7, R2, 1
+    memoryArray[8] = Utility.convertToInt("10010000000000000000000000101001", true); // MOVR R9, R2
+    memoryArray[9] = Utility.convertToInt("00101000000000000000000100100010", true); // ADDI R2, R2, 1
+    memoryArray[10] = Utility.convertToInt("01111000000000001100100001110110", true); // LW R6, R7, 200
+    memoryArray[11] = Utility.convertToInt("10111000000000000000010001010110", true); // BLT R5, R6, 4
+    memoryArray[12] = Utility.convertToInt("10010000000000000000000001011000", true); // MOVR R8, R5
+    memoryArray[13] = Utility.convertToInt("10000000000000001100100001101001", true); // SW R6, R9, 200
+    memoryArray[14] = Utility.convertToInt("10000000000000001100100010000111", true); // SW R8, R7, 200
+    memoryArray[15] = Utility.convertToInt("10011000000000001111111111110110", true); // BU -10
+    memoryArray[16] = Utility.convertToInt("10001000000000000000111111111111", true); // MOVI R16, 255 (Move 255 into R16)  - SVC call to suspend/halt the program being simulated
   }
 
   /**

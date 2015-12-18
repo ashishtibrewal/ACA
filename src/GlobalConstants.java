@@ -16,7 +16,7 @@ public final class GlobalConstants
 
   // Memory constants
   // public static final int MEMORY_SIZE = 1024;
-  public static final int MEMORY_SIZE = 32;
+  public static final int MEMORY_SIZE = 256;
   public static final int MEMORY_INITIALIZATION_VALUE = 0;
   //public static final int STACK_SIZE = 1024;                    // Not used since by default the Stack class in Java doesn't support a constructor with a parameter specifying the size
 
